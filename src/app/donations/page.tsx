@@ -39,6 +39,7 @@ export default function DonationPage() {
                 <span className="sr-only">Gabon Relief Hub</span>
                 </Link>
                 <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
+                <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Accueil</Link>
                 <Button asChild variant="ghost">
                     <Link href="/login">Connexion</Link>
                 </Button>
