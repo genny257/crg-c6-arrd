@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -10,6 +11,7 @@ import {
   User,
   LogOut,
   Settings,
+  LineChart,
 } from "lucide-react"
 
 import {
@@ -19,13 +21,18 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
+  SidebarSeparator,
 } from "@/components/ui/sidebar"
 
-const navItems = [
+const mainNavItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Tableau de bord" },
   { href: "/dashboard/missions", icon: Briefcase, label: "Missions" },
   { href: "/dashboard/volunteers", icon: Users, label: "Volontaires" },
-  { href: "/dashboard/donations", icon: HeartHandshake, label: "Dons" },
+]
+
+const reportsNavItems = [
+    { href: "/dashboard/donations", icon: HeartHandshake, label: "Dons" },
+    // { href: "/dashboard/analytics", icon: LineChart, label: "Statistiques" },
 ]
 
 export function AppNav() {
@@ -57,11 +64,31 @@ export function AppNav() {
       </SidebarHeader>
       <SidebarContent className="p-2">
         <SidebarMenu>
-          {navItems.map((item) => (
+          {mainNavItems.map((item) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild
-                isActive={pathname.startsWith(item.href) && (item.href !== '/dashboard' || pathname === '/dashboard')}
+                isActive={pathname === item.href}
+                tooltip={item.label}
+              >
+                <Link href={item.href}>
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+        <SidebarSeparator />
+         <SidebarMenu>
+            <SidebarMenuItem>
+                <span className="px-2 text-xs font-medium text-muted-foreground group-data-[collapsible=icon]:hidden">Rapports</span>
+            </SidebarMenuItem>
+          {reportsNavItems.map((item) => (
+            <SidebarMenuItem key={item.href}>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname.startsWith(item.href)}
                 tooltip={item.label}
               >
                 <Link href={item.href}>
@@ -83,6 +110,15 @@ export function AppNav() {
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton tooltip="Paramètres" asChild>
+                    <Link href="#">
+                        <Settings className="h-4 w-4" />
+                        <span>Paramètres</span>
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarSeparator />
             <SidebarMenuItem>
                 <SidebarMenuButton tooltip="Déconnexion" asChild>
                     <Link href="/">
