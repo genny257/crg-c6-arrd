@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
-import { HeartHandshake, Users, ShieldCheck } from "lucide-react"
+import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy } from "lucide-react"
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-[100dvh] bg-background">
-      <header className="px-4 lg:px-6 h-14 flex items-center bg-card shadow-sm z-10">
+      <header className="px-4 lg:px-6 h-14 flex items-center bg-card shadow-sm z-10 sticky top-0">
         <Link href="#" className="flex items-center justify-center" prefetch={false}>
           <svg
             width="32"
@@ -26,17 +26,17 @@ export default function Home() {
           <span className="sr-only">Gabon Relief Hub</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
-          <Link href="#features" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
-            Fonctionnalités
+          <Link href="#actions" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
+            Nos Actions
           </Link>
-          <Link href="#about" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
-            À propos
+          <Link href="#engagement" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
+            S'engager
           </Link>
           <Button asChild variant="ghost">
             <Link href="/login">Connexion</Link>
           </Button>
           <Button asChild>
-            <Link href="/login">Devenir Volontaire</Link>
+            <Link href="/login">Faire un Don</Link>
           </Button>
         </nav>
       </header>
@@ -56,7 +56,7 @@ export default function Home() {
                 </p>
                 <div className="space-x-4 mt-6">
                   <Button asChild size="lg">
-                    <Link href="/login">Faire un Don</Link>
+                    <Link href="/login">Devenir Volontaire</Link>
                   </Button>
                   <Button asChild size="lg" variant="outline">
                     <Link href="/dashboard/missions">Voir les Missions</Link>
@@ -75,43 +75,45 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-card">
+        
+        <section id="actions" className="w-full py-12 md:py-24 lg:py-32 bg-card">
           <div className="container space-y-12 px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Nos Piliers</div>
+                <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Nos Actions</div>
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Agir. Aider. Protéger.</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Notre plateforme est conçue pour optimiser chaque aspect de nos opérations humanitaires, de la gestion des dons à la coordination des missions sur le terrain.
+                  Découvrez comment nous intervenons sur le terrain pour apporter une aide concrète et un soutien essentiel aux communautés.
                 </p>
               </div>
             </div>
             <div className="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
               <div className="grid gap-2 text-center p-4 rounded-lg hover:bg-background transition-colors">
-                <HeartHandshake className="h-10 w-10 mx-auto text-primary" />
-                <h3 className="text-lg font-bold font-headline mt-2">Dons Simplifiés</h3>
-                <p className="text-sm text-muted-foreground">
-                  Un portail sécurisé pour les donateurs, permettant de suivre leurs contributions et de recevoir des reçus instantanément.
-                </p>
-              </div>
-              <div className="grid gap-2 text-center p-4 rounded-lg hover:bg-background transition-colors">
-                <Users className="h-10 w-10 mx-auto text-primary" />
-                <h3 className="text-lg font-bold font-headline mt-2">Gestion des Volontaires</h3>
-                <p className="text-sm text-muted-foreground">
-                  Recrutez, formez et assignez des volontaires aux missions en fonction de leurs compétences et disponibilités.
-                </p>
-              </div>
-              <div className="grid gap-2 text-center p-4 rounded-lg hover:bg-background transition-colors">
                 <ShieldCheck className="h-10 w-10 mx-auto text-primary" />
-                <h3 className="text-lg font-bold font-headline mt-2">Missions Efficaces</h3>
+                <h3 className="text-lg font-bold font-headline mt-2">Urgences & Secourisme</h3>
                 <p className="text-sm text-muted-foreground">
-                  Planifiez, suivez et archivez chaque mission avec des outils de cartographie et de reporting intégrés.
+                  Intervention rapide lors de catastrophes naturelles et gestion des postes de secours pour les événements publics.
+                </p>
+              </div>
+              <div className="grid gap-2 text-center p-4 rounded-lg hover:bg-background transition-colors">
+                <LifeBuoy className="h-10 w-10 mx-auto text-primary" />
+                <h3 className="text-lg font-bold font-headline mt-2">Aide Sociale & Sanitaire</h3>
+                <p className="text-sm text-muted-foreground">
+                  Soutien aux plus vulnérables avec des aides matérielles, financières, et un accompagnement médicosocial.
+                </p>
+              </div>
+              <div className="grid gap-2 text-center p-4 rounded-lg hover:bg-background transition-colors">
+                <BookOpenCheck className="h-10 w-10 mx-auto text-primary" />
+                <h3 className="text-lg font-bold font-headline mt-2">Formations</h3>
+                <p className="text-sm text-muted-foreground">
+                  Apprenez les gestes qui sauvent et développez vos compétences avec nos formations certifiées.
                 </p>
               </div>
             </div>
           </div>
         </section>
-        <section id="about" className="w-full py-12 md:py-24 lg:py-32">
+        
+        <section id="engagement" className="w-full py-12 md:py-24 lg:py-32">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">Rejoignez le Mouvement</h2>
@@ -119,13 +121,27 @@ export default function Home() {
                 Votre engagement peut changer des vies. Devenez volontaire ou faites un don dès aujourd'hui.
               </p>
             </div>
-            <div className="flex justify-center space-x-4 mt-4">
-               <Button asChild size="lg">
-                <Link href="/login">Devenir Volontaire</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link href="/login">Faire un Don</Link>
-              </Button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
+                <div className="grid gap-2 text-center p-6 rounded-lg hover:bg-card transition-colors border w-full sm:w-auto">
+                    <HeartHandshake className="h-10 w-10 mx-auto text-primary" />
+                    <h3 className="text-lg font-bold font-headline mt-2">Devenir Volontaire</h3>
+                    <p className="text-sm text-muted-foreground">
+                        Donnez de votre temps et de vos compétences pour aider les autres.
+                    </p>
+                    <Button asChild className="mt-4">
+                        <Link href="/login">S'inscrire</Link>
+                    </Button>
+                </div>
+                <div className="grid gap-2 text-center p-6 rounded-lg hover:bg-card transition-colors border w-full sm:w-auto">
+                    <HeartHandshake className="h-10 w-10 mx-auto text-primary" />
+                    <h3 className="text-lg font-bold font-headline mt-2">Faire un Don</h3>
+                    <p className="text-sm text-muted-foreground">
+                        Soutenez financièrement nos actions pour amplifier notre impact.
+                    </p>
+                    <Button asChild variant="secondary" className="mt-4">
+                        <Link href="/login">Contribuer</Link>
+                    </Button>
+                </div>
             </div>
           </div>
         </section>
