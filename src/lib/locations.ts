@@ -1,136 +1,125 @@
 export const locations = {
-  "Province_1": {
-    "Département_1": {
+  "Estuaire": {
+    "Libreville": {
       "communes": {
-        "Commune_1": {
+        "Libreville": {
           "arrondissements": {
-            "Arrondissement_1": [
-              "Quartier_1",
-              "Quartier_2",
-              "Quartier_3",
-              "Quartier_4",
-              "Quartier_5"
+            "1er arrondissement": [
+              "Aéroport", "Okala Sud", "Mikolongo", "Lycée Indjendjet Gondjout",
+              "Alibandeng", "Pierre de Mbigou", "Camp de Gaulle", "Tahiti",
+              "Ambowé", "Charbonnages", "Cité de la Démocratie", "Lac Bleu",
+              "Diba Diba", "Ondogo 1", "Bel‑Air"
             ],
-            "Arrondissement_2": [
-              "Quartier_1",
-              "Quartier_2",
-              "Quartier_3",
-              "Quartier_4",
-              "Quartier_5"
-            ]
-          },
-          "quartiers": [
-            "Quartier_6",
-            "Quartier_7",
-            "Quartier_8",
-            "Quartier_9"
-          ]
-        },
-        "Commune_2": {
-          "arrondissements": {
-            "Arrondissement_1": [
-              "Quartier_1",
-              "Quartier_2",
-              "Quartier_3",
-              "Quartier_4",
-              "Quartier_5"
+            "2e arrondissement": [
+              "Université Omar Bongo", "ancien site RTG", "Plaine Orety",
+              "Saint‑Nicolas", "Port‑Môle", "Vallée Sainte‑Marie", "Archevêché",
+              "Jean Paul II", "Bessieux", "Hôtel de Ville", "Fonction Publique",
+              "Cocotiers", "Atong‑Abé", "Nkembo", "La Campagne", "SOTEGA",
+              "SOCIGA", "Avéa", "Atsib‑Ntsos", "USSO", "Cité de la Caisse",
+              "Cité MEBIAME"
             ],
-            "Arrondissement_2": [
-              "Quartier_1",
-              "Quartier_2",
-              "Quartier_3",
-              "Quartier_4",
-              "Quartier_5"
-            ]
-          },
-          "quartiers": [
-            "Quartier_6",
-            "Quartier_7",
-            "Quartier_8",
-            "Quartier_9"
-          ]
-        },
-        "Commune_3": {
-          "arrondissements": {
-            "Arrondissement_1": [
-              "Quartier_1",
-              "Quartier_2",
-              "Quartier_3",
-              "Quartier_4",
-              "Quartier_5"
+            "3e arrondissement": [
+              "Sorbonne", "Mont‑Bouët", "Sainte‑Anne", "Akémindjogoni",
+              "Abénélang", "Cinq Palmiers", "Carrefour Hassan", "Présidence",
+              "CHUL", "Avenue de Cointet", "Derrière l’Hôpital", "Montagne Sainte",
+              "Petit‑Paris", "La Peyrie", "Peyrie Dakar", "Akébé‑Ville",
+              "Nombakélé‑Nord", "Stade Omnisports", "STFO", "Venez‑Voir",
+              "Likouala", "Akébé Plaine", "Belle‑Vue", "Belle‑Vue II",
+              "Kinguélé I", "Kinguélé II", "Plein Ciel", "Akébé Frontière",
+              "Awendjé Zone B2", "Belles‑Peintures", "Dragon", "Cosmopark",
+              "Rio", "Terre Nouvelle", "PK5", "PK6", "PK7", "PK8"
             ],
-            "Arrondissement_2": [
-              "Quartier_1",
-              "Quartier_2",
-              "Quartier_3",
-              "Quartier_4",
-              "Quartier_5"
-            ]
-          },
-          "quartiers": [
-            "Quartier_6",
-            "Quartier_7",
-            "Quartier_8",
-            "Quartier_9"
-          ]
-        }
-      },
-      "cantons": {
-        "Canton_1": [
-          "Village_1",
-          "Village_2",
-          "Village_3",
-          "Village_4"
-        ],
-        "Canton_2": [
-          "Village_1",
-          "Village_2",
-          "Village_3",
-          "Village_4"
-        ]
-      }
-    },
-    "Département_2": {
-      "communes": {
-        "Commune_1": {
-          "arrondissements": {
-            "Arrondissement_1": [
-              "Quartier_1",
-              "Quartier_2",
-              "Quartier_3",
-              "Quartier_4",
-              "Quartier_5"
+            "4e arrondissement": [
+              "Ambilambani", "Baraka", "Carrefour Boulingui", "Plaine Niger",
+              "Awendjé II", "Poste Centrale", "Hollando", "BICIG Centre",
+              "Waterman", "Chambre de Commerce", "Saint‑Benoît",
+              "Nombakélé‑Sud", "Batavéa", "London", "Saint‑Michel",
+              "Toulon", "Glass"
             ],
-            "Arrondissement_2": [
-              "Quartier_1",
-              "Quartier_2",
-              "Quartier_3",
-              "Quartier_4",
-              "Quartier_5"
-            ]
-          },
-          "quartiers": [
-            "Quartier_6",
-            "Quartier_7",
-            "Quartier_8",
-            "Quartier_9"
-          ]
-        }
-      }
-    }
-  },
-  "Province_2": {
-    "Département_1": {
-      "communes": {
-        "Commune_1": {
-          "arrondissements": {
-            "Arrondissement_1": [
-              "Quartier_1",
-              "Quartier_2",
+            "5e arrondissement": [
+              "Plein‑Ciel", "Cité Damas", "Bisségué", "Beau‑Séjour",
+              "Terre Nouvelle", "FOPI", "Mindoubé I", "Mindoubé II", "IAI",
+              "Golf", "Ozangué", "PK10", "Melen ENA", "Nzeng‑Miang", "PK11",
+              "Lalala Gauche", "Lalala Droite", "Lalala Dakar", "ACAE",
+              "SODUCO", "Zone Industrielle d’Oloumi", "Ozoungué", "INJS"
+            ],
+            "6e arrondissement": [
+              "Ondogo 2", "Montalier", "Lycée Djoué Dabany", "PK9", "PK10",
+              "PK11", "PK12", "Derrière l’Hôpital Militaire", "Melen",
+              "Oveng", "Bambouchine", "Akougbe", "Sibang‑Nkol‑Ogoum",
+              "Sibang‑Arboretum", "Adzébé‑Sibang", "Marché‑Bananes", "SGA",
+              "Nzeng‑Ayong"
             ]
           }
         }
+      },
+      "cantons": {}
+    },
+    "Komo": {
+      "communes": {
+        "Kango": {"arrondissements": {}, "quartiers": []}
+      },
+      "cantons": {
+        "Bokoué": ["Village Bokoué‑1", "Village Bokoué‑2"],
+        "Engong": ["Village Engong‑1"],
+        "Komo": ["Village Komo‑1"]
+      }
+    },
+    "Komo-Mondah": {
+      "communes": {
+        "Ntoum": {"arrondissements": {}, "quartiers": []},
+        "Owendo": {"arrondissements": {}, "quartiers": []}
+      },
+      "cantons": {
+        "Ikoy-Tsini": ["Village Ikoy‑1"],
+        "Komo-Ntoum": ["Village Komo‑Ntoum‑1"],
+        "Mbéi": ["Village Mbéi‑1"],
+        "Océan-Gongoué": ["Village Océan‑1"]
+      }
+    },
+    "Komo-Océan": {
+      "communes": {
+        "Ndzomoé": {"arrondissements": {}, "quartiers": []}
+      },
+      "cantons": {
+        "Remboué-Gongoué": ["Village Remboué‑1"],
+        "Océan-Gongoué": ["Village Océan‑2"]
+      }
+    },
+    "Noya": {
+      "communes": {
+        "Cocobeach": {"arrondissements": {}, "quartiers": []}
+      },
+      "cantons": {
+        "Mouni-Noya": ["Village Mouni‑1"],
+        "Océan-Mondah": ["Village Océan‑3"]
       }
     }
-  }
-}
+  },
+  "Haut-Ogooué": {
+    "Département Test 1": {
+      "communes": {
+        "Commune Test 1": {
+          "arrondissements": {
+            "Arrondissement Test 1": ["Quartier Test 1", "Quartier Test 2"]
+          }
+        }
+      },
+      "cantons": {}
+    }
+  },
+  "Moyen-Ogooué": {
+    "Département Test 2": {
+      "communes": {},
+      "cantons": {
+        "Canton Test 1": ["Village Test 1"]
+      }
+    }
+  },
+  "Ngounié": {},
+  "Nyanga": {},
+  "Ogooué-Ivindo": {},
+  "Ogooué-Lolo": {},
+  "Ogooué-Maritime": {},
+  "Woleu-Ntem": {}
+};
