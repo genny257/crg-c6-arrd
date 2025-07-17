@@ -319,10 +319,56 @@ export const locations = {
     "Zadié": { "communes": {}, "cantons": {} }
   },
   "Ogooué-Lolo": {
-    "Lolo-Bouenguidi": { "communes": {}, "cantons": {} },
-    "Lombo-Bouenguidi": { "communes": {}, "cantons": {} },
+    "Lolo-Bouenguidi": {
+        "communes": {
+            "Koulamoutou": {
+                "arrondissements": {
+                    "1er Arrondissement": ["École Urbaine I", "École Urbaine II", "CES Louis Richer"],
+                    "2ème Arrondissement": ["École Urbaine III", "École Urbaine IV", "École Publique de Poungou", "CES Jean-Baptiste ANDOUKA"],
+                    "3ème Arrondissement": ["École Urbaine V", "École Urbaine VI", "Collège Ambouroue-Avaro"]
+                },
+                "quartiers": []
+            }
+        },
+        "cantons": {
+            "Haute-Lolo": ["Moukouangou", "Pounga", "Poungou-Douala", "Pongo", "Nzama", "Okouma", "Madjingo", "Akouana"],
+            "Lolo-Waboura": ["Mbigou 1", "Mbigou 2", "Mandji", "Moukouadi", "Diboundji 1", "Diboundji 2"],
+            "Lolo-Wagny": ["Okala 1", "Okala 2", "Libounou", "Mikouyi", "Otala", "Mouvindi 1", "Mouvindi 2"],
+            "Loué": ["Iboundji", "Loué", "Dienga", "Diyanga"],
+            "Mingala": ["Abongou", "Otoumbi", "Bilala", "Mboungou", "Diabouka", "Ngouadi", "Mandji-Mikouyi"],
+            "Ogooué-Lolo": ["Poungou-Ndindi", "Dilolo", "Akouani"]
+        }
+    },
+    "Lombo-Bouenguidi": {
+        "communes": {
+            "Pana": {
+                "arrondissements": {},
+                "quartiers": ["École Publique Pana", "Lycée d'État de Pana", "CES de Pana"]
+            }
+        },
+        "cantons": {
+            "Basse-Lombo": ["Dilolo", "Madouma", "Mivoula", "Pounga"],
+            "Bouenguidi": ["Akieni 1", "Akieni 2", "Dibwangui", "Poumbou", "Yambi"],
+            "Lombo": ["Dienga", "Otouma", "Massima", "Moungali"],
+            "Midounga": ["Moukougni", "Massango", "Mboungou", "Mandji", "Ndoubi", "Diougo"],
+            "Offoué-Bouenguidi": ["Bambidie", "Akouango", "Akoumou"],
+            "Pana": ["Poumbou-Diassa", "Poumbou-Diboundji", "Divindi", "Nzinga"]
+        }
+    },
     "Mouloundou": { "communes": {}, "cantons": {} },
-    "Offoué-Onoye": { "communes": {}, "cantons": {} }
+    "Offoué-Onoye": {
+        "communes": {
+            "Iboundji": {
+                "arrondissements": {},
+                "quartiers": ["École Publique Centre", "Quartier Poto-Poto", "CES Iboundji"]
+            }
+        },
+        "cantons": {
+            "Estuaire-Offoué": ["Mounianguela", "Douma", "Pongo"],
+            "Offoué": ["Poungui", "Yamba", "Mouyabi"],
+            "Onoye": ["Koungou", "Lekey"]
+        }
+    }
   },
   "Ogooué-Maritime": {
     "Bendje": { "communes": {}, "cantons": {} },
@@ -404,3 +450,5 @@ export const locations = {
     }
 }
 };
+
+    
