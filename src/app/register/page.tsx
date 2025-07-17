@@ -3,7 +3,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { ArrowLeft, Check, Upload, X, ChevronsUpDown, CheckIcon } from "lucide-react"
+import { ArrowLeft, Check, Upload, X, ChevronsUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -39,21 +39,35 @@ const skillsList = [
     { group: "Mobilisation & plaidoyer", skills: ["Organisation de campagnes de don", "Mobilisation communautaire", "Préparation d’événements solidaires", "Collecte de signatures/pétitions", "Coordination de groupes de jeunes", "Animation de stands", "Communication avec les élus", "Participation à des forums locaux", "Mise en réseau avec d’autres ONG", "Élaboration de messages clés", "Préparation d’un dossier de plaidoyer", "Relais des besoins des populations", "Communication avec les partenaires techniques", "Animation de campagnes de sensibilisation", "Soutien à la mobilisation humanitaire", "Coordination de volontaires terrain", "Représentation associative", "Diffusion d’alertes", "Organisation de marches solidaires", "Création d’un mouvement local de soutien"] },
 ];
 
-const allSkills = skillsList.flatMap(group => group.skills);
+const educationLevels = [
+    { group: "Niveaux hors système scolaire", levels: ["Jamais allé(e) à l’école", "Analphabète (ne sait ni lire ni écrire)", "Alpha-niveau 1 (début de l’alphabétisation)", "Alpha-niveau 2 (alphabétisation fonctionnelle)", "Alpha-niveau 3 (lecture, écriture et calculs simples)", "Apprentissage traditionnel / coutumier (transmission orale)", "Savoir-faire autodidacte (sans scolarisation)", "Formation religieuse de base uniquement (Coranique, Biblique...)", "Éducation communautaire informelle", "Enseignement domestique / à domicile (non déclaré)"] },
+    { group: "Enseignement préscolaire / maternelle", levels: ["Petite section (PS)", "Moyenne section (MS)", "Grande section (GS)", "Éducation préscolaire informelle / garderie"] },
+    { group: "Enseignement primaire", levels: ["Cours préparatoire 1 (CP1)", "Cours préparatoire 2 (CP2)", "Cours élémentaire 1 (CE1)", "Cours élémentaire 2 (CE2)", "Cours moyen 1 (CM1)", "Cours moyen 2 (CM2)", "Certificat d’Études Primaires (CEP / CEPE / CPE)", "Fin du primaire sans diplôme"] },
+    { group: "Enseignement secondaire – 1er cycle (collège)", levels: ["6e (sixième)", "5e (cinquième)", "4e (quatrième)", "3e (troisième)", "Brevet d’Études du Premier Cycle (BEPC / DNB)", "Fin du collège sans diplôme"] },
+    { group: "Enseignement secondaire – 2nd cycle (lycée)", levels: ["2nde (seconde)", "1ère (première)", "Terminale", "Baccalauréat général (BAC A, B, C, D…)", "Baccalauréat technique / professionnel", "Fin du lycée sans le Bac"] },
+    { group: "Formation technique & professionnelle", levels: ["CAP (Certificat d'Aptitude Professionnelle)", "BEP (Brevet d'Études Professionnelles)", "BT (Brevet de Technicien)", "Baccalauréat professionnel / technique", "BAC +1 en formation pro (type BTS 1ère année)", "BTS (Brevet de Technicien Supérieur)", "DUT (Diplôme Universitaire de Technologie)", "Diplôme de Qualification Professionnelle (DQP)", "Diplôme d’État d’aide-soignant(e)", "Certificat de Formation aux Métiers (CFM)", "Attestation de qualification professionnelle", "Formation courte certifiante (1-6 mois)", "Apprentissage en entreprise (avec ou sans diplôme)", "Artisan formé sur le tas (non diplômé)"] },
+    { group: "Enseignement supérieur", levels: ["BAC +1 (Licence 1 / L1)", "BAC +2 (Licence 2 / L2)", "DEUG / DUT / BTS", "BAC +3 (Licence / Licence professionnelle / L3)", "BAC +4 (Master 1 / M1)", "BAC +5 (Master / Ingénieur / M2)", "Diplôme d’école supérieure (BBA, MBA, etc.)", "Diplôme de Grandes Écoles (HEC, ENA, etc.)", "BAC +6 et + (DEA, DESS, spécialisation)", "Doctorat (PhD)", "Doctorat d’État / Post-doc", "Habilitation à Diriger des Recherches (HDR)"] },
+    { group: "Autres cas particuliers", levels: ["Éducation non diplômante (auditeur libre)", "Études inachevées (niveau arrêté)", "Formation en ligne / e-learning sans diplôme", "Diplôme étranger non reconnu", "Équivalence de diplôme en cours", "Formation continue d’adulte", "Réorientation en cours de cycle"] }
+];
+
+const allEducationLevels = educationLevels.flatMap(group => group.levels);
 
 export default function RegisterPage() {
   const [step, setStep] = React.useState(1)
   const [formData, setFormData] = React.useState({})
 
-  const [open, setOpen] = React.useState(false)
+  const [skillsPopoverOpen, setSkillsPopoverOpen] = React.useState(false)
   const [selectedSkills, setSelectedSkills] = React.useState<string[]>([])
+  
+  const [educationPopoverOpen, setEducationPopoverOpen] = React.useState(false)
+  const [educationValue, setEducationValue] = React.useState("")
 
   const handleNext = () => setStep((prev) => Math.min(prev + 1, totalSteps))
   const handlePrevious = () => setStep((prev) => Math.max(prev - 1, 1))
 
   const progress = (step / totalSteps) * 100
   
-  const handleUnselect = (skill: string) => {
+  const handleUnselectSkill = (skill: string) => {
     setSelectedSkills(selectedSkills.filter((s) => s !== skill));
   };
 
@@ -115,18 +129,74 @@ export default function RegisterPage() {
                     <h3 className="text-lg font-semibold">Profil & compétences</h3>
                      <div className="grid gap-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="educationLevel">Niveau d’études / profession actuelle</Label>
-                            <Input id="educationLevel" placeholder="Ex: Étudiant en droit, Infirmier, etc." />
-                        </div>
-                        <div className="grid gap-2">
-                             <Label>Compétences spécifiques utiles</Label>
-                             <p className="text-sm text-muted-foreground">Sélectionnez vos compétences dans la liste.</p>
-                             <Popover open={open} onOpenChange={setOpen}>
+                             <Label>Niveau d’études</Label>
+                             <Popover open={educationPopoverOpen} onOpenChange={setEducationPopoverOpen}>
                                 <PopoverTrigger asChild>
                                     <Button
                                     variant="outline"
                                     role="combobox"
-                                    aria-expanded={open}
+                                    aria-expanded={educationPopoverOpen}
+                                    className="w-full justify-between"
+                                    >
+                                    {educationValue
+                                        ? allEducationLevels.find((level) => level.toLowerCase() === educationValue) || educationValue
+                                        : "Sélectionner un niveau..."}
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
+                                    <Command>
+                                        <CommandInput 
+                                            placeholder="Rechercher ou saisir un niveau..." 
+                                            value={educationValue} 
+                                            onValueChange={setEducationValue}
+                                        />
+                                        <CommandList>
+                                            <CommandEmpty>
+                                                <CommandItem onSelect={() => setEducationPopoverOpen(false)}>
+                                                    Utiliser "{educationValue}"
+                                                </CommandItem>
+                                            </CommandEmpty>
+                                            {educationLevels.map((group) => (
+                                                <CommandGroup key={group.group} heading={group.group}>
+                                                    {group.levels.map((level) => (
+                                                    <CommandItem
+                                                        key={level}
+                                                        value={level}
+                                                        onSelect={(currentValue) => {
+                                                            setEducationValue(currentValue === educationValue ? "" : currentValue)
+                                                            setEducationPopoverOpen(false)
+                                                        }}
+                                                    >
+                                                        <Check
+                                                            className={cn(
+                                                                "mr-2 h-4 w-4",
+                                                                educationValue === level.toLowerCase() ? "opacity-100" : "opacity-0"
+                                                            )}
+                                                        />
+                                                        {level}
+                                                    </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            ))}
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                               </Popover>
+                        </div>
+                         <div className="grid gap-2">
+                            <Label htmlFor="profession">Profession actuelle</Label>
+                            <Input id="profession" placeholder="Ex: Infirmier, Enseignant, Sans emploi..." />
+                        </div>
+                        <div className="grid gap-2">
+                             <Label>Compétences spécifiques utiles</Label>
+                             <p className="text-sm text-muted-foreground">Sélectionnez vos compétences dans la liste.</p>
+                             <Popover open={skillsPopoverOpen} onOpenChange={setSkillsPopoverOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    aria-expanded={skillsPopoverOpen}
                                     className="w-full justify-between h-auto"
                                     >
                                     <div className="flex gap-1 flex-wrap">
@@ -136,21 +206,21 @@ export default function RegisterPage() {
                                                     variant="secondary"
                                                     key={skill}
                                                     className="mr-1 mb-1"
-                                                    onClick={() => handleUnselect(skill)}
+                                                    onClick={(e) => { e.stopPropagation(); handleUnselectSkill(skill); }}
                                                 >
                                                     {skill}
                                                     <button
                                                         className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                                                         onKeyDown={(e) => {
                                                             if (e.key === "Enter") {
-                                                                handleUnselect(skill);
+                                                                handleUnselectSkill(skill);
                                                             }
                                                         }}
                                                         onMouseDown={(e) => {
                                                             e.preventDefault();
                                                             e.stopPropagation();
                                                         }}
-                                                        onClick={() => handleUnselect(skill)}
+                                                        onClick={(e) => { e.stopPropagation(); handleUnselectSkill(skill); }}
                                                     >
                                                         <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
                                                     </button>
@@ -175,7 +245,7 @@ export default function RegisterPage() {
                                                     key={skill}
                                                     onSelect={() => {
                                                         setSelectedSkills(prev => prev.includes(skill) ? prev.filter(s => s !== skill) : [...prev, skill]);
-                                                        setOpen(true);
+                                                        setSkillsPopoverOpen(true);
                                                     }}
                                                 >
                                                     <Check
