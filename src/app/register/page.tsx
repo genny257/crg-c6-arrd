@@ -16,6 +16,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { locations } from "@/lib/locations"
+
 
 const totalSteps = 5
 
@@ -35,7 +37,7 @@ const skillsList = [
     { group: "Nutrition & alimentation", skills: ["Dépistage de la malnutrition", "Préparation de bouillie nutritionnelle", "Sensibilisation à la nutrition infantile", "Promotion de l’allaitement exclusif", "Calcul de ration alimentaire", "Suivi de croissance infantile", "Lutte contre les carences", "Campagnes de distribution alimentaire", "Sélection des bénéficiaires vulnérables", "Promotion de l’agriculture familiale", "Cuisine en situation de crise", "Repas adaptés aux personnes âgées", "Éducation nutritionnelle", "Préparation de menus équilibrés", "Sécurité alimentaire", "Tri et conservation des denrées", "Prévention de l’obésité infantile", "Diagnostic nutritionnel communautaire", "Partage de recettes locales saines", "Soutien aux cantines scolaires"] },
     { group: "Administration & gestion financière", skills: ["Tenue de caisse simple", "Rédaction de reçus/dépenses", "Gestion de budget associatif", "Justificatifs de dépenses", "Gestion des pièces comptables", "Classement de documents", "Gestion administrative d’un site", "Suivi de feuilles de présence", "Appui logistique à une réunion", "Rédaction de comptes-rendus", "Traitement des remboursements", "Connaissances de base en comptabilité", "Organisation d’un planning d’activités", "Archivage physique ou numérique", "Suivi de contrats de bénévoles", "Rédaction de rapports financiers", "Utilisation d’un petit logiciel de gestion", "Établissement de budgets prévisionnels", "Réconciliation de dépenses", "Préparation de documents pour audit"] },
     { group: "Artisanat & activités pratiques", skills: ["Couture de base", "Fabrication de masques/barrières", "Tricotage de vêtements pour bébés", "Teinture naturelle", "Réparation de vêtements", "Fabrication de savon", "Création d’objets artisanaux à vendre", "Broderie communautaire", "Activités manuelles pour enfants", "Réalisation de sacs à dos recyclés", "Travail du bois (niveau simple)", "Montage de meubles simples", "Conception de supports éducatifs faits main", "Fabrication de jeux éducatifs", "Cuisiner avec peu de ressources", "Décoration communautaire", "Création de kits hygiène faits main", "Réutilisation de matériaux recyclés", "Organisation d’ateliers artisanaux", "Réparation de chaussures/sandales"] },
-    { group: "Leadership & coordination associative", skills: ["Organisation d’un planning d’équipe", "Motivation de bénévoles", "Résolution de conflits", "Coordination d’activités solidaires", "Leadership positif", "Prise de décision en groupe", "Esprit d’équipe", "Accompagnement de nouveaux volontaires", "Transmission de savoirs", "Gestion d’un comité local", "Animation d’une assemblée associative", "Communication intergénérationnelle", "Gestion de ressources humaines locales", "Organisation de réunions efficaces", "Gestion des dynamiques de groupe", "Autonomie dans la mission", "Gestion de la pression terrain", "Sens de l’organisation", "Éthique du leadership", "Travail collaboratif"] },
+    { group: "Leadership & coordination associative", skills: ["Organisation d’un planning d’équipe", "Motivation de bénévoles", "Résolution de conflits", "Coordination d’activités solidaires", "Leadership positif", "Prise de décision en groupe", "Esprit d’équipe", "Accompagnement de nouveaux volontaires", "Transmission de savoirs", "Gestion d’un comité local", "Animation d’une assemblée associative", "Communication intergénérationnelle", "Gestion de ressources humaines locales", "Organisation d’un planning d’activités efficaces", "Gestion des dynamiques de groupe", "Autonomie dans la mission", "Gestion de la pression terrain", "Sens de l’organisation", "Éthique du leadership", "Travail collaboratif"] },
     { group: "Mobilisation & plaidoyer", skills: ["Organisation de campagnes de don", "Mobilisation communautaire", "Préparation d’événements solidaires", "Collecte de signatures/pétitions", "Coordination de groupes de jeunes", "Animation de stands", "Communication avec les élus", "Participation à des forums locaux", "Mise en réseau avec d’autres ONG", "Élaboration de messages clés", "Préparation d’un dossier de plaidoyer", "Relais des besoins des populations", "Communication avec les partenaires techniques", "Animation de campagnes de sensibilisation", "Soutien à la mobilisation humanitaire", "Coordination de volontaires terrain", "Représentation associative", "Diffusion d’alertes", "Organisation de marches solidaires", "Création d’un mouvement local de soutien"] },
 ];
 
@@ -66,6 +68,97 @@ const professionsList = [
     { group: "Professions émergentes & numériques", professions: ["Influenceur•se digital", "Créateur•rice de contenu", "Gestionnaire de communauté (TikTok, Insta)", "Designer d’interface vocale", "Spécialiste IA éthique", "Développeur blockchain", "Mineur de cryptomonnaie", "Coach de vie en ligne", "Animateur de webinaires", "Télétravailleur freelance", "Spécialiste dropshipping", "Vendeur e-commerce local", "Monteur vidéo YouTube", "Gamer professionnel", "Modérateur de contenu web", "Consultant en sobriété numérique", "Développeur de jeux", "Designer NFT", "Assistant virtuel", "Professeur particulier en ligne"] }
 ];
 const allProfessions = professionsList.flatMap(group => group.professions);
+
+
+const LocationSelector = ({ title }: { title: string }) => {
+  const [selectedProvince, setSelectedProvince] = React.useState('');
+  const [selectedDepartement, setSelectedDepartement] = React.useState('');
+  const [selectedCommuneCanton, setSelectedCommuneCanton] = React.useState('');
+  const [selectedArrondissement, setSelectedArrondissement] = React.useState('');
+
+  const departements = selectedProvince ? Object.keys(locations[selectedProvince as keyof typeof locations] || {}) : [];
+  
+  const communes = selectedDepartement 
+    ? Object.keys(locations[selectedProvince as keyof typeof locations]?.[selectedDepartement as keyof typeof locations[keyof typeof locations]]?.['communes'] || {}) 
+    : [];
+    
+  const cantons = selectedDepartement 
+    ? Object.keys(locations[selectedProvince as keyof typeof locations]?.[selectedDepartement as keyof typeof locations[keyof typeof locations]]?.['cantons'] || {}) 
+    : [];
+    
+  const communesEtCantons = [...communes, ...cantons];
+
+  const arrondissements = selectedCommuneCanton && selectedDepartement && communes.includes(selectedCommuneCanton)
+    ? Object.keys(locations[selectedProvince as keyof typeof locations]?.[selectedDepartement as keyof typeof locations[keyof typeof locations]]?.communes?.[selectedCommuneCanton as keyof typeof locations[keyof typeof locations][keyof typeof locations]['communes']]?.arrondissements || {})
+    : [];
+
+  const quartiers = selectedArrondissement && selectedDepartement && communes.includes(selectedCommuneCanton)
+    ? locations[selectedProvince as keyof typeof locations]?.[selectedDepartement as keyof typeof locations[keyof typeof locations]]?.communes?.[selectedCommuneCanton as keyof typeof locations[keyof typeof locations]['communes']]?.arrondissements?.[selectedArrondissement as keyof any] || []
+    : (selectedCommuneCanton && selectedDepartement && communes.includes(selectedCommuneCanton)) 
+      ? locations[selectedProvince as keyof typeof locations]?.[selectedDepartement as keyof typeof locations[keyof typeof locations]]?.communes?.[selectedCommuneCanton as keyof any]?.quartiers || []
+      : [];
+
+  const villages = selectedCommuneCanton && selectedDepartement && cantons.includes(selectedCommuneCanton)
+    ? locations[selectedProvince as keyof typeof locations]?.[selectedDepartement as keyof typeof locations[keyof typeof locations]]?.cantons?.[selectedCommuneCanton as keyof any] || []
+    : [];
+    
+  const localitesFinales = [...quartiers, ...villages];
+
+
+  return (
+    <div className="grid gap-2 p-4 border rounded-lg">
+      <h4 className="font-semibold">{title}</h4>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid gap-2">
+            <Label>Province</Label>
+            <Select onValueChange={(value) => { setSelectedProvince(value); setSelectedDepartement(''); setSelectedCommuneCanton(''); setSelectedArrondissement(''); }}>
+                <SelectTrigger><SelectValue placeholder="Sélectionner une province" /></SelectTrigger>
+                <SelectContent>
+                    {Object.keys(locations).map(province => <SelectItem key={province} value={province}>{province}</SelectItem>)}
+                </SelectContent>
+            </Select>
+        </div>
+        <div className="grid gap-2">
+            <Label>Département</Label>
+            <Select disabled={!selectedProvince} onValueChange={(value) => { setSelectedDepartement(value); setSelectedCommuneCanton(''); setSelectedArrondissement(''); }}>
+                <SelectTrigger><SelectValue placeholder="Sélectionner un département" /></SelectTrigger>
+                <SelectContent>
+                    {departements.map(dep => <SelectItem key={dep} value={dep}>{dep}</SelectItem>)}
+                </SelectContent>
+            </Select>
+        </div>
+        <div className="grid gap-2">
+            <Label>Commune ou Canton</Label>
+            <Select disabled={!selectedDepartement} onValueChange={(value) => { setSelectedCommuneCanton(value); setSelectedArrondissement(''); }}>
+                <SelectTrigger><SelectValue placeholder="Sélectionner une commune/canton" /></SelectTrigger>
+                <SelectContent>
+                    {communesEtCantons.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}
+                </SelectContent>
+            </Select>
+        </div>
+        <div className="grid gap-2">
+            <Label>Arrondissement</Label>
+            <Select disabled={!selectedCommuneCanton || !communes.includes(selectedCommuneCanton)} onValueChange={setSelectedArrondissement}>
+                <SelectTrigger><SelectValue placeholder="Sélectionner un arrondissement" /></SelectTrigger>
+                <SelectContent>
+                    {arrondissements.map(arr => <SelectItem key={arr} value={arr}>{arr}</SelectItem>)}
+                </SelectContent>
+            </Select>
+        </div>
+        <div className="grid gap-2 md:col-span-2">
+            <Label>Quartier ou Village</Label>
+            <Select disabled={!selectedCommuneCanton}>
+                <SelectTrigger><SelectValue placeholder="Sélectionner un quartier/village" /></SelectTrigger>
+                <SelectContent>
+                     {localitesFinales.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
+                </SelectContent>
+            </Select>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 export default function RegisterPage() {
   const [step, setStep] = React.useState(1)
@@ -147,8 +240,8 @@ export default function RegisterPage() {
                              <Input id="email" type="email" placeholder="nom@exemple.com" />
                         </div>
                          <div className="grid gap-2">
-                            <Label htmlFor="address">Adresse complète</Label>
-                            <Textarea id="address" placeholder="Votre adresse complète..." className="capitalize" />
+                            <Label htmlFor="address">Adresse complète (Rue, Immeuble, etc.)</Label>
+                            <Textarea id="address" placeholder="Ex: Rue de la Paix, Immeuble B, Porte 12" className="capitalize" />
                         </div>
                     </div>
                 </div>
@@ -339,6 +432,7 @@ export default function RegisterPage() {
                                                 {group.skills.map((skill) => (
                                                 <CommandItem
                                                     key={skill}
+                                                    value={skill}
                                                     onSelect={() => handleSelectSkill(skill)}
                                                 >
                                                     <Check
@@ -381,24 +475,9 @@ export default function RegisterPage() {
                                 ))}
                             </div>
                         </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="location">Lieu de résidence ou secteur d’intervention souhaité</Label>
-                             <Select>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Sélectionnez une province" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="estuaire">Estuaire (Libreville)</SelectItem>
-                                    <SelectItem value="haut-ogooue">Haut-Ogooué (Franceville)</SelectItem>
-                                    <SelectItem value="moyen-ogooue">Moyen-Ogooué (Lambaréné)</SelectItem>
-                                    <SelectItem value="ngounie">Ngounié (Mouila)</SelectItem>
-                                    <SelectItem value="nyanga">Nyanga (Tchibanga)</SelectItem>
-                                    <SelectItem value="ogooue-ivindo">Ogooué-Ivindo (Makokou)</SelectItem>
-                                    <SelectItem value="ogooue-lolo">Ogooué-Lolo (Koulamoutou)</SelectItem>
-                                    <SelectItem value="ogooue-maritime">Ogooué-Maritime (Port-Gentil)</SelectItem>
-                                    <SelectItem value="woleu-ntem">Woleu-Ntem (Oyem)</SelectItem>
-                                </SelectContent>
-                            </Select>
+                        <div className="grid gap-4">
+                           <LocationSelector title="Lieu de résidence" />
+                           <LocationSelector title="Secteur d’intervention souhaité" />
                         </div>
                     </div>
                 </div>
@@ -495,5 +574,3 @@ export default function RegisterPage() {
     </div>
   )
 }
-
-    
