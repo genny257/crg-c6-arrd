@@ -165,8 +165,54 @@ export const locations = {
     }
 },
   "Moyen-Ogooué": {
-    "Abanga-Bigne": { "communes": {}, "cantons": {} },
-    "Ogooué et des Lacs": { "communes": {}, "cantons": {} }
+    "Abanga-Bigne": {
+      "communes": {
+        "Ndjolé": {
+          "arrondissements": {},
+          "quartiers": [
+            "Bingoma-Nord", "Bingoma-Sud (Belle Vue)", "Bingoma (Centre)",
+            "Missanga Saint Jean", "Missanga Nazareth", "Nyankok-Mbounei-II",
+            "Centre Ville", "KM 1 (Sorbone)", "Andock (Mbilavion)"
+          ]
+        }
+      },
+      "cantons": {
+        "Bifoun-Weliga": [],
+        "Ebel-Abanga": [],
+        "Ebel-Alembe": [],
+        "Samkita": []
+      }
+    },
+    "Ogooué et des Lacs": {
+      "communes": {
+        "Lambaréné": {
+          "arrondissements": {
+            "1er Arrondissement": [
+              "Lalala (Centre Ville)", "Foyer Protestant", "Lycée Charles Mefane",
+              "Abongo", "École Avenir B (Atongowanga)", "École Adouma",
+              "École Moussamoûkôugôu", "École Grand Village 1",
+              "École Grand Village 2", "École Avenir (Dakar)",
+              "Village Lumière (Schweitzer)", "Adiwa St François", "Point V"
+            ],
+            "2ème Arrondissement": [
+              "Petit Paris 2 (Aviation)", "École Atsie", "École Cath. Isaac (Aniouzoûma)",
+              "Quartier Carrière", "École Jacqueline-Rawiri", "Malebe",
+              "Petit Paris", "École Isaac A", "École Isaac B", "Mbilandzambi",
+              "École Publ. Magnang"
+            ]
+          }
+        }
+      },
+      "cantons": {
+        "Biweni-Diala (Route Fougamou)": [],
+        "Lacs du Nord": [],
+        "Lacs du Sud": [],
+        "Ogooué-Amont": [],
+        "Ogooué-Aval": [],
+        "Ogooué-Ngounié": [],
+        "Route Mbine (anciennement Ogooué-Mbiné)": []
+      }
+    }
   },
   "Ngounié": {
     "Boumi-Louetsi": { "communes": {}, "cantons": {} },
