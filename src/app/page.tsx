@@ -29,6 +29,9 @@ export default function Home() {
           <Link href="#actions" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
             Nos Actions
           </Link>
+          <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
+            Équipe
+          </Link>
           <Link href="#engagement" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
             S'engager
           </Link>

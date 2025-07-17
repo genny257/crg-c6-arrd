@@ -30,7 +30,7 @@ const mainNavItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Tableau de bord" },
   { href: "/dashboard/missions", icon: Briefcase, label: "Missions" },
   { href: "/dashboard/volunteers", icon: Users, label: "Volontaires" },
-  { href: "/dashboard/team", icon: Sitemap, label: "Équipe" },
+  { href: "/team", icon: Sitemap, label: "Équipe" },
   { href: "/dashboard/calendar", icon: Calendar, label: "Calendrier" },
 ]
 
