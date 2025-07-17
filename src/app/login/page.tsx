@@ -2,14 +2,19 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
 export default function LoginPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
-      <Card className="mx-auto max-w-sm w-full">
+      <Card className="mx-auto max-w-sm w-full relative">
+        <Link href="/" className="absolute top-4 left-4 text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="h-5 w-5" />
+            <span className="sr-only">Retour à l'accueil</span>
+        </Link>
         <CardHeader>
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-4 pt-8">
             <svg
               width="48"
               height="48"
@@ -28,7 +33,7 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-2xl font-headline text-center">Connexion</CardTitle>
           <CardDescription className="text-center">
-            Accédez à votre espace sécurisé
+            Accédez à votre espace ou inscrivez-vous
           </CardDescription>
         </CardHeader>
         <CardContent>
