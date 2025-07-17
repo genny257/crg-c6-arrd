@@ -121,11 +121,11 @@ export default function Home() {
                 Votre engagement peut changer des vies. Devenez volontaire ou faites un don dès aujourd'hui.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
+            <div className="mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
                 <div className="grid gap-2 text-center p-6 rounded-lg hover:bg-card transition-colors border w-full sm:w-auto">
                     <HeartHandshake className="h-10 w-10 mx-auto text-primary" />
                     <h3 className="text-lg font-bold font-headline mt-2">Devenir Volontaire</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground max-w-xs">
                         Donnez de votre temps et de vos compétences pour aider les autres.
                     </p>
                     <Button asChild className="mt-4">
@@ -135,7 +135,7 @@ export default function Home() {
                 <div className="grid gap-2 text-center p-6 rounded-lg hover:bg-card transition-colors border w-full sm:w-auto">
                     <HeartHandshake className="h-10 w-10 mx-auto text-primary" />
                     <h3 className="text-lg font-bold font-headline mt-2">Faire un Don</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground max-w-xs">
                         Soutenez financièrement nos actions pour amplifier notre impact.
                     </p>
                     <Button asChild variant="secondary" className="mt-4">
