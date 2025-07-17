@@ -65,12 +65,11 @@ export default function Home() {
               </div>
               <div className="flex justify-center items-center">
                 <Image
-                  src="https://placehold.co/600x400.png"
+                  src="https://firebasestudio.ai/api/files/GerejeZ/patched/gabon-red-cross-logo.png"
                   width="600"
                   height="400"
-                  alt="Hero"
-                  data-ai-hint="red cross volunteers"
-                  className="mx-auto aspect-video overflow-hidden rounded-xl object-cover"
+                  alt="Logo de la Croix-Rouge Gabonaise"
+                  className="mx-auto aspect-video overflow-hidden rounded-xl object-contain"
                 />
               </div>
             </div>
