@@ -1,13 +1,18 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
-import { Inter, Poppins } from 'next/font/google'
+import { Belleza, Alegreya } from 'next/font/google'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-body' })
-const poppins = Poppins({
+const belleza = Belleza({
   subsets: ['latin'],
-  weight: ['400', '600', '700'],
+  weight: ['400'],
   variable: '--font-headline',
+})
+
+const alegreya = Alegreya({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-body',
 })
 
 export const metadata: Metadata = {
@@ -22,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className={`${inter.variable} ${poppins.variable} font-body antialiased`}>
+      <body className={`${alegreya.variable} ${belleza.variable} font-body antialiased`}>
         {children}
         <Toaster />
       </body>
