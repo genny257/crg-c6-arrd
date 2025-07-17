@@ -56,7 +56,7 @@ export default function Home() {
                 </p>
                 <div className="space-x-4 mt-6">
                   <Button asChild size="lg">
-                    <Link href="/login">Devenir Volontaire</Link>
+                    <Link href="/register">Devenir Volontaire</Link>
                   </Button>
                   <Button asChild size="lg" variant="outline">
                     <Link href="/dashboard/missions">Voir les Missions</Link>
@@ -176,7 +176,7 @@ export default function Home() {
                         Donnez de votre temps et de vos compétences pour aider les autres.
                     </p>
                     <Button asChild className="mt-4">
-                        <Link href="/login">S'inscrire</Link>
+                        <Link href="/register">S'inscrire</Link>
                     </Button>
                 </div>
                 <div className="grid gap-2 text-center p-6 rounded-lg hover:bg-card transition-colors border w-full sm:w-auto">
