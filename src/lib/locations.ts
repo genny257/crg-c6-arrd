@@ -97,29 +97,62 @@ export const locations = {
     }
   },
   "Haut-Ogooué": {
-    "Département Test 1": {
-      "communes": {
-        "Commune Test 1": {
-          "arrondissements": {
-            "Arrondissement Test 1": ["Quartier Test 1", "Quartier Test 2"]
-          }
-        }
-      },
-      "cantons": {}
-    }
+    "Bayi-Brikolo": { "communes": {}, "cantons": {} },
+    "Djoue": { "communes": {}, "cantons": {} },
+    "Djououri-Aguilli": { "communes": {}, "cantons": {} },
+    "Lékabi-Léwolo": { "communes": {}, "cantons": {} },
+    "Lekoni-Lekori": { "communes": {}, "cantons": {} },
+    "Lekoko": { "communes": {}, "cantons": {} },
+    "Lemboumbi-Leyou": { "communes": {}, "cantons": {} },
+    "Mpassa": { "communes": {}, "cantons": {} },
+    "Ogooué-Létili": { "communes": {}, "cantons": {} },
+    "Plateaux": { "communes": {}, "cantons": {} },
+    "Sebe-Brikolo": { "communes": {}, "cantons": {} }
   },
   "Moyen-Ogooué": {
-    "Département Test 2": {
-      "communes": {},
-      "cantons": {
-        "Canton Test 1": ["Village Test 1"]
-      }
-    }
+    "Abanga-Bigne": { "communes": {}, "cantons": {} },
+    "Ogooué et des Lacs": { "communes": {}, "cantons": {} }
   },
-  "Ngounié": {},
-  "Nyanga": {},
-  "Ogooué-Ivindo": {},
-  "Ogooué-Lolo": {},
-  "Ogooué-Maritime": {},
-  "Woleu-Ntem": {}
+  "Ngounié": {
+    "Boumi-Louetsi": { "communes": {}, "cantons": {} },
+    "DolaDouya-Onoy": { "communes": {}, "cantons": {} },
+    "Louetsi-Bibaka": { "communes": {}, "cantons": {} },
+    "Louetsi-Wano": { "communes": {}, "cantons": {} },
+    "Mougalaba": { "communes": {}, "cantons": {} },
+    "Ndolou": { "communes": {}, "cantons": {} },
+    "Ogoulou": { "communes": {}, "cantons": {} },
+    "Tsamba-Magotsi": { "communes": {}, "cantons": {} }
+  },
+  "Nyanga": {
+    "Basse-Banio": { "communes": {}, "cantons": {} },
+    "Douigni": { "communes": {}, "cantons": {} },
+    "Doutsila": { "communes": {}, "cantons": {} },
+    "Haute-Banio": { "communes": {}, "cantons": {} },
+    "Mongo": { "communes": {}, "cantons": {} },
+    "Mougoutsi": { "communes": {}, "cantons": {} }
+  },
+  "Ogooué-Ivindo": {
+    "Ivindo": { "communes": {}, "cantons": {} },
+    "Lope": { "communes": {}, "cantons": {} },
+    "Mvoung": { "communes": {}, "cantons": {} },
+    "Zadié": { "communes": {}, "cantons": {} }
+  },
+  "Ogooué-Lolo": {
+    "Lolo-Bouenguidi": { "communes": {}, "cantons": {} },
+    "Lombo-Bouenguidi": { "communes": {}, "cantons": {} },
+    "Mouloundou": { "communes": {}, "cantons": {} },
+    "Offoué-Onoye": { "communes": {}, "cantons": {} }
+  },
+  "Ogooué-Maritime": {
+    "Bendje": { "communes": {}, "cantons": {} },
+    "Etimboue": { "communes": {}, "cantons": {} },
+    "Ndougou": { "communes": {}, "cantons": {} }
+  },
+  "Woleu-Ntem": {
+    "Haut-Komo": { "communes": {}, "cantons": {} },
+    "Haut-Ntem": { "communes": {}, "cantons": {} },
+    "Ntem": { "communes": {}, "cantons": {} },
+    "Okano": { "communes": {}, "cantons": {} },
+    "Woleu": { "communes": {}, "cantons": {} }
+  }
 };
