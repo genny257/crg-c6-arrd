@@ -45,9 +45,15 @@ export default function RegisterPage() {
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Informations personnelles</h3>
                     <div className="grid gap-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="fullName">Nom complet</Label>
-                            <Input id="fullName" placeholder="Prénom Nom" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                           <div className="grid gap-2">
+                                <Label htmlFor="firstName">Prénom</Label>
+                                <Input id="firstName" placeholder="Votre prénom" className="capitalize" />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="lastName">Nom</Label>
+                                <Input id="lastName" placeholder="Votre nom" className="uppercase" />
+                            </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="grid gap-2">
