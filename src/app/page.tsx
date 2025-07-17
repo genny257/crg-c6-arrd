@@ -36,7 +36,7 @@ export default function Home() {
             <Link href="/login">Connexion</Link>
           </Button>
           <Button asChild>
-            <Link href="/login">Faire un Don</Link>
+            <Link href="/donations">Faire un Don</Link>
           </Button>
         </nav>
       </header>
@@ -186,7 +186,7 @@ export default function Home() {
                         Soutenez financièrement nos actions pour amplifier notre impact.
                     </p>
                     <Button asChild variant="secondary" className="mt-4">
-                        <Link href="/login">Contribuer</Link>
+                        <Link href="/donations">Contribuer</Link>
                     </Button>
                 </div>
             </div>

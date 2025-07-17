@@ -33,7 +33,7 @@ const mainNavItems = [
 ]
 
 const reportsNavItems = [
-    { href: "/dashboard/donations", icon: HeartHandshake, label: "Dons" },
+    { href: "/donations", icon: HeartHandshake, label: "Dons" },
     { href: "/dashboard/analytics", icon: LineChart, label: "Statistiques" },
 ]
 
