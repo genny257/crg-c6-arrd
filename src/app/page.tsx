@@ -35,7 +35,7 @@ export default function Home() {
           <Button asChild variant="ghost">
             <Link href="/login">Connexion</Link>
           </Button>
-          <Button asChild style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} className="hover:opacity-90">
+          <Button asChild>
             <Link href="/login">Devenir Volontaire</Link>
           </Button>
         </nav>
@@ -55,7 +55,7 @@ export default function Home() {
                   Ensemble, pour un avenir plus sûr. Rejoignez-nous pour gérer les missions, coordonner les volontaires et amplifier notre impact.
                 </p>
                 <div className="space-x-4 mt-6">
-                  <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+                  <Button asChild size="lg">
                     <Link href="/login">Faire un Don</Link>
                   </Button>
                   <Button asChild size="lg" variant="outline">
@@ -121,10 +121,10 @@ export default function Home() {
               </p>
             </div>
             <div className="flex justify-center space-x-4 mt-4">
-               <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+               <Button asChild size="lg">
                 <Link href="/login">Devenir Volontaire</Link>
               </Button>
-              <Button asChild size="lg" style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }} className="hover:opacity-90">
+              <Button asChild size="lg" variant="outline">
                 <Link href="/login">Faire un Don</Link>
               </Button>
             </div>
