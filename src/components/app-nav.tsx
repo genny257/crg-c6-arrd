@@ -13,7 +13,7 @@ import {
   Settings,
   LineChart,
   Calendar,
-  Sitemap,
+  Network,
 } from "lucide-react"
 
 import {
@@ -30,7 +30,7 @@ const mainNavItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Tableau de bord" },
   { href: "/dashboard/missions", icon: Briefcase, label: "Missions" },
   { href: "/dashboard/volunteers", icon: Users, label: "Volontaires" },
-  { href: "/team", icon: Sitemap, label: "Équipe" },
+  { href: "/team", icon: Network, label: "Équipe" },
   { href: "/dashboard/calendar", icon: Calendar, label: "Calendrier" },
 ]
 
