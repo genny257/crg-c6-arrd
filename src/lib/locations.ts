@@ -149,10 +149,77 @@ export const locations = {
     "Ndougou": { "communes": {}, "cantons": {} }
   },
   "Woleu-Ntem": {
-    "Haut-Komo": { "communes": {}, "cantons": {} },
-    "Haut-Ntem": { "communes": {}, "cantons": {} },
-    "Ntem": { "communes": {}, "cantons": {} },
-    "Okano": { "communes": {}, "cantons": {} },
-    "Woleu": { "communes": {}, "cantons": {} }
+    "Woleu": {
+      "communes": {
+        "Oyem": {
+          "arrondissements": {
+            "1er Arrondissement": [],
+            "2ème Arrondissement": []
+          },
+          "quartiers": []
+        }
+      },
+      "cantons": {
+        "WOLEU": []
+      }
+    },
+    "Ntem": {
+      "communes": {
+        "Bitam": {
+          "arrondissements": {},
+          "quartiers": []
+        }
+      },
+      "cantons": {
+        "KESS": [],
+        "KYE": [],
+        "NTEM (DISTRICT MEYO-KYE)": [],
+        "SOSSOLO-NTEM": []
+      }
+    },
+    "Haut-Ntem": {
+      "communes": {
+        "Minvoul": {
+          "arrondissements": {},
+          "quartiers": []
+        }
+      },
+      "cantons": {
+        "BISSOCK": [],
+        "KOUM": [],
+        "MBOA'A SUD": [],
+        "NYE": []
+      }
+    },
+    "Haut-Komo": {
+      "communes": {
+        "Medouneu": {
+          "arrondissements": {},
+          "quartiers": []
+        }
+      },
+      "cantons": {
+        "EKORETE (DISTRIC BIKONDOME)": [],
+        "MBEI": [],
+        "MVO-ABANGA": [],
+        "NORD": []
+      }
+    },
+    "Okano": {
+      "communes": {
+        "Mitzic": {
+          "arrondissements": {},
+          "quartiers": []
+        }
+      },
+      "cantons": {
+        "DOUM": [],
+        "DOUMANDZOU (DISTRICT DE SAM)": [],
+        "ELLELEM": [],
+        "LALARA": [],
+        "OKALA": [],
+        "SUD (DISTRICT DE BOLOSSOVILLE)": []
+      }
+    }
   }
 };
