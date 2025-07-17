@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
-import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy } from "lucide-react"
+import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users } from "lucide-react"
 
 export default function Home() {
   return (
@@ -77,37 +77,84 @@ export default function Home() {
         </section>
         
         <section id="actions" className="w-full py-12 md:py-24 lg:py-32 bg-card">
-          <div className="container space-y-12 px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Nos Actions</div>
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Agir. Aider. Protéger.</h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Découvrez comment nous intervenons sur le terrain pour apporter une aide concrète et un soutien essentiel aux communautés.
-                </p>
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+              <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Nos Actions</div>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Agir. Aider. Protéger.</h2>
+              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Découvrez comment nous intervenons sur le terrain pour apporter une aide concrète et un soutien essentiel aux communautés.
+              </p>
+            </div>
+            <div className="mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-2 lg:gap-12">
+              <Image
+                src="https://placehold.co/600x400.png"
+                width={600}
+                height={400}
+                alt="Urgence & Secourisme"
+                data-ai-hint="emergency rescue"
+                className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last"
+              />
+              <div className="flex flex-col justify-center space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="h-6 w-6 text-primary" />
+                    <h3 className="text-2xl font-bold font-headline">Urgences & Secourisme</h3>
+                  </div>
+                  <p className="text-muted-foreground">
+                    Intervention rapide lors de catastrophes naturelles, gestion des postes de secours pour les événements publics et assistance immédiate aux victimes.
+                  </p>
+                  <Button asChild variant="link" className="px-0">
+                    <Link href="#">En savoir plus</Link>
+                  </Button>
+                </div>
               </div>
             </div>
-            <div className="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
-              <div className="grid gap-2 text-center p-4 rounded-lg hover:bg-background transition-colors">
-                <ShieldCheck className="h-10 w-10 mx-auto text-primary" />
-                <h3 className="text-lg font-bold font-headline mt-2">Urgences & Secourisme</h3>
-                <p className="text-sm text-muted-foreground">
-                  Intervention rapide lors de catastrophes naturelles et gestion des postes de secours pour les événements publics.
-                </p>
+            <div className="mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-2 lg:gap-12 mt-12">
+              <Image
+                src="https://placehold.co/600x400.png"
+                width={600}
+                height={400}
+                alt="Aide Sociale & Sanitaire"
+                data-ai-hint="social support"
+                className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full"
+              />
+              <div className="flex flex-col justify-center space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <LifeBuoy className="h-6 w-6 text-primary" />
+                    <h3 className="text-2xl font-bold font-headline">Aide Sociale & Sanitaire</h3>
+                  </div>
+                  <p className="text-muted-foreground">
+                    Soutien aux plus vulnérables avec des aides matérielles, financières, et un accompagnement médicosocial pour garantir dignité et bien-être.
+                  </p>
+                   <Button asChild variant="link" className="px-0">
+                    <Link href="#">En savoir plus</Link>
+                  </Button>
+                </div>
               </div>
-              <div className="grid gap-2 text-center p-4 rounded-lg hover:bg-background transition-colors">
-                <LifeBuoy className="h-10 w-10 mx-auto text-primary" />
-                <h3 className="text-lg font-bold font-headline mt-2">Aide Sociale & Sanitaire</h3>
-                <p className="text-sm text-muted-foreground">
-                  Soutien aux plus vulnérables avec des aides matérielles, financières, et un accompagnement médicosocial.
-                </p>
-              </div>
-              <div className="grid gap-2 text-center p-4 rounded-lg hover:bg-background transition-colors">
-                <BookOpenCheck className="h-10 w-10 mx-auto text-primary" />
-                <h3 className="text-lg font-bold font-headline mt-2">Formations</h3>
-                <p className="text-sm text-muted-foreground">
-                  Apprenez les gestes qui sauvent et développez vos compétences avec nos formations certifiées.
-                </p>
+            </div>
+             <div className="mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-2 lg:gap-12 mt-12">
+              <Image
+                src="https://placehold.co/600x400.png"
+                width={600}
+                height={400}
+                alt="Formations"
+                data-ai-hint="first aid training"
+                className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last"
+              />
+              <div className="flex flex-col justify-center space-y-4">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                        <BookOpenCheck className="h-6 w-6 text-primary" />
+                        <h3 className="text-2xl font-bold font-headline">Formations</h3>
+                    </div>
+                  <p className="text-muted-foreground">
+                    Apprenez les gestes qui sauvent et développez vos compétences avec nos formations certifiées pour devenir un maillon essentiel de la chaîne de secours.
+                  </p>
+                   <Button asChild variant="link" className="px-0">
+                    <Link href="#">En savoir plus</Link>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -121,9 +168,9 @@ export default function Home() {
                 Votre engagement peut changer des vies. Devenez volontaire ou faites un don dès aujourd'hui.
               </p>
             </div>
-            <div className="mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
+            <div className="mx-auto w-full max-w-sm sm:max-w-md md:max-w-none flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
                 <div className="grid gap-2 text-center p-6 rounded-lg hover:bg-card transition-colors border w-full sm:w-auto">
-                    <HeartHandshake className="h-10 w-10 mx-auto text-primary" />
+                    <Users className="h-10 w-10 mx-auto text-primary" />
                     <h3 className="text-lg font-bold font-headline mt-2">Devenir Volontaire</h3>
                     <p className="text-sm text-muted-foreground max-w-xs">
                         Donnez de votre temps et de vos compétences pour aider les autres.
