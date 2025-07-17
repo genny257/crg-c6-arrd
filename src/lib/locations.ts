@@ -313,10 +313,70 @@ export const locations = {
     "Mougoutsi": { "communes": {}, "cantons": {} }
   },
   "Ogooué-Ivindo": {
-    "Ivindo": { "communes": {}, "cantons": {} },
-    "Lope": { "communes": {}, "cantons": {} },
-    "Mvoung": { "communes": {}, "cantons": {} },
-    "Zadié": { "communes": {}, "cantons": {} }
+    "Ivindo": {
+      "communes": {
+        "Makokou": {
+          "arrondissements": {
+            "1er Arrondissement": [
+              "Palais de Justice", "École Communale A", "École Publ. Mbolo 3", "Conseil Départemental Ivindo", "École Publ. Epassendjei", "École Zoatab", "École Publ. Epassendje II", "Iyoko-Ngota Résidence (Chef Q.)", "Mbolo 2", "Ebandangoye", "Mbeza", "Edoung Avion 1", "École de Santé"
+            ],
+            "2ème Arrondissement": [
+              "Collège Essia", "École Publ. Marien Ngouabi", "Nzing-Meyong (Chef Quartier)", "Andock (Chef Quartier)", "École Publ. d'Ekowong", "Loaloa (Chef Quartier)", "Edoung Avion 2", "Mayiga (Chef Quartier)"
+            ]
+          }
+        }
+      },
+      "cantons": {
+        "Aboye": ["Etakanyabe", "Mbomo", "Ntsiete", "Mbondou", "Indombo"],
+        "Bonga (District de Batouala)": ["Massaha", "Zolende", "Batouala I", "Nze", "Ngazi", "Batouala II"],
+        "Ivindo (District de Mvadhy)": ["Messeb", "Mananga", "Ndjeng", "Abor", "Mekob"],
+        "Iyeze": ["Mvadhy", "Mvadhy II", "Mayibouth I", "Mayibouth II", "Mbondo"],
+        "Liboumba": ["Mayela", "Latta", "Bombenda", "La Scierie", "Pont-Zadié"],
+        "Mouniandzi (District Makebe-Bakw)": ["Mohoba-Mozehe", "Mbela", "Hendje", "Zoolende", "Trouwaya", "Makebe", "Bakwaka", "Yoko-Milieu", "Cocomioala", "Melondomiole"],
+        "Ntang Louli": ["Ntsibelongi", "Mbess", "Minkouala", "Adoue", "Ntsibelong II", "Ntsengkele"]
+      }
+    },
+    "Lope": {
+      "communes": {
+        "Booué": {
+          "arrondissements": {},
+          "quartiers": ["C.E.S. Booué", "Atsombial", "Linze", "Massoukou et Kekele", "Setrag (Transgabonais)", "Centre Ville II", "Centre Ville I"]
+        }
+      },
+      "cantons": {
+        "Fieng Okano": ["Djidji 1 et 2", "Lolo 1 et 2", "Lassio et Matora", "Yen", "Laboka 1 et 2", "Oussa et Mbomao"],
+        "Leledi (District Mokeko)": ["Kongo-Mboumba", "École Publique Lope-Centre", "Kazamabika", "Aschouka", "Ayem-Gare"],
+        "Lezinda": ["Balem 1 et 2", "Inzanza", "Poteau-Ciment & Kank (Abenelang)", "Rougier-Ivindo (Mangoumba)", "Assala-Miele", "Rougier Massouna"],
+        "Nke": ["Akoba-Bissobilam", "Mbadi (Akiguelam)", "Nzafieng", "Balimba"],
+        "Offoué Aval": ["Makoghe", "Mikongoietii", "Nsg-Offoué", "Massenguelani", "PK Zéro"]
+      }
+    },
+    "Mvoung": {
+      "communes": {
+        "Ovan": {
+          "arrondissements": {},
+          "quartiers": ["École Publique", "Bingoma", "Ayol", "École Protestante Kombani", "Elatabakota", "Nkaritom-Ngoreki CES", "École Protestante Allar"]
+        }
+      },
+      "cantons": {
+        "Beleme": ["Ebe-Messe", "Melane", "Sougalam-Mfoubenzock", "Ekarlong", "Koumameyong", "Chantier S.H.M"],
+        "Dzoue": ["Mintoum", "Agnang", "Akana", "Afoumadzo", "Bissobilam"]
+      }
+    },
+    "Zadié": {
+      "communes": {
+        "Mekambo": {
+          "arrondissements": {},
+          "quartiers": ["C.E.S. Mekambo", "École Publique", "Mbelakembe", "Batouala", "Paris Bouyon", "Djibo-Mayeka", "Mbembezale", "Vie-Dure", "Vie-Chere (Ngolamayong)"]
+        }
+      },
+      "cantons": {
+        "Djouah": ["Etakangaye", "Imbong", "Ibea", "Zoula", "Massombo", "Mazingo", "Toumbi II", "Ego-Poma"],
+        "Loue": ["Mbenza", "Malassa", "Komambela", "Etsela-Endounga", "Mendemba", "Ilahounene", "Ekata", "Ntolo", "Malouma"],
+        "Mbengoue": ["Zambakangaka", "Ikeiboca-Boca", "Heanzo", "Ingolandjodjo", "Mbela-Baya"],
+        "Sassamongo": ["Bonamaza", "Mandombo II", "Zadindoue", "Matote", "Bangadi"]
+      }
+    }
   },
   "Ogooué-Lolo": {
     "Lolo-Bouenguidi": {
