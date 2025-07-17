@@ -66,10 +66,10 @@ export default function Home() {
               <div className="flex justify-center items-center">
                 <Image
                   src="https://firebasestudio.ai/api/files/GerejeZ/patched/gabon-red-cross-logo.png"
-                  width="600"
-                  height="400"
+                  width="500"
+                  height="300"
                   alt="Logo de la Croix-Rouge Gabonaise"
-                  className="mx-auto aspect-video overflow-hidden rounded-xl object-contain"
+                  className="rounded-xl object-contain"
                 />
               </div>
             </div>
