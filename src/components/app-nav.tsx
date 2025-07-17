@@ -12,6 +12,7 @@ import {
   LogOut,
   Settings,
   LineChart,
+  Calendar,
 } from "lucide-react"
 
 import {
@@ -28,11 +29,12 @@ const mainNavItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Tableau de bord" },
   { href: "/dashboard/missions", icon: Briefcase, label: "Missions" },
   { href: "/dashboard/volunteers", icon: Users, label: "Volontaires" },
+  { href: "/dashboard/calendar", icon: Calendar, label: "Calendrier" },
 ]
 
 const reportsNavItems = [
     { href: "/dashboard/donations", icon: HeartHandshake, label: "Dons" },
-    // { href: "/dashboard/analytics", icon: LineChart, label: "Statistiques" },
+    { href: "/dashboard/analytics", icon: LineChart, label: "Statistiques" },
 ]
 
 export function AppNav() {
