@@ -1,3 +1,4 @@
+
 export const locations = {
   "Estuaire": {
     "Libreville": {
@@ -97,18 +98,72 @@ export const locations = {
     }
   },
   "Haut-Ogooué": {
-    "Bayi-Brikolo": { "communes": {}, "cantons": {} },
-    "Djoue": { "communes": {}, "cantons": {} },
-    "Djououri-Aguilli": { "communes": {}, "cantons": {} },
-    "Lékabi-Léwolo": { "communes": {}, "cantons": {} },
-    "Lekoni-Lekori": { "communes": {}, "cantons": {} },
-    "Lekoko": { "communes": {}, "cantons": {} },
-    "Lemboumbi-Leyou": { "communes": {}, "cantons": {} },
-    "Mpassa": { "communes": {}, "cantons": {} },
-    "Ogooué-Létili": { "communes": {}, "cantons": {} },
-    "Plateaux": { "communes": {}, "cantons": {} },
-    "Sebe-Brikolo": { "communes": {}, "cantons": {} }
-  },
+    "Mpassa": {
+        "communes": {
+            "Franceville": {
+                "arrondissements": {
+                    "1er Arrondissement": [],
+                    "2ème Arrondissement": [],
+                    "3ème Arrondissement": [],
+                    "4ème Arrondissement": []
+                },
+                "quartiers": []
+            }
+        },
+        "cantons": {}
+    },
+    "Lemboumbi-Leyou": {
+        "communes": {
+            "Moanda": {
+                "arrondissements": {
+                    "1er Arrondissement": [],
+                    "2ème Arrondissement": []
+                },
+                "quartiers": []
+            }
+        },
+        "cantons": {
+            "LEBOMBI-LEKEDI": [],
+            "LEKEDI-LEYOU": []
+        }
+    },
+    "Lekoko": {
+        "communes": { "Bakoumba": { "arrondissements": {}, "quartiers": [] } },
+        "cantons": { "LEKEYE": [] }
+    },
+    "Lekoni-Lekori": {
+        "communes": { "Akiéni": { "arrondissements": {}, "quartiers": [] } },
+        "cantons": { "KAYIE": [] }
+    },
+    "Bayi-Brikolo": {
+        "communes": { "Aboumi": { "arrondissements": {}, "quartiers": [] } },
+        "cantons": { "BRIKOLO": [] }
+    },
+    "Djououri-Aguilli": {
+        "communes": { "Bongoville": { "arrondissements": {}, "quartiers": [] } },
+        "cantons": { "MPANI": [], "NGAYI": [] }
+    },
+    "Lékabi-Léwolo": {
+        "communes": { "Ngouoni": { "arrondissements": {}, "quartiers": [] } },
+        "cantons": { "LEBEYI": [], "LESSIMI": [] }
+    },
+    "Sebe-Brikolo": {
+        "communes": { "Okondja": { "arrondissements": {}, "quartiers": [] } },
+        "cantons": { "LEBOMBI SUD": [], "MIAGASSA NORD": [] }
+    },
+    "Ogooué-Létili": {
+        "communes": { "Boumango": { "arrondissements": {}, "quartiers": [] } },
+        "cantons": { "ENKORO": [], "MPANI-EKOULA": [], "NGOUA": [] }
+    },
+    "Djoue": {
+        "communes": { "Onga": { "arrondissements": {}, "quartiers": [] } },
+        "cantons": { "LEYOUMOU": [], "LOUAMI-LELAMA": [] }
+    },
+    "Plateaux": {
+        "communes": { "Léconi": { "arrondissements": {}, "quartiers": [] } },
+        "cantons": { "ALANGA": [], "LEBALADOUBA": [], "LEKALA": [], "LIMI": [] }
+    }
+},
   "Moyen-Ogooué": {
     "Abanga-Bigne": { "communes": {}, "cantons": {} },
     "Ogooué et des Lacs": { "communes": {}, "cantons": {} }
@@ -150,76 +205,78 @@ export const locations = {
   },
   "Woleu-Ntem": {
     "Woleu": {
-      "communes": {
-        "Oyem": {
-          "arrondissements": {
-            "1er Arrondissement": [],
-            "2ème Arrondissement": []
-          },
-          "quartiers": []
+        "communes": {
+            "Oyem": {
+                "arrondissements": {
+                    "1er Arrondissement": [],
+                    "2ème Arrondissement": []
+                },
+                "quartiers": []
+            }
+        },
+        "cantons": {
+            "WOLEU": []
         }
-      },
-      "cantons": {
-        "WOLEU": []
-      }
     },
     "Ntem": {
-      "communes": {
-        "Bitam": {
-          "arrondissements": {},
-          "quartiers": []
+        "communes": {
+            "Bitam": {
+                "arrondissements": {},
+                "quartiers": []
+            }
+        },
+        "cantons": {
+            "KESS": [],
+            "KYE": [],
+            "NTEM (DISTRICT MEYO-KYE)": [],
+            "SOSSOLO-NTEM": []
         }
-      },
-      "cantons": {
-        "KESS": [],
-        "KYE": [],
-        "NTEM (DISTRICT MEYO-KYE)": [],
-        "SOSSOLO-NTEM": []
-      }
     },
     "Haut-Ntem": {
-      "communes": {
-        "Minvoul": {
-          "arrondissements": {},
-          "quartiers": []
+        "communes": {
+            "Minvoul": {
+                "arrondissements": {},
+                "quartiers": []
+            }
+        },
+        "cantons": {
+            "BISSOCK": [],
+            "KOUM": [],
+            "MBOA'A SUD": [],
+            "NYE": []
         }
-      },
-      "cantons": {
-        "BISSOCK": [],
-        "KOUM": [],
-        "MBOA'A SUD": [],
-        "NYE": []
-      }
     },
     "Haut-Komo": {
-      "communes": {
-        "Medouneu": {
-          "arrondissements": {},
-          "quartiers": []
+        "communes": {
+            "Medouneu": {
+                "arrondissements": {},
+                "quartiers": []
+            }
+        },
+        "cantons": {
+            "EKORETE (DISTRICT BIKONDOME)": [],
+            "MBEI": [],
+            "MVO-ABANGA": [],
+            "NORD": []
         }
-      },
-      "cantons": {
-        "EKORETE (DISTRIC BIKONDOME)": [],
-        "MBEI": [],
-        "MVO-ABANGA": [],
-        "NORD": []
-      }
     },
     "Okano": {
-      "communes": {
-        "Mitzic": {
-          "arrondissements": {},
-          "quartiers": []
+        "communes": {
+            "Mitzic": {
+                "arrondissements": {},
+                "quartiers": []
+            }
+        },
+        "cantons": {
+            "DOUM": [],
+            "DOUMANDZOU (DISTRICT DE SAM)": [],
+            "ELLELEM": [],
+            "LALARA": [],
+            "OKALA": [],
+            "SUD (DISTRICT DE BOLOSSOVILLE)": []
         }
-      },
-      "cantons": {
-        "DOUM": [],
-        "DOUMANDZOU (DISTRICT DE SAM)": [],
-        "ELLELEM": [],
-        "LALARA": [],
-        "OKALA": [],
-        "SUD (DISTRICT DE BOLOSSOVILLE)": []
-      }
     }
-  }
+}
 };
+
+    
