@@ -215,15 +215,95 @@ export const locations = {
     }
   },
   "Ngounié": {
-    "Boumi-Louetsi": { "communes": {}, "cantons": {} },
-    "DolaDouya-Onoy": { "communes": {}, "cantons": {} },
-    "Louetsi-Bibaka": { "communes": {}, "cantons": {} },
-    "Louetsi-Wano": { "communes": {}, "cantons": {} },
-    "Mougalaba": { "communes": {}, "cantons": {} },
-    "Ndolou": { "communes": {}, "cantons": {} },
-    "Ogoulou": { "communes": {}, "cantons": {} },
-    "Tsamba-Magotsi": { "communes": {}, "cantons": {} }
-  },
+    "Douya-Onoy": {
+        "communes": {
+            "Mouila": {
+                "arrondissements": {
+                    "1er Arrondissement": ["École Communale A", "École Publique D", "Notre Dame", "St Gabriel", "Lycée-Excellence", "École Santé (ENSAS)", "Nouveau CES", "École Communale E", "École Communale B", "École Privée Protestante", "Lycée Professionnel"],
+                    "2ème Arrondissement": ["École Publique-C-", "Saint Kisito", "École-Publ-F", "Immeuble CNSS/CNGS", "Centre de Formation-P"]
+                }
+            }
+        },
+        "cantons": {
+            "Dibadi": ["Moualo", "Saint-Martin", "Migabe"],
+            "Dikoka": ["Igoumai", "Igouma 2", "Dikoka", "Mokabo", "Bandi 1 et 2"]
+        }
+    },
+    "Boumi-Louetsi": {
+        "communes": {
+            "Mbigou": {"arrondissements": {}, "quartiers": []}
+        },
+        "cantons": {
+            "Bangando-Ngounie": ["Koya", "Loba", "Rebe"],
+            "Basse-Louetsi": ["École Publ. Mackongonio", "Ndoubi", "Dibwangui", "École Privée Catholique Ngomo-Boul", "Poundi", "Mandji"],
+            "Douai": ["Nzenzele", "Nzenzele II", "Moubou-Lelolo", "Souangui", "Lekindou", "Chantier Boutsala", "Kamamongo-Lepoye"],
+            "Louetsi-Boumi": ["Kambamongo", "Itsiba-Koumou-Mala", "Kotto", "Lebagni", "Ndenga"]
+        }
+    },
+    "Dola": {
+        "communes": {
+            "Ndendé": {
+                "arrondissements": {},
+                "quartiers": ["Conseil Départemental", "École Publique Centre", "Lycée D'Etat A", "Lycée D'Etat B", "École Privée Prot. (Mindanda-Kamba)", "Ndendé 1-2-3", "Camp T.P. (Aviation)", "École Cath. Dola A", "École Cath. Dola B", "École Publique Yelo-Dola", "Volet Villageois (Malaba)"]
+            }
+        },
+        "cantons": {}
+    },
+    "Louetsi-Wano": {
+        "communes": {
+            "Lebamba": {
+                "arrondissements": {},
+                "quartiers": ["École Alliance.Chret. Makombo", "École Alliance.Chret Bongolo", "École Catholique Lebamba", "École Publique Lebamba", "École Alliance Chrétienne", "Foyer des Jeunes (Ctr Ville)", "College Bongolo", "École Cath. Letogo-Mabengo", "Poungou-Imeno", "Foyer des Jeunes (Malongo-Mapa)"]
+            }
+        },
+        "cantons": {}
+    },
+    "Louetsi-Bibaka": {
+        "communes": {
+            "Malinga": {"arrondissements": {}, "quartiers": []}
+        },
+        "cantons": {
+            "Haute Louetsi": ["École Alliance Chret. Moukouagna", "École Catholique Mbomo", "École Publique Mitsandza", "École Alliance Chret. Leyonga", "École Publ. Levinda", "Mikovandza (Chef de Village)", "Mayigha (Hangar)", "École Publ. Mambonga", "École Cath. Moukimbi", "Ndzindzi", "Mombi", "Moukimbi 2", "Levinda 2", "Lepepe", "Madiba", "École Publ. Mbengamamba", "École Privée Cath. Baposso"]
+        }
+    },
+    "Mougalaba": {
+        "communes": {
+            "Guietsou": {"arrondissements": {}, "quartiers": []}
+        },
+        "cantons": {
+            "Basse-Mougalaba": ["Nieguiamou", "École Publique Dibotsa", "Nzambi", "École Publique Mingola", "École Publique Ilendo", "Mandji-Dakar", "Mouki_di", "Guimanga", "Nyanga"],
+            "Haute-Mougalaba": ["Oukoumbou", "Guissa Carrefour", "École Publique Idemba"]
+        }
+    },
+    "Ndolou": {
+        "communes": {
+            "Mandji": {"arrondissements": {}, "quartiers": []}
+        },
+        "cantons": {
+            "Doubanga": ["Tsyka", "Nzambinatsiengui", "Massana-Doubinana", "Cfaguivanga"],
+            "Dourembou": ["Yeno Petit-Village", "Yeno", "Moukouna", "Matsouka", "Fouanou", "Omengo"],
+            "Koumou": ["Diangui", "Kanana", "Lambarene-Kili", "Fanguindaka", "Bemboudie", "Boungounga"]
+        }
+    },
+    "Ogoulou": {
+        "communes": {
+            "Mimongo": {"arrondissements": {}, "quartiers": []}
+        },
+        "cantons": {
+            "Haut-Ogoulou": ["Dibassa", "Moukabou", "Poungui", "Dibandi", "Diyanga"],
+            "Haute Dikobi": ["Dibamba", "Moukandi", "Mounongo", "Boulembo"]
+        }
+    },
+    "Tsamba-Magotsi": {
+        "communes": {
+            "Fougamou": {"arrondissements": {}, "quartiers": []}
+        },
+        "cantons": {
+            "Banda": ["Dispens. Moulandoufala", "École Protest. Moudouma", "École Mourimatsiengui", "Yombi 2-Chef de Village", "École Publique Yombi 1", "École Publique Mandilou 1", "Kessi 2", "École Publ. Oyenano", "Kessi 1", "Petit Odavo-Chefferie", "École Publ. Nzemba", "École Mamiengue", "École Ekanga", "École Waka", "Ningui", "Grand Odavo Pont", "Mandilou 2-Chef de Village"],
+            "Dibwa (District Ikobey)": ["Lekita", "Londene", "Egono", "École Catholique Matadi 7", "Guediba-Divinde", "École Nimbie", "I-F-L", "Chantier Egg-Sud (Kawa)"]
+        }
+    }
+},
   "Nyanga": {
     "Basse-Banio": { "communes": {}, "cantons": {} },
     "Douigni": { "communes": {}, "cantons": {} },
@@ -324,5 +404,3 @@ export const locations = {
     }
 }
 };
-
-    
