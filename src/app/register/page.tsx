@@ -52,15 +52,37 @@ const educationLevels = [
 
 const allEducationLevels = educationLevels.flatMap(group => group.levels);
 
+const professionsList = [
+    { group: "Santé & médical", professions: ["Médecin généraliste", "Chirurgien", "Infirmier•ère", "Sage-femme", "Kinésithérapeute", "Pharmacien•ne", "Dentiste", "Opticien•ne", "Psychologue", "Psychiatre", "Technicien•ne de laboratoire", "Radiologue", "Aide-soignant•e", "Diététicien•ne", "Orthophoniste", "Ergothérapeute", "Podologue", "Auxiliaire de puériculture", "Paramedic", "Ambulancier•ère"] },
+    { group: "Urgence & secours", professions: ["Sapeur-pompier•ère", "Agent de sécurité", "Médecin urgentiste", "Secouriste bénévole", "Technicien•ne de sauvetage aquatique", "Coordinateur de secours", "Chef de poste de secours", "Opérateur radio secours", "Responsable DPS", "Formateur secourisme", "Technicien•ne de désastre", "Plongeur de secours", "Médecin du SAMU", "Psychologue de crise", "Logistien de gestion des urgences", "Conducteur d’ambulance", "Sauveteur en mer", "Secouriste événementiel", "Chef d’équipe secours", "Agent de désinfection post-catastrophe"] },
+    { group: "Ingénierie & technique", professions: ["Ingénieur civil", "Ingénieur mécanique", "Ingénieur électricien", "Ingénieur environnement", "Ingénieur agroalimentaire", "Ingénieur géotechnicien", "Ingénieur télécommunications", "Ingénieur énergie renouvelable", "Ingénieur informatique", "Ingénieur sécurité", "Technicien de maintenance", "Technicien environnement", "Technicien réseau", "Electricien", "Plombier", "Mécanicien auto", "Soudeur", "Charpentier", "Serrurier", "Conducteur de travaux"] },
+    { group: "Construction & bâti", professions: ["Architecte", "Maçon•ne", "Carreleur•euse", "Plâtrier•ère", "Peintre en bâtiment", "Couvreur•euse", "Menuisier•ère", "Plombier•ère chauffagiste", "Chef de chantier", "Préfabriqué traitement", "Conducteur•trice d’engins (grue, pelleteuse…)", "Géomètre-topographe", "Expert bâtiment", "Monteur en échafaudage", "Encadre spécialiste école", "Projeteur en bâtiment", "Urbaniste", "Ingénieur structure", "Technicien béton", "Contrôleur technique"] },
+    { group: "Informatique & numérique", professions: ["Développeur•euse web", "Développeur•euse mobile", "Data analyst", "Data scientist", "Administrateur•trice systèmes", "Administrateur•trice réseaux", "Ingénieur•e sécurité informatique", "Webmaster", "UX designer", "UI designer", "Chef de projet IT", "Développeur•euse full-stack", "Testeur qualité logiciel", "Architecte logiciel", "Analyste fonctionnel", "DevOps", "Consultant•e ERP", "Technicien•ne informatique", "Formateur•trice numérique", "Technicien•ne helpdesk"] },
+    { group: "Finance & comptabilité", professions: ["Comptable", "Expert-comptable", "Auditeur•trice financier", "Contrôleur de gestion", "Analyste financier", "Trader", "Consultant•e en finance", "Gestionnaire de paie", "Directeur financier", "Assistant•e juridique", "Fiscaliste", "Conseiller•ère en gestion privée", "Banque d’affaires", "Chargé•e de recouvrement", "Agent de guichet bancaire", "Agent de crédit", "Gestionnaire de portefeuille", "Risk manager", "Analyste crédit", "Trésorier•ère"] },
+    { group: "Métiers informels & vie quotidienne", professions: ["Ménagère / Femme au foyer", "Homme au foyer", "Cuisinière de rue (restauration informelle)", "Coiffeur de quartier", "Couturière à domicile", "Vendeur ambulant", "Marchande de vivres frais", "Brocanteur", "Débrouillard urbain", "Revendeur de friperie", "Laveur de voitures", "Manœuvre journalier", "Portefaix (transporteur manuel)", "Recycleur informel / récupérateur", "Tôlier de rue", "Réparateur de chaussures", "Cordonnier ambulant", "Mécanicien de quartier", "Soudeur de fortune", "Technicien téléphone / smartphone (rue)"] },
+    { group: "Commerce & auto-emploi", professions: ["Vendeuse de marché", "Vendeur de recharge téléphonique", "Boutique de quartier (tenancier)", "Gérant de kiosque", "Livreur informel", "Fripier", "Vendeur de poisson", "Vendeur de bois / charbon", "Pâtissière artisanale", "Fabricant de jus locaux", "Réparateur électroménager", "Revendeur de pièces détachées", "Vendeur de cartes SIM", "Propriétaire de buvette", "Conducteur de moto-taxi", "Chauffeur particulier", "Préparateur de gari / manioc", "Tresseuse", "Tailleur", "Vendeur de tissu africain"] },
+    { group: "Métiers traditionnels, artisanaux & ruraux", professions: ["Forgeron", "Potière", "Tisserand•e", "Apiculteur traditionnel", "Chasseur", "Cultivateur traditionnel", "Éleveur de village", "Pêcheur artisanal", "Herboriste", "Devin / guérisseur traditionnel", "Praticien de médecine douce", "Marabout / spiritualiste", "Fabricant de tam-tams", "Sculpteur sur bois", "Fabricant de paniers", "Vannier", "Artisan bijoutier traditionnel", "Peintre muraliste", "Tapissier traditionnel", "Chanteur griot"] },
+    { group: "Autres statuts sociaux importants", professions: ["Étudiant•e", "Élève", "Apprenti•e", "Stagiaire", "Boursier•ère", "Personne sans emploi", "Personne handicapée sans activité", "Personne retraitée", "Bénévole", "Volontaire non rémunéré", "Femme veuve avec enfants à charge", "Tuteur•rice familial•e", "Ex-combattant", "Orphelin•e majeur•e", "Personne déplacée", "Réfugié•e", "Demandeur•euse d’asile", "Prisonnier•ère (en réinsertion)", "En réinsertion sociale", "Travailleurs saisonniers"] },
+    { group: "Professions émergentes & numériques", professions: ["Influenceur•se digital", "Créateur•rice de contenu", "Gestionnaire de communauté (TikTok, Insta)", "Designer d’interface vocale", "Spécialiste IA éthique", "Développeur blockchain", "Mineur de cryptomonnaie", "Coach de vie en ligne", "Animateur de webinaires", "Télétravailleur freelance", "Spécialiste dropshipping", "Vendeur e-commerce local", "Monteur vidéo YouTube", "Gamer professionnel", "Modérateur de contenu web", "Consultant en sobriété numérique", "Développeur de jeux", "Designer NFT", "Assistant virtuel", "Professeur particulier en ligne"] }
+];
+const allProfessions = professionsList.flatMap(group => group.professions);
+
 export default function RegisterPage() {
   const [step, setStep] = React.useState(1)
   const [formData, setFormData] = React.useState({})
 
   const [skillsPopoverOpen, setSkillsPopoverOpen] = React.useState(false)
   const [selectedSkills, setSelectedSkills] = React.useState<string[]>([])
+  const [skillsInputValue, setSkillsInputValue] = React.useState("")
   
   const [educationPopoverOpen, setEducationPopoverOpen] = React.useState(false)
   const [educationValue, setEducationValue] = React.useState("")
+  const [educationInputValue, setEducationInputValue] = React.useState("")
+
+  const [professionPopoverOpen, setProfessionPopoverOpen] = React.useState(false);
+  const [professionValue, setProfessionValue] = React.useState("");
+  const [professionInputValue, setProfessionInputValue] = React.useState("");
+
 
   const handleNext = () => setStep((prev) => Math.min(prev + 1, totalSteps))
   const handlePrevious = () => setStep((prev) => Math.max(prev - 1, 1))
@@ -70,6 +92,14 @@ export default function RegisterPage() {
   const handleUnselectSkill = (skill: string) => {
     setSelectedSkills(selectedSkills.filter((s) => s !== skill));
   };
+  
+  const handleSelectSkill = (skill: string) => {
+      if (!selectedSkills.includes(skill)) {
+          setSelectedSkills(prev => [...prev, skill]);
+      }
+      setSkillsInputValue("");
+      setSkillsPopoverOpen(true);
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
@@ -139,8 +169,8 @@ export default function RegisterPage() {
                                     className="w-full justify-between"
                                     >
                                     {educationValue
-                                        ? allEducationLevels.find((level) => level.toLowerCase() === educationValue) || educationValue
-                                        : "Sélectionner un niveau..."}
+                                        ? allEducationLevels.find((level) => level.toLowerCase() === educationValue.toLowerCase()) || educationValue
+                                        : "Sélectionner ou saisir un niveau..."}
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                     </Button>
                                 </PopoverTrigger>
@@ -148,13 +178,16 @@ export default function RegisterPage() {
                                     <Command>
                                         <CommandInput 
                                             placeholder="Rechercher ou saisir un niveau..." 
-                                            value={educationValue} 
-                                            onValueChange={setEducationValue}
+                                            value={educationInputValue} 
+                                            onValueChange={setEducationInputValue}
                                         />
                                         <CommandList>
                                             <CommandEmpty>
-                                                <CommandItem onSelect={() => setEducationPopoverOpen(false)}>
-                                                    Utiliser "{educationValue}"
+                                                 <CommandItem onSelect={() => {
+                                                    setEducationValue(educationInputValue)
+                                                    setEducationPopoverOpen(false)
+                                                }}>
+                                                    Ajouter "{educationInputValue}"
                                                 </CommandItem>
                                             </CommandEmpty>
                                             {educationLevels.map((group) => (
@@ -171,7 +204,7 @@ export default function RegisterPage() {
                                                         <Check
                                                             className={cn(
                                                                 "mr-2 h-4 w-4",
-                                                                educationValue === level.toLowerCase() ? "opacity-100" : "opacity-0"
+                                                                educationValue.toLowerCase() === level.toLowerCase() ? "opacity-100" : "opacity-0"
                                                             )}
                                                         />
                                                         {level}
@@ -185,12 +218,67 @@ export default function RegisterPage() {
                                </Popover>
                         </div>
                          <div className="grid gap-2">
-                            <Label htmlFor="profession">Profession actuelle</Label>
-                            <Input id="profession" placeholder="Ex: Infirmier, Enseignant, Sans emploi..." />
+                             <Label>Profession actuelle</Label>
+                            <Popover open={professionPopoverOpen} onOpenChange={setProfessionPopoverOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    aria-expanded={professionPopoverOpen}
+                                    className="w-full justify-between"
+                                    >
+                                    {professionValue
+                                        ? allProfessions.find((prof) => prof.toLowerCase() === professionValue.toLowerCase()) || professionValue
+                                        : "Sélectionner ou saisir une profession..."}
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
+                                    <Command>
+                                        <CommandInput 
+                                            placeholder="Rechercher ou saisir une profession..."
+                                            value={professionInputValue}
+                                            onValueChange={setProfessionInputValue}
+                                        />
+                                        <CommandList>
+                                            <CommandEmpty>
+                                                 <CommandItem onSelect={() => {
+                                                     setProfessionValue(professionInputValue)
+                                                     setProfessionPopoverOpen(false)
+                                                 }}>
+                                                    Ajouter "{professionInputValue}"
+                                                 </CommandItem>
+                                            </CommandEmpty>
+                                            {professionsList.map((group) => (
+                                                <CommandGroup key={group.group} heading={group.group}>
+                                                    {group.professions.map((profession) => (
+                                                        <CommandItem
+                                                            key={profession}
+                                                            value={profession}
+                                                            onSelect={(currentValue) => {
+                                                                setProfessionValue(currentValue === professionValue ? "" : currentValue)
+                                                                setProfessionPopoverOpen(false)
+                                                            }}
+                                                        >
+                                                            <Check
+                                                                className={cn(
+                                                                    "mr-2 h-4 w-4",
+                                                                    professionValue.toLowerCase() === profession.toLowerCase() ? "opacity-100" : "opacity-0"
+                                                                )}
+                                                            />
+                                                            {profession}
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            ))}
+                                        </CommandList>
+                                    </Command>
+                                </PopoverContent>
+                            </Popover>
                         </div>
                         <div className="grid gap-2">
                              <Label>Compétences spécifiques utiles</Label>
-                             <p className="text-sm text-muted-foreground">Sélectionnez vos compétences dans la liste.</p>
+                             <p className="text-sm text-muted-foreground">Sélectionnez vos compétences ou ajoutez les vôtres.</p>
                              <Popover open={skillsPopoverOpen} onOpenChange={setSkillsPopoverOpen}>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -205,7 +293,7 @@ export default function RegisterPage() {
                                                 <Badge
                                                     variant="secondary"
                                                     key={skill}
-                                                    className="mr-1 mb-1"
+                                                    className="mr-1 mb-1 capitalize"
                                                     onClick={(e) => { e.stopPropagation(); handleUnselectSkill(skill); }}
                                                 >
                                                     {skill}
@@ -230,23 +318,28 @@ export default function RegisterPage() {
                                             <span className="text-muted-foreground">Sélectionner des compétences...</span>
                                         )}
                                     </div>
-                                    <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+                                    <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 ml-2" />
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
                                     <Command>
-                                    <CommandInput placeholder="Rechercher une compétence..." />
+                                    <CommandInput 
+                                        placeholder="Rechercher une compétence..."
+                                        value={skillsInputValue}
+                                        onValueChange={setSkillsInputValue}
+                                    />
                                     <CommandList>
-                                        <CommandEmpty>Aucune compétence trouvée.</CommandEmpty>
+                                        <CommandEmpty>
+                                             <CommandItem onSelect={() => handleSelectSkill(skillsInputValue)}>
+                                                Ajouter "{skillsInputValue}"
+                                             </CommandItem>
+                                        </CommandEmpty>
                                         {skillsList.map((group) => (
                                             <CommandGroup key={group.group} heading={group.group}>
                                                 {group.skills.map((skill) => (
                                                 <CommandItem
                                                     key={skill}
-                                                    onSelect={() => {
-                                                        setSelectedSkills(prev => prev.includes(skill) ? prev.filter(s => s !== skill) : [...prev, skill]);
-                                                        setSkillsPopoverOpen(true);
-                                                    }}
+                                                    onSelect={() => handleSelectSkill(skill)}
                                                 >
                                                     <Check
                                                     className={cn(
