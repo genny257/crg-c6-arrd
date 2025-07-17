@@ -1,0 +1,98 @@
+"use client"
+
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import {
+  LayoutDashboard,
+  Users,
+  Briefcase,
+  HeartHandshake,
+  User,
+  LogOut,
+  Settings,
+} from "lucide-react"
+
+import {
+  SidebarHeader,
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarFooter,
+} from "@/components/ui/sidebar"
+
+const navItems = [
+  { href: "/dashboard", icon: LayoutDashboard, label: "Tableau de bord" },
+  { href: "/dashboard/missions", icon: Briefcase, label: "Missions" },
+  { href: "/dashboard/volunteers", icon: Users, label: "Volontaires" },
+  { href: "/dashboard/donations", icon: HeartHandshake, label: "Dons" },
+]
+
+export function AppNav() {
+  const pathname = usePathname()
+
+  return (
+    <>
+      <SidebarHeader>
+        <div className="flex items-center gap-2 p-2">
+            <svg
+                width="32"
+                height="32"
+                viewBox="0 0 48 48"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-primary w-8 h-8"
+            >
+                <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M24 4C12.96 4 4 12.96 4 24C4 35.04 12.96 44 24 44C35.04 44 44 35.04 44 24C44 12.96 35.04 4 24 4ZM24 40C15.16 40 8 32.84 8 24C8 15.16 15.16 8 24 8C32.84 8 40 15.16 40 24C40 32.84 32.84 40 24 40ZM26 22V12H22V22H12V26H22V36H26V26H36V22H26Z"
+                fill="currentColor"
+                />
+            </svg>
+            <span className="font-headline text-lg group-data-[collapsible=icon]:hidden">
+                Gabon Relief Hub
+            </span>
+        </div>
+      </SidebarHeader>
+      <SidebarContent className="p-2">
+        <SidebarMenu>
+          {navItems.map((item) => (
+            <SidebarMenuItem key={item.href}>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname.startsWith(item.href) && (item.href !== '/dashboard' || pathname === '/dashboard')}
+                tooltip={item.label}
+              >
+                <Link href={item.href}>
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarContent>
+      <SidebarFooter className="p-2">
+        <SidebarMenu>
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/profile')} tooltip="Profil">
+                    <Link href="/dashboard/profile">
+                        <User className="h-4 w-4" />
+                        <span>Profil</span>
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton tooltip="Déconnexion" asChild>
+                    <Link href="/">
+                        <LogOut className="h-4 w-4" />
+                        <span>Déconnexion</span>
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </>
+  )
+}
