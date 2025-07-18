@@ -4,7 +4,7 @@ import * as React from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
-import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users, Menu, X, HandHeart, ChevronDown, CheckCircle2, Droplets } from "lucide-react"
+import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users, Menu, X, HandHeart, ChevronDown, CheckCircle2, Droplets, LayoutDashboard } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   Dialog,
@@ -20,9 +20,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const { user, loading } = useAuth();
 
   return (
     <div className="flex flex-col min-h-[100dvh] bg-background">
@@ -76,9 +78,18 @@ export default function Home() {
           <Link href="#engagement" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
             S'engager
           </Link>
-          <Button asChild variant="ghost">
-            <Link href="/login">Connexion</Link>
-          </Button>
+          {!loading && user ? (
+            <Button asChild variant="ghost">
+              <Link href="/dashboard">
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                Dashboard
+              </Link>
+            </Button>
+          ) : (
+            <Button asChild variant="ghost">
+                <Link href="/login">Connexion</Link>
+            </Button>
+          )}
           <Button asChild>
             <Link href="/donations">Faire un Don</Link>
           </Button>
@@ -116,9 +127,18 @@ export default function Home() {
                       S'engager
                   </Link>
                    <div className="flex flex-col gap-4 w-full items-center mt-4 border-t pt-4">
-                        <Button asChild variant="ghost" className="w-full">
-                            <Link href="/login" onClick={() => setIsMenuOpen(false)}>Connexion</Link>
-                        </Button>
+                        {!loading && user ? (
+                            <Button asChild variant="ghost" className="w-full">
+                                <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                                    Dashboard
+                                </Link>
+                            </Button>
+                        ) : (
+                            <Button asChild variant="ghost" className="w-full">
+                                <Link href="/login" onClick={() => setIsMenuOpen(false)}>Connexion</Link>
+                            </Button>
+                        )}
                         <Button asChild className="w-full">
                             <Link href="/donations" onClick={() => setIsMenuOpen(false)}>Faire un Don</Link>
                         </Button>

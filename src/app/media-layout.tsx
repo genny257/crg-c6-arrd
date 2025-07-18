@@ -11,9 +11,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X, LayoutDashboard } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/hooks/use-auth";
 
 const tabs = [
     { name: "Blog", href: "/blog" },
@@ -24,6 +25,7 @@ const tabs = [
 export default function MediaLayout({ children }: { children: ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const pathname = usePathname();
+  const { user, loading } = useAuth();
 
   return (
     <div className="bg-background min-h-screen">
@@ -68,9 +70,18 @@ export default function MediaLayout({ children }: { children: ReactNode }) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button asChild variant="ghost">
-                <Link href="/login">Connexion</Link>
-            </Button>
+            {!loading && user ? (
+                <Button asChild variant="ghost">
+                  <Link href="/dashboard">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Link>
+                </Button>
+            ) : (
+                <Button asChild variant="ghost">
+                    <Link href="/login">Connexion</Link>
+                </Button>
+            )}
             <Button asChild>
                 <Link href="/donations">Faire un Don</Link>
             </Button>
@@ -93,9 +104,18 @@ export default function MediaLayout({ children }: { children: ReactNode }) {
                   <Link href="/reports" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Rapports</Link>
                   <Link href="/events" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Évènements</Link>
                    <div className="flex flex-col gap-4 w-full items-center mt-4 border-t pt-4">
-                        <Button asChild variant="ghost" className="w-full">
-                            <Link href="/login" onClick={() => setIsMenuOpen(false)}>Connexion</Link>
-                        </Button>
+                        {!loading && user ? (
+                            <Button asChild variant="ghost" className="w-full">
+                                <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                                    Dashboard
+                                </Link>
+                            </Button>
+                        ) : (
+                            <Button asChild variant="ghost" className="w-full">
+                                <Link href="/login" onClick={() => setIsMenuOpen(false)}>Connexion</Link>
+                            </Button>
+                        )}
                         <Button asChild className="w-full">
                             <Link href="/donations" onClick={() => setIsMenuOpen(false)}>Faire un Don</Link>
                         </Button>

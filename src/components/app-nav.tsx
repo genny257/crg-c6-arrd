@@ -54,7 +54,13 @@ const reportsNavItems = [
 export function AppNav() {
   const pathname = usePathname()
   const { user, logout } = useAuth();
-  const [isMediaOpen, setIsMediaOpen] = React.useState(pathname.startsWith('/blog') || pathname.startsWith('/reports') || pathname.startsWith('/events'));
+  const [isMediaOpen, setIsMediaOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (pathname.startsWith('/blog') || pathname.startsWith('/reports') || pathname.startsWith('/events')) {
+      setIsMediaOpen(true);
+    }
+  }, [pathname]);
 
   const filteredMainNav = mainNavItems.filter(item => {
     if (!item.adminOnly) return true;
