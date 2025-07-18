@@ -69,7 +69,7 @@ export default function Home() {
                   <Link href="/dashboard/media/reports">Rapports</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="#">Évènements Avenir</Link>
+                  <Link href="/dashboard/media/events">Évènements</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -109,8 +109,8 @@ export default function Home() {
                    <Link href="/dashboard/media/reports" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
                       Rapports
                   </Link>
-                  <Link href="#" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
-                      Évènements Avenir
+                  <Link href="/dashboard/media/events" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
+                      Évènements
                   </Link>
                   <Link href="#engagement" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
                       S'engager

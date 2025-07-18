@@ -60,7 +60,7 @@ export default function TeamLayout({ children }: { children: ReactNode }) {
                   <Link href="/dashboard/media/reports">Rapports</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="#">Évènements Avenir</Link>
+                  <Link href="/dashboard/media/events">Évènements</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -87,7 +87,7 @@ export default function TeamLayout({ children }: { children: ReactNode }) {
                   <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Contact</Link>
                   <Link href="/dashboard/media/blog" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Blog</Link>
                   <Link href="/dashboard/media/reports" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Rapports</Link>
-                  <Link href="#" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Évènements Avenir</Link>
+                  <Link href="/dashboard/media/events" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Évènements</Link>
                    <div className="flex flex-col gap-4 w-full items-center mt-4 border-t pt-4">
                         <Button asChild variant="ghost" className="w-full">
                             <Link href="/login" onClick={() => setIsMenuOpen(false)}>Connexion</Link>
