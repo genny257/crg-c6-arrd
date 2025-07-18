@@ -431,9 +431,44 @@ export const locations = {
     }
   },
   "Ogooué-Maritime": {
-    "Bendje": { "communes": {}, "cantons": {} },
-    "Etimboue": { "communes": {}, "cantons": {} },
-    "Ndougou": { "communes": {}, "cantons": {} }
+    "Bendje": {
+      "communes": {
+        "Port-Gentil": {
+          "arrondissements": {
+            "1er Arrondissement": ["Lycée Joseph Ambourouet Avaro", "École de la Cité", "École Publique Balise 2 Ngadi", "Centre de Formation Prof."],
+            "2ème Arrondissement": ["École Protestante (EPP)", "École Sainte Thérèse (EPC)", "École du Stade Blanc 1 (EP)", "École du Stade Blanc 2 (Henri Clément)", "École Ancienne Balise 1", "École Publique Mangrove 1", "École Publique Mangrove 2", "École Publique Moukoundzi I", "École Publique Moukoundzi II"],
+            "3ème Arrondissement": ["École Cath. St. Louis (Plateau I)", "École Publique Jean-Hilaire Obame (Plateau II)", "Lycée Technique Agondje", "École Normale des Instituts", "École Publique Akébé", "École Publique Massanga"],
+            "4ème Arrondissement": ["École Publique Nkoltang", "École Jean Ping (Km5)", "École Publique du PK8", "École Publique Château d'Eau (PK9)", "Lycée Michel Essonghe (PK8)", "École Publique du PK10", "École Publique du PK11", "École Publique du PK12", "École Publique du PK13", "École du Camp"]
+          }
+        }
+      },
+      "cantons": {}
+    },
+    "Etimboue": {
+      "communes": {
+        "Omboué": {
+          "arrondissements": {},
+          "quartiers": ["École Publique Centre", "École Catholique", "École Publique Ilogue", "Adjinama", "Ngadi"]
+        }
+      },
+      "cantons": {
+        "Mpivié": ["Saint-Louis", "Mboungou-Wanda", "Mbega", "Tsika"],
+        "Orembo-Nkomi": ["Igo-Mboumba", "Mogouma", "Mbandja", "Dienga", "Mingoué", "Migamba", "Moussâmukugu", "Simani", "Ikassa-Mabouna", "Ezigo", "Azendje", "Vendarene", "Missoula Ngola", "Plaine Wora-Na-Yeno", "Douartsanda"],
+        "Rembo-Nkomi": ["Okala 2", "Okala 1"]
+      }
+    },
+    "Ndougou": {
+      "communes": {
+        "Gamba": {
+          "arrondissements": {},
+          "quartiers": ["Collège d'Enseignement Général de Gamba (CEG)", "École Publique Gamba 1", "École Publique Gamba 2", "École Publique Gamba 3", "École Gamba Marine", "École Notre Dame de Gamba"]
+        }
+      },
+      "cantons": {
+        "Doussala": ["Dibadi", "Doussala II", "Madinguila", "Doussala I", "Loubomo", "Moungana"],
+        "Sette-Cama": ["Sette-Cama Village", "Campement Sette-Cama"]
+      }
+    }
   },
   "Woleu-Ntem": {
     "Woleu": {
@@ -444,12 +479,19 @@ export const locations = {
             "2ème Arrondissement": ["École Publique Nkoum-Oyem", "École Publique Adjoubi", "Hôtel de Ville", "École Mvea", "École Publique Assok", "École Publique Nkoum-Oyem 2", "École Publique d'Akok", "École Publique Ékéla", "École Publique Nkoum-Oyem 3"],
             "3ème Arrondissement": ["École Publique Mekoum", "Lycée d'État d'Oyem", "École Publique Ening", "École Publique Ayen-Assi", "École Publique Akouakam-Mba", "École Publique Alénakiri", "École Publique Akébé", "École Publique Ekoune", "Centre Artisanal", "École Publique Mendouk"]
           }
+        },
+         "Medouneu": {
+          "arrondissements": {},
+          "quartiers": ["École Publique Medouneu", "Collège d'Enseignement Général"]
         }
       },
       "cantons": {
         "Ntem": ["Mbenga", "Nkang", "Nkarzok", "Nkomelene-Assas", "Akok-Mbong-Seme", "Nkoum-Mbabo", "Ayos", "Ntseng-Ntem", "Ékol", "Koudou", "Adouma", "Melen"],
         "Okana": ["Bissok", "Mendoung", "École Publique Nkomezok", "École Publique Ngama", "École Publique Biba", "Alene", "Bilone-Nkoum", "Nkolbong-Engong", "École Publique Assok-Bekoum", "Akoga", "Nkan", "Akoga-Yop", "Ndoum", "Nkol-Ngock-Oyem", "Nkomelene"],
-        "Sud": ["Meyang (École Primaire)", "Nkan", "Adjougo-Ntem (Nkolzog)", "Ndong-Mba", "Ngouadi", "Avamane", "Abang", "Ndong-Ntem", "Mbeng", "Nkem-Oyem", "Ekodok", "Aké-Oyem", "Mvaé-Ntem"]
+        "Sud": ["Meyang (École Primaire)", "Nkan", "Adjougo-Ntem (Nkolzog)", "Ndong-Mba", "Ngouadi", "Avamane", "Abang", "Ndong-Ntem", "Mbeng", "Nkem-Oyem", "Ekodok", "Aké-Oyem", "Mvaé-Ntem"],
+         "Ndzomoe": ["Abouram", "Ékoukou", "Ayap-Assok", "Nkol-Ndama", "Ékoukou II"],
+        "Nkan": ["Nkom", "Nkan-Medouneu", "Bissok"],
+        "Woleu": ["Minkol", "Ayong", "Ndzomoé", "Ntam"]
       }
     },
     "Haut-Ntem": {
@@ -499,14 +541,10 @@ export const locations = {
         "communes": {
             "Medouneu": {
                 "arrondissements": {},
-                "quartiers": ["École Publique Medouneu", "Collège d'Enseignement Général"]
+                "quartiers": []
             }
         },
-        "cantons": {
-            "Ndzomoe": ["Abouram", "Ékoukou", "Ayap-Assok", "Nkol-Ndama", "Ékoukou II"],
-            "Nkan": ["Nkom", "Nkan-Medouneu", "Bissok"],
-            "Woleu": ["Minkol", "Ayong", "Ndzomoé", "Ntam"]
-        }
+        "cantons": {}
     }
   }
 }
