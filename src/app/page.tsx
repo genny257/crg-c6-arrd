@@ -1,13 +1,18 @@
 
+"use client"
+import * as React from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
-import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users } from "lucide-react"
+import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users, Menu, X } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 export default function Home() {
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
   return (
     <div className="flex flex-col min-h-[100dvh] bg-background">
-      <header className="px-4 lg:px-6 h-14 flex items-center bg-card shadow-sm z-10 sticky top-0">
+      <header className="px-4 lg:px-6 h-14 flex items-center bg-card shadow-sm z-20 sticky top-0">
         <Link href="#" className="flex items-center justify-center" prefetch={false}>
           <svg
             width="32"
@@ -26,7 +31,7 @@ export default function Home() {
           </svg>
           <span className="sr-only">Gabon Relief Hub</span>
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
+        <nav className="ml-auto hidden xs:flex gap-4 sm:gap-6 items-center">
           <Link href="#actions" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
             Nos Actions
           </Link>
@@ -43,7 +48,38 @@ export default function Home() {
             <Link href="/donations">Faire un Don</Link>
           </Button>
         </nav>
+        <div className="ml-auto xs:hidden">
+            <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                <span className="sr-only">Ouvrir le menu</span>
+            </Button>
+        </div>
       </header>
+
+       {isMenuOpen && (
+          <div className="xs:hidden bg-card shadow-md absolute top-14 left-0 w-full z-10">
+              <nav className="flex flex-col items-center gap-4 p-4">
+                  <Link href="#actions" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
+                      Nos Actions
+                  </Link>
+                  <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
+                      Équipe
+                  </Link>
+                  <Link href="#engagement" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
+                      S'engager
+                  </Link>
+                   <div className="flex flex-col gap-4 w-full items-center">
+                        <Button asChild variant="ghost" className="w-full">
+                            <Link href="/login" onClick={() => setIsMenuOpen(false)}>Connexion</Link>
+                        </Button>
+                        <Button asChild className="w-full">
+                            <Link href="/donations" onClick={() => setIsMenuOpen(false)}>Faire un Don</Link>
+                        </Button>
+                   </div>
+              </nav>
+          </div>
+      )}
+
       <main className="flex-1">
         <section className="w-full pt-12 md:pt-24 lg:pt-32">
           <div className="container px-4 md:px-6 space-y-10 xl:space-y-16">

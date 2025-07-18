@@ -9,6 +9,9 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        'xs': '530px',
+      },
       fontFamily: {
         body: ['var(--font-body)', 'serif'],
         headline: ['var(--font-headline)', 'sans-serif'],
