@@ -1,4 +1,6 @@
 
+"use client"
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle } from "lucide-react";
@@ -34,6 +36,7 @@ const blogPosts = [
 ];
 
 export default function BlogPage() {
+  const { user } = useAuth();
   
   return (
     <div className="flex flex-col gap-8">
@@ -43,10 +46,12 @@ export default function BlogPage() {
                 <p className="text-muted-foreground">Les dernières nouvelles et articles de la Croix-Rouge Gabonaise.</p>
             </div>
             
-            <Button>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Nouvel article
-            </Button>
+            {(user?.role === 'admin' || user?.role === 'superadmin') && (
+              <Button>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Nouvel article
+              </Button>
+            )}
             
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

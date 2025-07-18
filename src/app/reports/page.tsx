@@ -1,6 +1,8 @@
 
+"use client"
+
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Download, FileText, PlusCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -29,6 +31,7 @@ const reports = [
 ];
 
 export default function ReportsPage() {
+  const { user } = useAuth();
 
   return (
     <div className="flex flex-col gap-8">
@@ -38,10 +41,12 @@ export default function ReportsPage() {
                 <p className="text-muted-foreground">Consultez nos rapports d'activité et financiers.</p>
             </div>
              
-             <Button>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Nouveau rapport
-            </Button>
+             {(user?.role === 'admin' || user?.role === 'superadmin') && (
+                <Button>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Nouveau rapport
+                </Button>
+             )}
              
         </div>
         <Card>
