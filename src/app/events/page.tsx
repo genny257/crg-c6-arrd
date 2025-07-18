@@ -1,15 +1,16 @@
 
 "use client"
 
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Calendar, MapPin, MoreVertical, Pencil, PlusCircle, Trash2, XCircle } from "lucide-react";
+import { Calendar, MapPin, MoreVertical, Pencil, PlusCircle, Trash2, XCircle, RefreshCcw } from "lucide-react";
 import Image from "next/image";
 import { useAuth } from "@/hooks/use-auth";
 
 
-const events = [
+const initialEvents = [
     {
         title: "Grande Collecte de Sang",
         date: "15 Août 2024",
@@ -42,6 +43,18 @@ const events = [
 export default function EventsPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+  const [events, setEvents] = React.useState(initialEvents);
+
+  const handleDelete = (title: string) => {
+    setEvents(events.filter(e => e.title !== title));
+  };
+
+  const toggleStatus = (title: string) => {
+    setEvents(events.map(e => 
+      e.title === title ? { ...e, status: e.status === 'Annulé' ? 'À venir' : 'Annulé' } : e
+    ));
+  };
+
 
   return (
     <div className="flex flex-col gap-8">
@@ -74,12 +87,21 @@ export default function EventsPage() {
                                     <Pencil className="mr-2 h-4 w-4" />
                                     <span>Modifier</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <XCircle className="mr-2 h-4 w-4" />
-                                    <span>{event.status !== 'Annulé' ? 'Annuler' : 'Réactiver'}</span>
+                                <DropdownMenuItem onClick={() => toggleStatus(event.title)}>
+                                    {event.status !== 'Annulé' ? (
+                                        <>
+                                            <XCircle className="mr-2 h-4 w-4" />
+                                            <span>Annuler</span>
+                                        </>
+                                    ) : (
+                                         <>
+                                            <RefreshCcw className="mr-2 h-4 w-4" />
+                                            <span>Réactiver</span>
+                                        </>
+                                    )}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-destructive">
+                                <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(event.title)}>
                                     <Trash2 className="mr-2 h-4 w-4" />
                                     <span>Supprimer</span>
                                 </DropdownMenuItem>

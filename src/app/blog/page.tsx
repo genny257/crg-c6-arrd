@@ -1,6 +1,7 @@
 
 "use client"
 
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -9,7 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
 
-const blogPosts = [
+const initialBlogPosts = [
     {
         title: "Notre engagement lors des dernières inondations",
         date: "12 Juillet 2024",
@@ -42,6 +43,17 @@ const blogPosts = [
 export default function BlogPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+  const [blogPosts, setBlogPosts] = React.useState(initialBlogPosts);
+
+  const handleDelete = (title: string) => {
+    setBlogPosts(blogPosts.filter(p => p.title !== title));
+  };
+
+  const toggleVisibility = (title: string) => {
+    setBlogPosts(blogPosts.map(p => 
+      p.title === title ? { ...p, visible: !p.visible } : p
+    ));
+  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -74,12 +86,12 @@ export default function BlogPage() {
                                     <Pencil className="mr-2 h-4 w-4" />
                                     <span>Modifier</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => toggleVisibility(post.title)}>
                                     <Eye className="mr-2 h-4 w-4" />
                                     <span>{post.visible ? 'Masquer' : 'Afficher'}</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-destructive">
+                                <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(post.title)}>
                                     <Trash2 className="mr-2 h-4 w-4" />
                                     <span>Supprimer</span>
                                 </DropdownMenuItem>

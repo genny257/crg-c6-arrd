@@ -1,6 +1,7 @@
 
 "use client"
 
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -8,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Download, FileText, MoreHorizontal, Eye, Pencil, Trash2, PlusCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
-const reports = [
+const initialReports = [
     {
         title: "Rapport d'Activité Annuel 2023",
         date: "15 Février 2024",
@@ -38,6 +39,17 @@ const reports = [
 export default function ReportsPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+  const [reports, setReports] = React.useState(initialReports);
+
+  const handleDelete = (title: string) => {
+    setReports(reports.filter(r => r.title !== title));
+  };
+
+  const toggleVisibility = (title: string) => {
+    setReports(reports.map(r => 
+      r.title === title ? { ...r, visible: !r.visible } : r
+    ));
+  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -101,12 +113,12 @@ export default function ReportsPage() {
                                                         <Pencil className="mr-2 h-4 w-4" />
                                                         <span>Modifier</span>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => toggleVisibility(report.title)}>
                                                         <Eye className="mr-2 h-4 w-4" />
                                                         <span>{report.visible ? 'Masquer' : 'Afficher'}</span>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
-                                                    <DropdownMenuItem className="text-destructive">
+                                                    <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(report.title)}>
                                                         <Trash2 className="mr-2 h-4 w-4" />
                                                         <span>Supprimer</span>
                                                     </DropdownMenuItem>
