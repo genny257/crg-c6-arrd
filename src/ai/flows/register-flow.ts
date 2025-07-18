@@ -36,8 +36,8 @@ export const RegisterUserInputSchema = z.object({
   interventionZone: LocationSchema,
   idCardFront: z.string().optional().describe("A data URI of the front of the ID card."),
   idCardBack: z.string().optional().describe("A data URI of the back of the ID card."),
-  termsAccepted: z.boolean().refine(val => val === true, {
-    message: "Vous devez accepter les termes et conditions.",
+  termsAccepted: z.literal(true, {
+    errorMap: () => ({ message: "Vous devez accepter les termes et conditions." }),
   }),
 });
 
@@ -64,5 +64,3 @@ export async function registerUser(input: RegisterUserInput): Promise<{ success:
     const validatedInput = RegisterUserInputSchema.parse(input);
     return await registerUserFlow(validatedInput);
 }
-
-    

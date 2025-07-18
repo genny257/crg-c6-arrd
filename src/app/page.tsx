@@ -4,7 +4,7 @@ import * as React from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
-import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users, Menu, X, HandHeart, ChevronDown, CheckCircle2 } from "lucide-react"
+import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users, Menu, X, HandHeart, ChevronDown, CheckCircle2, Droplets } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   Dialog,
@@ -325,6 +325,114 @@ export default function Home() {
                 </div>
               </div>
             </div>
+             <div className="mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-2 lg:gap-12">
+              <Image
+                src="https://placehold.co/600x400.png"
+                width={600}
+                height={400}
+                alt="Hygiène, Eau et Assainissement"
+                data-ai-hint="clean water community"
+                className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full"
+              />
+              <div className="flex flex-col justify-center space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Droplets className="h-6 w-6 text-primary" />
+                    <h3 className="text-2xl font-bold font-headline">Hygiène, Eau, Assainissement</h3>
+                  </div>
+                  <p className="text-muted-foreground">
+                    Promouvoir l'accès à l'eau potable et aux bonnes pratiques d'hygiène pour prévenir les maladies et améliorer la santé communautaire.
+                  </p>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="link" className="px-0">En savoir plus</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[525px]">
+                      <DialogHeader>
+                        <DialogTitle className="font-headline text-2xl flex items-center gap-2"><Droplets className="h-6 w-6 text-primary" /> Hygiène, Eau et Assainissement</DialogTitle>
+                        <DialogDescription className="pt-2 text-left">
+                          Nos interventions visent à garantir un environnement sain pour tous à travers :
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <ul className="space-y-3">
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>La sensibilisation aux bonnes pratiques d'hygiène (lavage des mains, etc.).</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>La construction et la réhabilitation de points d'eau potable.</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>La promotion de l'assainissement de base (latrines, gestion des déchets).</span>
+                          </li>
+                           <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>La distribution de kits d'hygiène en situation d'urgence.</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
+            </div>
+             <div className="mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-2 lg:gap-12">
+              <Image
+                src="https://placehold.co/600x400.png"
+                width={600}
+                height={400}
+                alt="Jeunesse"
+                data-ai-hint="youth volunteers group"
+                className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last"
+              />
+              <div className="flex flex-col justify-center space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-6 w-6 text-primary" />
+                    <h3 className="text-2xl font-bold font-headline">Jeunesse</h3>
+                  </div>
+                  <p className="text-muted-foreground">
+                    Engager et former les jeunes pour en faire des leaders responsables et des acteurs du changement au sein de leurs communautés.
+                  </p>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="link" className="px-0">En savoir plus</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[525px]">
+                      <DialogHeader>
+                        <DialogTitle className="font-headline text-2xl flex items-center gap-2"><Users className="h-6 w-6 text-primary" /> Engagement de la Jeunesse</DialogTitle>
+                        <DialogDescription className="pt-2 text-left">
+                          Nous investissons dans la jeunesse comme moteur de l'action humanitaire future :
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <ul className="space-y-3">
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>Création et animation de clubs de jeunes de la Croix-Rouge dans les écoles.</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>Formation des jeunes au leadership, au civisme et aux principes humanitaires.</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>Organisation de camps de vacances et d'activités socio-éducatives.</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>Implication des jeunes dans des projets communautaires (reboisement, nettoyage, etc.).</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
         
@@ -375,3 +483,5 @@ export default function Home() {
     </div>
   )
 }
+
+    
