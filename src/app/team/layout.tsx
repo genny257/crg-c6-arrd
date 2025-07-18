@@ -80,7 +80,7 @@ export default function TeamLayout({ children }: { children: ReactNode }) {
       </header>
 
       {isMenuOpen && (
-          <div className="absolute top-14 left-0 w-full md:hidden bg-background shadow-md z-50">
+          <div className="fixed top-14 left-0 w-full md:hidden bg-background shadow-md z-50">
               <nav className="flex flex-col items-center gap-4 p-4">
                   <Link href="/" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Accueil</Link>
                   <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Équipe</Link>
