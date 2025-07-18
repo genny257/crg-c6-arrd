@@ -63,13 +63,13 @@ export function Chatbot() {
       </div>
 
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50">
-          <Card className="w-[350px] shadow-2xl rounded-lg flex flex-col h-[500px]">
+        <div className="fixed bottom-24 right-4 z-50">
+          <Card className="w-[calc(100vw-2rem)] sm:w-[350px] shadow-2xl rounded-lg flex flex-col h-[500px]">
             <CardHeader className="flex flex-row items-center gap-3">
                <Bot className="h-8 w-8 text-primary" />
                <div>
                 <CardTitle className="font-headline text-lg">Assistant Virtuel</CardTitle>
-                <CardDescription>Croix-Rouge Gabonaise</CardDescription>
+                <CardDescription>Comité 6ième Arrondissement</CardDescription>
                </div>
             </CardHeader>
             <CardContent className="flex-1 p-0">
