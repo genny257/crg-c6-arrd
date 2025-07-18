@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -18,7 +19,7 @@ interface Message {
 export function Chatbot() {
   const [isOpen, setIsOpen] = React.useState(false)
   const [messages, setMessages] = React.useState<Message[]>([
-    { role: "model", content: "Bonjour ! Comment puis-je vous aider aujourd'hui concernant la Croix-Rouge Gabonaise ?" }
+    { role: "model", content: "Bonjour ! Je suis l'assistant virtuel du comité du 6ème arrondissement.\n\nComment puis-je vous aider ?\n\nVoici quelques sujets sur lesquels je peux vous renseigner :\n- Devenir volontaire\n- Faire un don\n- Nos missions" }
   ])
   const [input, setInput] = React.useState("")
   const [isLoading, setIsLoading] = React.useState(false)
@@ -79,7 +80,7 @@ export function Chatbot() {
                     <div
                       key={index}
                       className={cn(
-                        "flex w-max max-w-[85%] flex-col gap-2 rounded-lg px-3 py-2 text-sm",
+                        "flex w-max max-w-[85%] flex-col gap-2 rounded-lg px-3 py-2 text-sm whitespace-pre-wrap",
                         message.role === "user" ? "ml-auto bg-primary text-primary-foreground" : "bg-muted"
                       )}
                     >
