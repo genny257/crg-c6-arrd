@@ -45,7 +45,7 @@ const mainNavItems = [
 ]
 
 const reportsNavItems = [
-    { href: "/donations", icon: HeartHandshake, label: "Dons" },
+    { href: "/dashboard/donations", icon: HeartHandshake, label: "Dons" },
     { href: "/dashboard/analytics", icon: LineChart, label: "Statistiques" },
 ]
 
@@ -99,7 +99,7 @@ export function AppNav() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
-          <SidebarMenuItem>
+           <SidebarMenuItem>
             <Collapsible open={isMediaOpen} onOpenChange={setIsMediaOpen}>
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton
