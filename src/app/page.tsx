@@ -84,7 +84,7 @@ export default function Home() {
       </header>
 
        {isMenuOpen && (
-          <div className="md:hidden bg-background shadow-md z-50 sticky top-14 w-full">
+          <div className="absolute top-14 left-0 w-full md:hidden bg-background shadow-md z-50">
               <nav className="flex flex-col items-center gap-4 p-4">
                   <Link href="#actions" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
                       Nos Actions
