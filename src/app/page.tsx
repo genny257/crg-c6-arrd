@@ -171,28 +171,26 @@ export default function Home() {
                 Votre engagement peut changer des vies. Devenez volontaire ou faites un don dès aujourd'hui.
               </p>
             </div>
-            <div className="flex justify-center mt-6">
-                <div className="w-full max-w-sm sm:max-w-md md:max-w-none flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <div className="grid gap-2 text-center p-6 rounded-lg hover:bg-card transition-colors border w-full sm:w-auto">
-                        <Users className="h-10 w-10 mx-auto text-primary" />
-                        <h3 className="text-lg font-bold font-headline mt-2">Devenir Volontaire</h3>
-                        <p className="text-sm text-muted-foreground max-w-xs">
-                            Donnez de votre temps et de vos compétences pour aider les autres.
-                        </p>
-                        <Button asChild className="mt-4">
-                            <Link href="/register">S'inscrire</Link>
-                        </Button>
-                    </div>
-                    <div className="grid gap-2 text-center p-6 rounded-lg hover:bg-card transition-colors border w-full sm:w-auto">
-                        <HeartHandshake className="h-10 w-10 mx-auto text-primary" />
-                        <h3 className="text-lg font-bold font-headline mt-2">Faire un Don</h3>
-                        <p className="text-sm text-muted-foreground max-w-xs">
-                            Soutenez financièrement nos actions pour amplifier notre impact.
-                        </p>
-                        <Button asChild variant="secondary" className="mt-4">
-                            <Link href="/donations">Contribuer</Link>
-                        </Button>
-                    </div>
+            <div className="mt-6 flex w-full max-w-sm flex-col items-center justify-center gap-4 sm:max-w-md md:max-w-none sm:flex-row">
+                <div className="grid w-full gap-2 rounded-lg border p-6 text-center transition-colors hover:bg-card sm:w-auto">
+                    <Users className="mx-auto h-10 w-10 text-primary" />
+                    <h3 className="mt-2 text-lg font-bold font-headline">Devenir Volontaire</h3>
+                    <p className="max-w-xs text-sm text-muted-foreground">
+                        Donnez de votre temps et de vos compétences pour aider les autres.
+                    </p>
+                    <Button asChild className="mt-4">
+                        <Link href="/register">S'inscrire</Link>
+                    </Button>
+                </div>
+                <div className="grid w-full gap-2 rounded-lg border p-6 text-center transition-colors hover:bg-card sm:w-auto">
+                    <HeartHandshake className="mx-auto h-10 w-10 text-primary" />
+                    <h3 className="mt-2 text-lg font-bold font-headline">Faire un Don</h3>
+                    <p className="max-w-xs text-sm text-muted-foreground">
+                        Soutenez financièrement nos actions pour amplifier notre impact.
+                    </p>
+                    <Button asChild variant="secondary" className="mt-4">
+                        <Link href="/donations">Contribuer</Link>
+                    </Button>
                 </div>
             </div>
           </div>
