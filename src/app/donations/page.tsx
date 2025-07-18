@@ -260,5 +260,3 @@ const DonationForm = ({ isMonthly = false }: { isMonthly?: boolean }) => (
         </Button>
     </div>
 );
-
-    
