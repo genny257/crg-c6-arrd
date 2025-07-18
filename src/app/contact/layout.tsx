@@ -29,7 +29,6 @@ export default function ContactLayout({ children }: { children: ReactNode }) {
             <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Accueil</Link>
             <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4">Équipe</Link>
             <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">Contact</Link>
-            <Link href="/donations" className="text-sm font-medium hover:underline underline-offset-4">Don</Link>
             <Button asChild variant="ghost">
                 <Link href="/login">Connexion</Link>
             </Button>

@@ -33,9 +33,6 @@ export default function TeamLayout({ children }: { children: ReactNode }) {
             <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
                 Contact
             </Link>
-            <Link href="/donations" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
-                Don
-            </Link>
             <Button asChild variant="ghost">
                 <Link href="/login">Connexion</Link>
             </Button>
