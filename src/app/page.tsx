@@ -349,28 +349,36 @@ export default function Home() {
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[525px]">
                       <DialogHeader>
-                        <DialogTitle className="font-headline text-2xl flex items-center gap-2"><Droplets className="h-6 w-6 text-primary" /> Hygiène, Eau et Assainissement</DialogTitle>
+                        <DialogTitle className="font-headline text-2xl flex items-center gap-2"><Droplets className="h-6 w-6 text-primary" /> Hygiène, Eau, Assainissement et développement</DialogTitle>
                         <DialogDescription className="pt-2 text-left">
-                          Nos interventions visent à garantir un environnement sain pour tous à travers :
+                          En vue de garantir un envirronement sain et sûr, nos actions d'assainissement du milieu et de développement durable s'articulent autour :
                         </DialogDescription>
                       </DialogHeader>
                       <div className="grid gap-4 py-4">
                         <ul className="space-y-3">
                           <li className="flex items-start gap-3">
                             <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                            <span>La sensibilisation aux bonnes pratiques d'hygiène (lavage des mains, etc.).</span>
+                            <span>Du Curage des caniveaux, des cours d'eau et des bassins versants.</span>
                           </li>
                           <li className="flex items-start gap-3">
                             <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                            <span>La construction et la réhabilitation de points d'eau potable.</span>
+                            <span>Du Désherbage dans les zones ciblées.</span>
                           </li>
                           <li className="flex items-start gap-3">
                             <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                            <span>La promotion de l'assainissement de base (latrines, gestion des déchets).</span>
+                            <span>Du Ramassage des déchets plastiques.</span>
                           </li>
                            <li className="flex items-start gap-3">
                             <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                            <span>La distribution de kits d'hygiène en situation d'urgence.</span>
+                            <span>Du Lavage des mains dans les établissements scolaires.</span>
+                          </li>
+                           <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>Du Nettoyage des plages.</span>
+                          </li>
+                           <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>De La sensibilisation des communautés.</span>
                           </li>
                         </ul>
                       </div>
@@ -403,28 +411,28 @@ export default function Home() {
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[525px]">
                       <DialogHeader>
-                        <DialogTitle className="font-headline text-2xl flex items-center gap-2"><Users className="h-6 w-6 text-primary" /> Engagement de la Jeunesse</DialogTitle>
+                        <DialogTitle className="font-headline text-2xl flex items-center gap-2"><Users className="h-6 w-6 text-primary" /> Jeunesse</DialogTitle>
                         <DialogDescription className="pt-2 text-left">
-                          Nous investissons dans la jeunesse comme moteur de l'action humanitaire future :
+                          Soucieux de du rôle fondamental des jeunes, nous investissons dans le renforcement de leurs capacités à travers:
                         </DialogDescription>
                       </DialogHeader>
                       <div className="grid gap-4 py-4">
                         <ul className="space-y-3">
                           <li className="flex items-start gap-3">
                             <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                            <span>Création et animation de clubs de jeunes de la Croix-Rouge dans les écoles.</span>
+                            <span>La formation sur la sécurité routière en milieu scolaire.</span>
                           </li>
                           <li className="flex items-start gap-3">
                             <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                            <span>Formation des jeunes au leadership, au civisme et aux principes humanitaires.</span>
+                            <span>la mise en place des clubs Croix-Rouge dans les lycées et collèges.</span>
                           </li>
                           <li className="flex items-start gap-3">
                             <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                            <span>Organisation de camps de vacances et d'activités socio-éducatives.</span>
+                            <span>L'organisation des "Camps de Jeunesse".</span>
                           </li>
                           <li className="flex items-start gap-3">
                             <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                            <span>Implication des jeunes dans des projets communautaires (reboisement, nettoyage, etc.).</span>
+                            <span>Les formations diverses.</span>
                           </li>
                         </ul>
                       </div>
@@ -483,5 +491,3 @@ export default function Home() {
     </div>
   )
 }
-
-    
