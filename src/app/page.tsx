@@ -242,7 +242,7 @@ export default function Home() {
                 Votre engagement peut changer des vies. Devenez volontaire ou faites un don dès aujourd'hui.
               </p>
             </div>
-            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <div className="grid w-full max-w-sm gap-2 rounded-lg border p-6 text-center transition-colors hover:bg-card">
                     <Users className="mx-auto h-10 w-10 text-primary" />
                     <h3 className="mt-2 text-lg font-bold font-headline">Devenir Volontaire</h3>
@@ -281,3 +281,5 @@ export default function Home() {
     </div>
   )
 }
+
+    
