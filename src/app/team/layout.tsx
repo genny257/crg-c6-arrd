@@ -2,6 +2,14 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ChevronDown } from "lucide-react";
+
 
 export default function TeamLayout({ children }: { children: ReactNode }) {
   return (
@@ -33,6 +41,21 @@ export default function TeamLayout({ children }: { children: ReactNode }) {
             <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
                 Contact
             </Link>
+             <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="text-sm font-medium hover:underline underline-offset-4 px-0">
+                  Média <ChevronDown className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/media/blog">Blog</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/media/reports">Rapports</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button asChild variant="ghost">
                 <Link href="/login">Connexion</Link>
             </Button>

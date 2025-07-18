@@ -6,9 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Lock, CreditCard, Smartphone, Banknote, HeartHandshake, Link as LinkIcon, Users } from "lucide-react";
+import { Lock, CreditCard, Smartphone, Banknote, HeartHandshake, Link as LinkIcon, Users, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const donationAmounts = [
     { amount: 2000, label: "2 000 FCFA", description: "Fournit un kit d'hygiène de base." },
@@ -39,12 +45,30 @@ export default function DonationPage() {
                 <span className="sr-only">Gabon Relief Hub</span>
                 </Link>
                 <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
-                <Button asChild variant="ghost">
-                    <Link href="/login">Connexion</Link>
-                </Button>
-                <Button asChild>
-                    <Link href="/register">Devenir Volontaire</Link>
-                </Button>
+                    <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Accueil</Link>
+                    <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4">Équipe</Link>
+                    <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">Contact</Link>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="text-sm font-medium hover:underline underline-offset-4 px-0">
+                            Média <ChevronDown className="w-4 h-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                            <Link href="/dashboard/media/blog">Blog</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                            <Link href="/dashboard/media/reports">Rapports</Link>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button asChild variant="ghost">
+                        <Link href="/login">Connexion</Link>
+                    </Button>
+                    <Button asChild>
+                        <Link href="/register">Devenir Volontaire</Link>
+                    </Button>
                 </nav>
             </header>
             <main className="container mx-auto px-4 py-8 md:py-16">
