@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { Belleza, Alegreya } from 'next/font/google'
 import { AuthProvider } from '@/hooks/use-auth';
+import { Chatbot } from '@/components/chatbot';
 
 const belleza = Belleza({
   subsets: ['latin'],
@@ -31,6 +32,7 @@ export default function RootLayout({
       <body className={`${alegreya.variable} ${belleza.variable} font-body antialiased`}>
         <AuthProvider>
             {children}
+            <Chatbot />
             <Toaster />
         </AuthProvider>
       </body>
