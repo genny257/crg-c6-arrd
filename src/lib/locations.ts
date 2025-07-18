@@ -437,78 +437,77 @@ export const locations = {
   },
   "Woleu-Ntem": {
     "Woleu": {
-        "communes": {
-            "Oyem": {
-                "arrondissements": {
-                    "1er Arrondissement": [],
-                    "2ème Arrondissement": []
-                },
-                "quartiers": []
-            }
-        },
-        "cantons": {
-            "WOLEU": []
+      "communes": {
+        "Oyem": {
+          "arrondissements": {
+            "1er Arrondissement": ["École Privée Cath. St Eloi Akoakam", "T.P. Minkaa-Nfouaa", "Collège Marie Mindze (INJS)", "Lycée Richard Nguema Bekale (Monaco)", "I.D.A.", "Imm. Agriculture (Hevegab-Socagab)", "Endomo", "École Privée Cath. Ndzomossi", "École Privée Cath. Angone"],
+            "2ème Arrondissement": ["École Publique Nkoum-Oyem", "École Publique Adjoubi", "Hôtel de Ville", "École Mvea", "École Publique Assok", "École Publique Nkoum-Oyem 2", "École Publique d'Akok", "École Publique Ékéla", "École Publique Nkoum-Oyem 3"],
+            "3ème Arrondissement": ["École Publique Mekoum", "Lycée d'État d'Oyem", "École Publique Ening", "École Publique Ayen-Assi", "École Publique Akouakam-Mba", "École Publique Alénakiri", "École Publique Akébé", "École Publique Ekoune", "Centre Artisanal", "École Publique Mendouk"]
+          }
         }
-    },
-    "Ntem": {
-        "communes": {
-            "Bitam": {
-                "arrondissements": {},
-                "quartiers": []
-            }
-        },
-        "cantons": {
-            "KESS": [],
-            "KYE": [],
-            "NTEM (DISTRICT MEYO-KYE)": [],
-            "SOSSOLO-NTEM": []
-        }
+      },
+      "cantons": {
+        "Ntem": ["Mbenga", "Nkang", "Nkarzok", "Nkomelene-Assas", "Akok-Mbong-Seme", "Nkoum-Mbabo", "Ayos", "Ntseng-Ntem", "Ékol", "Koudou", "Adouma", "Melen"],
+        "Okana": ["Bissok", "Mendoung", "École Publique Nkomezok", "École Publique Ngama", "École Publique Biba", "Alene", "Bilone-Nkoum", "Nkolbong-Engong", "École Publique Assok-Bekoum", "Akoga", "Nkan", "Akoga-Yop", "Ndoum", "Nkol-Ngock-Oyem", "Nkomelene"],
+        "Sud": ["Meyang (École Primaire)", "Nkan", "Adjougo-Ntem (Nkolzog)", "Ndong-Mba", "Ngouadi", "Avamane", "Abang", "Ndong-Ntem", "Mbeng", "Nkem-Oyem", "Ekodok", "Aké-Oyem", "Mvaé-Ntem"]
+      }
     },
     "Haut-Ntem": {
-        "communes": {
-            "Minvoul": {
-                "arrondissements": {},
-                "quartiers": []
-            }
-        },
-        "cantons": {
-            "BISSOCK": [],
-            "KOUM": [],
-            "MBOA'A SUD": [],
-            "NYE": []
+      "communes": {
+        "Minvoul": {
+          "arrondissements": {},
+          "quartiers": ["École Publique Centre (Akon-Koumfame)", "École Publique Assi", "École Publique Nkougoussi", "Lycée d'État", "Collège Biyeme"]
         }
+      },
+      "cantons": {
+        "Doum": ["Akoga", "Mekome", "Menga", "Nkol-Minkoumou", "Olendji", "Biboula"],
+        "Nkoum": ["Nkomezok", "Ngouang-Minvoul", "Ngouadi"],
+        "Sud (District de Bolossovile)": ["Oveng", "Ongo'o", "Andock-Assi", "Bout-Engass"]
+      }
+    },
+    "Ntem": {
+      "communes": {
+        "Bitam": {
+          "arrondissements": {
+            "1er Arrondissement": ["École Publique Bitam I", "École Publique Bitam II", "École Publique Bitam III (Collège Bitam)"],
+            "2ème Arrondissement": ["École Publique Bitam IV (Lycee Bitam)", "École Publique Bitam V"]
+          }
+        }
+      },
+      "cantons": {
+        "Est": ["Nkol-Ang", "Melen", "Bilone", "Ndoum"],
+        "Sud": ["Nkala", "Akouakam", "Nkan-Esseng", "Bissok-Ntem", "Ayen-Mekok"],
+        "Tcham": ["Koungou", "Nkol-Ekome", "Ndzome-Nkoma", "Angone", "Ngouadi"]
+      }
+    },
+    "Okano": {
+      "communes": {
+        "Mitzic": {
+          "arrondissements": {},
+          "quartiers": ["École Publique Mitzic (Centre)", "Lycée d'État de Mitzic", "Collège d'Enseignement Général"]
+        }
+      },
+      "cantons": {
+        "Adjap": ["Ékol-Mbame", "Meyang-Mitzic", "Ening-Biba", "Atoua", "Adzom-Mimbeng", "Mengou", "Nkoul-Mba"],
+        "Assok": ["Angone", "Assok", "Ékou", "Oyem-Adzap"],
+        "Bango": ["Bibane", "Bango", "Aba'a", "Mekomane", "Aba'a 2", "Ndoum"],
+        "Ntem": ["Ayang", "Nkol-Mitzic", "Mitzic", "Ekoukou", "Engong", "Élam", "Akoga", "Andoum", "Ntem", "Akang-Ntem"],
+        "Oyan": ["Adzong", "Akouakam", "Oyane", "Koum", "Ndzomou", "Koum II"]
+      }
     },
     "Haut-Komo": {
         "communes": {
             "Medouneu": {
                 "arrondissements": {},
-                "quartiers": []
+                "quartiers": ["École Publique Medouneu", "Collège d'Enseignement Général"]
             }
         },
         "cantons": {
-            "EKORETE (DISTRICT BIKONDOME)": [],
-            "MBEI": [],
-            "MVO-ABANGA": [],
-            "NORD": []
-        }
-    },
-    "Okano": {
-        "communes": {
-            "Mitzic": {
-                "arrondissements": {},
-                "quartiers": []
-            }
-        },
-        "cantons": {
-            "DOUM": [],
-            "DOUMANDZOU (DISTRICT DE SAM)": [],
-            "ELLELEM": [],
-            "LALARA": [],
-            "OKALA": [],
-            "SUD (DISTRICT DE BOLOSSOVILLE)": []
+            "Ndzomoe": ["Abouram", "Ékoukou", "Ayap-Assok", "Nkol-Ndama", "Ékoukou II"],
+            "Nkan": ["Nkom", "Nkan-Medouneu", "Bissok"],
+            "Woleu": ["Minkol", "Ayong", "Ndzomoé", "Ntam"]
         }
     }
+  }
 }
 };
-
-    
