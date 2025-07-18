@@ -2,6 +2,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 
 export type UserRole = 'guest' | 'user' | 'admin' | 'superadmin';
 
@@ -24,7 +25,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate checking for a logged-in user in localStorage
     try {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
@@ -50,6 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
      try {
         localStorage.removeItem('user');
+        window.location.href = '/'; 
     } catch (error) {
         console.error("Could not remove user from localStorage", error);
     }
