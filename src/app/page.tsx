@@ -19,7 +19,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-[100dvh] bg-background">
       <header className="px-4 lg:px-6 h-14 flex items-center bg-card shadow-sm z-20 sticky top-0">
-        <Link href="#" className="flex items-center justify-center" prefetch={false}>
+        <Link href="/" className="flex items-center justify-center" prefetch={false}>
           <svg
             width="32"
             height="32"
@@ -37,7 +37,7 @@ export default function Home() {
           </svg>
           <span className="sr-only">Croix-Rouge Gabonaise</span>
         </Link>
-        <nav className="ml-auto hidden xs:flex gap-4 sm:gap-6 items-center">
+        <nav className="ml-auto hidden md:flex gap-4 sm:gap-6 items-center">
           <Link href="#actions" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
             Nos Actions
           </Link>
@@ -72,7 +72,7 @@ export default function Home() {
             <Link href="/donations">Faire un Don</Link>
           </Button>
         </nav>
-        <div className="ml-auto xs:hidden">
+        <div className="ml-auto md:hidden">
             <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                 {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                 <span className="sr-only">Ouvrir le menu</span>
@@ -81,7 +81,7 @@ export default function Home() {
       </header>
 
        {isMenuOpen && (
-          <div className="xs:hidden bg-card shadow-md absolute top-14 left-0 w-full z-10">
+          <div className="md:hidden bg-card shadow-md absolute top-14 left-0 w-full z-10">
               <nav className="flex flex-col items-center gap-4 p-4">
                   <Link href="#actions" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
                       Nos Actions
@@ -92,9 +92,6 @@ export default function Home() {
                   <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
                       Contact
                   </Link>
-                   <Link href="/donations" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
-                      Don
-                  </Link>
                    <Link href="/dashboard/media/blog" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
                       Blog
                   </Link>
@@ -104,7 +101,7 @@ export default function Home() {
                   <Link href="#engagement" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
                       S'engager
                   </Link>
-                   <div className="flex flex-col gap-4 w-full items-center">
+                   <div className="flex flex-col gap-4 w-full items-center mt-4 border-t pt-4">
                         <Button asChild variant="ghost" className="w-full">
                             <Link href="/login" onClick={() => setIsMenuOpen(false)}>Connexion</Link>
                         </Button>

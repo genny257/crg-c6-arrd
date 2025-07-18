@@ -1,12 +1,13 @@
 
 "use client"
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Lock, CreditCard, Smartphone, Banknote, HeartHandshake, Link as LinkIcon, Users, ChevronDown } from "lucide-react";
+import { Lock, CreditCard, Smartphone, Banknote, HeartHandshake, Link as LinkIcon, Users, ChevronDown, Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -23,9 +24,11 @@ const donationAmounts = [
 ];
 
 export default function DonationPage() {
+    const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
     return (
         <div className="bg-background min-h-screen">
-             <header className="px-4 lg:px-6 h-14 flex items-center bg-card shadow-sm z-10 sticky top-0">
+             <header className="px-4 lg:px-6 h-14 flex items-center bg-card shadow-sm z-20 sticky top-0">
                 <Link href="/" className="flex items-center justify-center" prefetch={false}>
                 <svg
                     width="32"
@@ -42,9 +45,9 @@ export default function DonationPage() {
                     fill="currentColor"
                     />
                 </svg>
-                <span className="sr-only">Gabon Relief Hub</span>
+                <span className="sr-only">Croix-Rouge Gabonaise</span>
                 </Link>
-                <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
+                <nav className="ml-auto hidden md:flex gap-4 sm:gap-6 items-center">
                     <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Accueil</Link>
                     <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4">Équipe</Link>
                     <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">Contact</Link>
@@ -70,7 +73,34 @@ export default function DonationPage() {
                         <Link href="/register">Devenir Volontaire</Link>
                     </Button>
                 </nav>
+                <div className="ml-auto md:hidden">
+                    <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                        {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                        <span className="sr-only">Ouvrir le menu</span>
+                    </Button>
+                </div>
             </header>
+            
+            {isMenuOpen && (
+                <div className="md:hidden bg-card shadow-md absolute top-14 left-0 w-full z-10">
+                    <nav className="flex flex-col items-center gap-4 p-4">
+                        <Link href="/" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Accueil</Link>
+                        <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Équipe</Link>
+                        <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Contact</Link>
+                        <Link href="/dashboard/media/blog" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Blog</Link>
+                        <Link href="/dashboard/media/reports" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Rapports</Link>
+                        <div className="flex flex-col gap-4 w-full items-center mt-4 border-t pt-4">
+                            <Button asChild variant="ghost" className="w-full">
+                                <Link href="/login" onClick={() => setIsMenuOpen(false)}>Connexion</Link>
+                            </Button>
+                            <Button asChild className="w-full">
+                                <Link href="/register" onClick={() => setIsMenuOpen(false)}>Devenir Volontaire</Link>
+                            </Button>
+                        </div>
+                    </nav>
+                </div>
+            )}
+
             <main className="container mx-auto px-4 py-8 md:py-16">
                 <div className="grid lg:grid-cols-2 gap-12">
                     <div className="space-y-8">
