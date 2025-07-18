@@ -239,9 +239,39 @@ export default function Home() {
                   <p className="text-muted-foreground">
                     Soutien aux plus vulnérables avec des aides matérielles, financières, et un accompagnement médicosocial pour garantir dignité et bien-être.
                   </p>
-                   <Button asChild variant="link" className="px-0">
-                    <Link href="#">En savoir plus</Link>
-                  </Button>
+                   <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="link" className="px-0">En savoir plus</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[525px]">
+                      <DialogHeader>
+                        <DialogTitle className="font-headline text-2xl flex items-center gap-2"><LifeBuoy className="h-6 w-6 text-primary" /> Santé et Action Sociale</DialogTitle>
+                        <DialogDescription className="pt-2 text-left">
+                          Nous contribuons à l'amélioration des contitions de vie et de santé des populations à travers:
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <ul className="space-y-3">
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>La médecine itinérante et de proximité en milieu rurale.</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>Les sensibilisations au VIH-SIDA, le dépistage, formation des paires éducateurs et la distribution des contraceptifs.</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>Les sensibilisations au paludisme, dépistage, distribution des moustiquaires imprégnées et formation d'agent de santé communautaire.</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>Les sensibilisations sur le tabac, l'alcool, la drogue et les maladies chroniques.</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
             </div>
