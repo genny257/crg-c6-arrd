@@ -4,8 +4,16 @@ import * as React from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
-import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users, Menu, X, HandHeart, ChevronDown } from "lucide-react"
+import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users, Menu, X, HandHeart, ChevronDown, CheckCircle2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -177,9 +185,39 @@ export default function Home() {
                   <p className="text-muted-foreground">
                     Intervention rapide lors de catastrophes naturelles, gestion des postes de secours pour les événements publics et assistance immédiate aux victimes.
                   </p>
-                  <Button asChild variant="link" className="px-0">
-                    <Link href="#">En savoir plus</Link>
-                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="link" className="px-0">En savoir plus</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[525px]">
+                      <DialogHeader>
+                        <DialogTitle className="font-headline text-2xl flex items-center gap-2"><ShieldCheck className="h-6 w-6 text-primary" /> Secourisme et Gestion de Catastrophes</DialogTitle>
+                        <DialogDescription className="pt-2 text-left">
+                          Afin d'améliorer la résilience des communautés, nous menons des actions de préparation et de gestion des catastrophes à travers :
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <ul className="space-y-3">
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>La formation aux gestes de premiers secours.</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>La sensibilisation sur les changements climatiques.</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>La formation sur la sécurité et la santé au travail.</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>Le déploiement des équipes de secouristes en situation d'urgence ou de catastrophe.</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
             </div>
