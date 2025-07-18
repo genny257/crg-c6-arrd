@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -9,16 +10,26 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useAuth, UserRole } from "@/hooks/use-auth"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
-  const [role, setRole] = React.useState<UserRole>('user');
+  const [email, setEmail] = React.useState("user@example.com");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    login({ name: 'Utilisateur Simulé', role });
+    let role: UserRole = 'user';
+    let name = 'Utilisateur';
+
+    if (email === 'admin@example.com') {
+      role = 'admin';
+      name = 'Admin';
+    } else if (email === 'superadmin@example.com') {
+      role = 'superadmin';
+      name = 'Super Admin';
+    }
+
+    login({ name: name, role });
     router.push('/dashboard');
   };
 
@@ -61,8 +72,12 @@ export default function LoginPage() {
                 type="email"
                 placeholder="nom@exemple.com"
                 required
-                defaultValue="test@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
+               <p className="text-xs text-muted-foreground pt-1">
+                Utilisez <code className="font-mono bg-muted p-1 rounded">admin@example.com</code> ou <code className="font-mono bg-muted p-1 rounded">superadmin@example.com</code> pour tester les différents rôles.
+              </p>
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
@@ -75,24 +90,6 @@ export default function LoginPage() {
                 </Link>
               </div>
               <Input id="password" type="password" required defaultValue="password" />
-            </div>
-
-            <div className="grid gap-2">
-                <Label>Simuler le rôle :</Label>
-                 <RadioGroup defaultValue="user" onValueChange={(value: UserRole) => setRole(value)} className="grid grid-cols-3 gap-4">
-                    <div>
-                        <RadioGroupItem value="user" id="role-user" className="sr-only" />
-                        <Label htmlFor="role-user" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary">Utilisateur</Label>
-                    </div>
-                    <div>
-                        <RadioGroupItem value="admin" id="role-admin" className="sr-only" />
-                        <Label htmlFor="role-admin" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary">Admin</Label>
-                    </div>
-                    <div>
-                        <RadioGroupItem value="superadmin" id="role-superadmin" className="sr-only" />
-                        <Label htmlFor="role-superadmin" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary">Super Admin</Label>
-                    </div>
-                </RadioGroup>
             </div>
 
             <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
