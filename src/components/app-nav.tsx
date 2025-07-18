@@ -3,6 +3,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import * as React from "react"
 import {
   LayoutDashboard,
   Users,
@@ -14,8 +15,15 @@ import {
   LineChart,
   Calendar,
   Network,
+  ChevronDown,
+  Newspaper,
 } from "lucide-react"
 
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import {
   SidebarHeader,
   SidebarContent,
@@ -26,6 +34,7 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/hooks/use-auth"
+import { cn } from "@/lib/utils"
 
 const mainNavItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Tableau de bord" },
@@ -43,6 +52,7 @@ const reportsNavItems = [
 export function AppNav() {
   const pathname = usePathname()
   const { user, logout } = useAuth();
+  const [isMediaOpen, setIsMediaOpen] = React.useState(pathname.startsWith('/dashboard/media'));
 
   const filteredMainNav = mainNavItems.filter(item => {
     if (!item.adminOnly) return true;
@@ -89,6 +99,30 @@ export function AppNav() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
+          <SidebarMenuItem>
+            <Collapsible open={isMediaOpen} onOpenChange={setIsMediaOpen}>
+              <CollapsibleTrigger asChild>
+                <SidebarMenuButton
+                  variant="ghost"
+                  className="w-full justify-start"
+                  isActive={pathname.startsWith('/dashboard/media')}
+                  tooltip="Média"
+                >
+                  <Newspaper className="h-4 w-4" />
+                  <span>Média</span>
+                  <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", isMediaOpen && "rotate-180")} />
+                </SidebarMenuButton>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pl-8 py-1 space-y-1">
+                 <Link href="/dashboard/media/blog" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", pathname === '/dashboard/media/blog' && 'bg-sidebar-accent')}>
+                    Blog
+                  </Link>
+                  <Link href="/dashboard/media/reports" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", pathname === '/dashboard/media/reports' && 'bg-sidebar-accent')}>
+                    Rapports
+                  </Link>
+              </CollapsibleContent>
+            </Collapsible>
+          </SidebarMenuItem>
         </SidebarMenu>
         <SidebarSeparator />
          <SidebarMenu>
