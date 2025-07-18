@@ -9,7 +9,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { RegisterUserInputSchema, type RegisterUserInput } from '@/ai/schemas/register-user-schema';
-import { adminDb } from '@/lib/firebase';
+import { adminDb } from '@/lib/firebase/admin';
 
 const registerUserFlow = ai.defineFlow(
   {
