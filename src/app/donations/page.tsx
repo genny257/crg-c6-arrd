@@ -39,13 +39,18 @@ export default function DonationPage() {
                 <span className="sr-only">Gabon Relief Hub</span>
                 </Link>
                 <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
-                <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Accueil</Link>
-                <Button asChild variant="ghost">
-                    <Link href="/login">Connexion</Link>
-                </Button>
-                <Button asChild>
-                    <Link href="/register">Devenir Volontaire</Link>
-                </Button>
+                    <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Accueil</Link>
+                    <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4">Équipe</Link>
+                    <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">Contact</Link>
+                    <Link href="/donations" className="text-sm font-medium underline underline-offset-4 text-primary" prefetch={false}>
+                        Don
+                    </Link>
+                    <Button asChild variant="ghost">
+                        <Link href="/login">Connexion</Link>
+                    </Button>
+                    <Button asChild>
+                        <Link href="/register">Devenir Volontaire</Link>
+                    </Button>
                 </nav>
             </header>
             <main className="container mx-auto px-4 py-8 md:py-16">

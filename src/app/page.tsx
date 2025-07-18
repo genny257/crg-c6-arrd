@@ -4,7 +4,7 @@ import * as React from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
-import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users, Menu, X } from "lucide-react"
+import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users, Menu, X, HandHeart } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export default function Home() {
@@ -41,6 +41,9 @@ export default function Home() {
           <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
             Contact
           </Link>
+          <Link href="/donations" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
+            Don
+          </Link>
           <Link href="#engagement" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
             S'engager
           </Link>
@@ -70,6 +73,9 @@ export default function Home() {
                   </Link>
                   <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
                       Contact
+                  </Link>
+                   <Link href="/donations" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
+                      Don
                   </Link>
                   <Link href="#engagement" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
                       S'engager
@@ -117,7 +123,7 @@ export default function Home() {
             </div>
         </section>
         
-        <section id="actions" className="w-full py-12 md:py-24 lg:py-32 bg-card flex flex-col items-center">
+        <section id="actions" className="w-full py-12 md:py-24 lg:py-32 flex flex-col items-center">
           <div className="container space-y-12 px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Nos Actions</div>
