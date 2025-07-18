@@ -79,14 +79,18 @@ export default function ContactPage() {
                 <CardTitle className="font-headline text-xl">Localisation</CardTitle>
             </CardHeader>
             <CardContent>
-                <Image
-                    src="https://placehold.co/600x400.png"
-                    width={600}
-                    height={400}
-                    alt="Map of Libreville"
-                    data-ai-hint="Libreville Gabon map"
-                    className="w-full h-auto rounded-lg"
-                 />
+                <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127674.3942398939!2d9.38555845183416!3d0.4132068875283917!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x107f43393116a907%3A0x86134b815663765!2sLibreville%2C%20Gabon!5e0!3m2!1sfr!2sfr!4v1720524453612!5m2!1sfr!2sfr"
+                        width="100%"
+                        height="400"
+                        style={{ border: 0 }}
+                        allowFullScreen={true}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        className="w-full h-full"
+                    ></iframe>
+                </div>
             </CardContent>
         </Card>
       </aside>
