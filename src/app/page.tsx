@@ -293,9 +293,35 @@ export default function Home() {
                   <p className="text-muted-foreground">
                     Apprenez les gestes qui sauvent et développez vos compétences avec nos formations certifiées pour devenir un maillon essentiel de la chaîne de secours.
                   </p>
-                   <Button asChild variant="link" className="px-0">
-                    <Link href="#">En savoir plus</Link>
-                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="link" className="px-0">En savoir plus</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[525px]">
+                      <DialogHeader>
+                        <DialogTitle className="font-headline text-2xl flex items-center gap-2"><BookOpenCheck className="h-6 w-6 text-primary" /> Nos Formations Certifiantes</DialogTitle>
+                        <DialogDescription className="pt-2 text-left">
+                          Devenez un acteur de la chaîne de secours. Nous proposons des formations pour le grand public et les professionnels.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <ul className="space-y-3">
+                           <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>Premiers Secours Civiques (PSC1) : Apprenez les gestes essentiels pour réagir face à un accident.</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>Initiation aux Premiers Secours (IPS) : Une formation courte pour acquérir les bases.</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                            <span>Formations pour entreprises : Des modules adaptés pour la sécurité au travail (SST).</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
             </div>
