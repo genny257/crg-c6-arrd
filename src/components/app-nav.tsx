@@ -17,6 +17,7 @@ import {
   Network,
   ChevronDown,
   Newspaper,
+  CalendarClock
 } from "lucide-react"
 
 import {
@@ -119,6 +120,9 @@ export function AppNav() {
                   </Link>
                   <Link href="/dashboard/media/reports" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", pathname === '/dashboard/media/reports' && 'bg-sidebar-accent')}>
                     Rapports
+                  </Link>
+                   <Link href="#" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent")}>
+                    Évènements Avenir
                   </Link>
               </CollapsibleContent>
             </Collapsible>

@@ -60,6 +60,9 @@ export default function Home() {
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/media/reports">Rapports</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="#">Évènements Avenir</Link>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           <Link href="#engagement" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
@@ -81,7 +84,7 @@ export default function Home() {
       </header>
 
        {isMenuOpen && (
-          <div className="md:hidden bg-card shadow-md absolute top-14 left-0 w-full z-10">
+          <div className="md:hidden bg-background shadow-md absolute top-14 left-0 w-full z-50">
               <nav className="flex flex-col items-center gap-4 p-4">
                   <Link href="#actions" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
                       Nos Actions
@@ -97,6 +100,9 @@ export default function Home() {
                   </Link>
                    <Link href="/dashboard/media/reports" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
                       Rapports
+                  </Link>
+                  <Link href="#" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
+                      Évènements Avenir
                   </Link>
                   <Link href="#engagement" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
                       S'engager

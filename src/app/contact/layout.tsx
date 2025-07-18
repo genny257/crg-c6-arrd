@@ -54,6 +54,9 @@ export default function ContactLayout({ children }: { children: ReactNode }) {
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard/media/reports">Rapports</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="#">Évènements Avenir</Link>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <Button asChild variant="ghost">
@@ -72,13 +75,14 @@ export default function ContactLayout({ children }: { children: ReactNode }) {
       </header>
 
       {isMenuOpen && (
-          <div className="md:hidden bg-card shadow-md absolute top-14 left-0 w-full z-10">
+          <div className="md:hidden bg-background shadow-md absolute top-14 left-0 w-full z-50">
               <nav className="flex flex-col items-center gap-4 p-4">
                   <Link href="/" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Accueil</Link>
                   <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Équipe</Link>
                   <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Contact</Link>
                   <Link href="/dashboard/media/blog" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Blog</Link>
                   <Link href="/dashboard/media/reports" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Rapports</Link>
+                  <Link href="#" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Évènements Avenir</Link>
                    <div className="flex flex-col gap-4 w-full items-center mt-4 border-t pt-4">
                         <Button asChild variant="ghost" className="w-full">
                             <Link href="/login" onClick={() => setIsMenuOpen(false)}>Connexion</Link>
