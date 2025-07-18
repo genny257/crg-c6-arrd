@@ -29,7 +29,7 @@ export default function Home() {
               fill="currentColor"
             />
           </svg>
-          <span className="sr-only">Gabon Relief Hub</span>
+          <span className="sr-only">Croix-Rouge Gabonaise</span>
         </Link>
         <nav className="ml-auto hidden xs:flex gap-4 sm:gap-6 items-center">
           <Link href="#actions" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
@@ -86,10 +86,10 @@ export default function Home() {
             <div className="grid max-w-[1300px] mx-auto gap-4 px-4 sm:px-6 md:px-10 md:grid-cols-2 md:gap-16">
               <div>
                 <h1 className="lg:leading-tighter text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem] font-headline text-primary">
-                  Gabon Relief Hub
+                  Croix-Rouge Gabonaise
                 </h1>
                 <h2 className="text-xl md:text-2xl font-headline text-foreground/80 mt-2">
-                  La plateforme de la Croix-Rouge Gabonaise
+                  Comité Sixième Arrondissement
                 </h2>
                 <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl mt-4">
                   Ensemble, pour un avenir plus sûr. Rejoignez-nous pour gérer les missions, coordonner les volontaires et amplifier notre impact.
