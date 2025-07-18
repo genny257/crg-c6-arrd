@@ -10,12 +10,20 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import { ChevronDown, Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+const tabs = [
+    { name: "Blog", href: "/blog" },
+    { name: "Rapports", href: "/reports" },
+    { name: "Évènements", href: "/events" },
+];
 
-export default function TeamLayout({ children }: { children: ReactNode }) {
+export default function MediaLayout({ children }: { children: ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const pathname = usePathname();
 
   return (
     <div className="bg-background min-h-screen">
@@ -40,13 +48,9 @@ export default function TeamLayout({ children }: { children: ReactNode }) {
         </Link>
         <nav className="ml-auto hidden md:flex gap-4 sm:gap-6 items-center">
             <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Accueil</Link>
-            <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
-                Équipe
-            </Link>
-            <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
-                Contact
-            </Link>
-             <DropdownMenu>
+            <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4">Équipe</Link>
+            <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">Contact</Link>
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="text-sm font-medium hover:underline underline-offset-4 px-0">
                   Média <ChevronDown className="w-4 h-4" />
@@ -101,8 +105,18 @@ export default function TeamLayout({ children }: { children: ReactNode }) {
       )}
 
       <main className="container mx-auto px-4 py-8 md:py-16">
+        <Tabs value={pathname} className="w-full mb-8">
+            <TabsList className="grid w-full grid-cols-3 max-w-md">
+                {tabs.map((tab) => (
+                    <TabsTrigger key={tab.href} value={tab.href} asChild>
+                        <Link href={tab.href}>{tab.name}</Link>
+                    </TabsTrigger>
+                ))}
+            </TabsList>
+        </Tabs>
         {children}
       </main>
+      
        <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t bg-card">
         <p className="text-xs text-muted-foreground">&copy; 2024 Croix-Rouge Gabonaise. Tous droits réservés.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">

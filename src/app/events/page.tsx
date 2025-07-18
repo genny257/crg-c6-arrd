@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, MapPin, PlusCircle } from "lucide-react";
 import Image from "next/image";
+import { useAuth } from "@/hooks/use-auth";
+
 
 const events = [
     {
@@ -32,6 +34,7 @@ const events = [
 ];
 
 export default function EventsPage() {
+
   return (
     <div className="flex flex-col gap-8">
         <div className="flex items-center justify-between">
@@ -39,10 +42,12 @@ export default function EventsPage() {
                 <h2 className="text-3xl font-headline font-bold">Évènements</h2>
                 <p className="text-muted-foreground">Participez à nos prochains évènements et engagez-vous à nos côtés.</p>
             </div>
+            
              <Button>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Créer un événement
             </Button>
+            
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((event) => (

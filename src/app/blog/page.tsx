@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { PlusCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useAuth } from "@/hooks/use-auth";
 
 const blogPosts = [
     {
@@ -12,7 +13,7 @@ const blogPosts = [
         excerpt: "Retour sur nos actions à Libreville pour venir en aide aux sinistrés. Mobilisation, distribution de kits et soutien psychologique...",
         image: "https://placehold.co/600x400.png",
         imageHint: "flood relief",
-        slug: "/dashboard/media/blog/inondations-libreville"
+        slug: "/blog/inondations-libreville"
     },
     {
         title: "La jeunesse de la Croix-Rouge, un engagement qui a du sens",
@@ -20,7 +21,7 @@ const blogPosts = [
         excerpt: "Portrait de Marie, jeune volontaire de 19 ans, qui nous partage son expérience et ses motivations au sein de notre comité.",
         image: "https://placehold.co/600x400.png",
         imageHint: "young volunteer",
-        slug: "/dashboard/media/blog/portrait-jeune-volontaire"
+        slug: "/blog/portrait-jeune-volontaire"
     },
     {
         title: "Conseils de prévention : se protéger contre le paludisme",
@@ -28,11 +29,12 @@ const blogPosts = [
         excerpt: "Le paludisme reste une menace. Découvrez les gestes simples et les bonnes pratiques pour vous protéger et protéger votre entourage.",
         image: "https://placehold.co/600x400.png",
         imageHint: "malaria prevention",
-        slug: "/dashboard/media/blog/prevention-paludisme"
+        slug: "/blog/prevention-paludisme"
     }
 ];
 
 export default function BlogPage() {
+  
   return (
     <div className="flex flex-col gap-8">
         <div className="flex items-center justify-between">
@@ -40,10 +42,12 @@ export default function BlogPage() {
                 <h2 className="text-3xl font-headline font-bold">Blog</h2>
                 <p className="text-muted-foreground">Les dernières nouvelles et articles de la Croix-Rouge Gabonaise.</p>
             </div>
+            
             <Button>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Nouvel article
             </Button>
+            
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {blogPosts.map((post) => (

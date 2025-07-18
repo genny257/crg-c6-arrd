@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Download, FileText, PlusCircle } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 const reports = [
     {
@@ -28,6 +29,7 @@ const reports = [
 ];
 
 export default function ReportsPage() {
+
   return (
     <div className="flex flex-col gap-8">
         <div className="flex items-center justify-between">
@@ -35,10 +37,12 @@ export default function ReportsPage() {
                 <h2 className="text-3xl font-headline font-bold">Rapports</h2>
                 <p className="text-muted-foreground">Consultez nos rapports d'activité et financiers.</p>
             </div>
+             
              <Button>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Nouveau rapport
             </Button>
+             
         </div>
         <Card>
             <CardContent className="p-6">
