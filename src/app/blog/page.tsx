@@ -3,7 +3,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Eye, MoreVertical, Pencil, PlusCircle, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
@@ -15,7 +16,8 @@ const blogPosts = [
         excerpt: "Retour sur nos actions à Libreville pour venir en aide aux sinistrés. Mobilisation, distribution de kits et soutien psychologique...",
         image: "https://placehold.co/600x400.png",
         imageHint: "flood relief",
-        slug: "/blog/inondations-libreville"
+        slug: "/blog/inondations-libreville",
+        visible: true,
     },
     {
         title: "La jeunesse de la Croix-Rouge, un engagement qui a du sens",
@@ -23,7 +25,8 @@ const blogPosts = [
         excerpt: "Portrait de Marie, jeune volontaire de 19 ans, qui nous partage son expérience et ses motivations au sein de notre comité.",
         image: "https://placehold.co/600x400.png",
         imageHint: "young volunteer",
-        slug: "/blog/portrait-jeune-volontaire"
+        slug: "/blog/portrait-jeune-volontaire",
+        visible: true,
     },
     {
         title: "Conseils de prévention : se protéger contre le paludisme",
@@ -31,13 +34,15 @@ const blogPosts = [
         excerpt: "Le paludisme reste une menace. Découvrez les gestes simples et les bonnes pratiques pour vous protéger et protéger votre entourage.",
         image: "https://placehold.co/600x400.png",
         imageHint: "malaria prevention",
-        slug: "/blog/prevention-paludisme"
+        slug: "/blog/prevention-paludisme",
+        visible: false,
     }
 ];
 
 export default function BlogPage() {
   const { user } = useAuth();
-  
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+
   return (
     <div className="flex flex-col gap-8">
         <div className="flex items-center justify-between">
@@ -45,18 +50,42 @@ export default function BlogPage() {
                 <h2 className="text-3xl font-headline font-bold">Blog</h2>
                 <p className="text-muted-foreground">Les dernières nouvelles et articles de la Croix-Rouge Gabonaise.</p>
             </div>
-            
-            {(user?.role === 'admin' || user?.role === 'superadmin') && (
+
+            {isAdmin && (
               <Button>
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Nouvel article
               </Button>
             )}
-            
+
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {blogPosts.map((post) => (
-                <Card key={post.title} className="flex flex-col">
+                <Card key={post.title} className="flex flex-col relative">
+                    {isAdmin && (
+                         <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-8 w-8 bg-black/20 hover:bg-black/50 text-white hover:text-white">
+                                    <MoreVertical className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                    <Pencil className="mr-2 h-4 w-4" />
+                                    <span>Modifier</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    <span>{post.visible ? 'Masquer' : 'Afficher'}</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-destructive">
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    <span>Supprimer</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
                     <CardHeader className="p-0">
                          <Image
                             src={post.image}
@@ -72,10 +101,11 @@ export default function BlogPage() {
                         <CardTitle className="font-headline text-xl mb-2">{post.title}</CardTitle>
                         <CardDescription>{post.excerpt}</CardDescription>
                     </CardContent>
-                    <CardFooter className="p-6 pt-0">
+                    <CardFooter className="p-6 pt-0 flex justify-between items-center">
                         <Button asChild variant="secondary">
                             <Link href={post.slug}>Lire la suite</Link>
                         </Button>
+                         {!post.visible && <span className="text-xs font-semibold text-amber-600">Masqué</span>}
                     </CardFooter>
                 </Card>
             ))}
