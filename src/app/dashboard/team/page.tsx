@@ -4,7 +4,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Sitemap, ShieldAlert } from "lucide-react";
+import { Network, ShieldAlert } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -90,7 +90,7 @@ export default function TeamPage() {
     return (
         <div className="flex flex-col gap-8">
             <h1 className="text-3xl font-headline font-bold flex items-center gap-2">
-                <Sitemap className="w-8 h-8 text-primary"/>
+                <Network className="w-8 h-8 text-primary"/>
                 Organigramme du Comité
             </h1>
             <p className="text-muted-foreground -mt-6">Comité du Sixième Arrondissement de Libreville</p>
