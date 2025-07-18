@@ -38,6 +38,9 @@ export default function Home() {
           <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
             Équipe
           </Link>
+          <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
+            Contact
+          </Link>
           <Link href="#engagement" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
             S'engager
           </Link>
@@ -64,6 +67,9 @@ export default function Home() {
                   </Link>
                   <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
                       Équipe
+                  </Link>
+                  <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
+                      Contact
                   </Link>
                   <Link href="#engagement" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
                       S'engager

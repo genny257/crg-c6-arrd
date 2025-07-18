@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export default function TeamLayout({ children }: { children: ReactNode }) {
+export default function ContactLayout({ children }: { children: ReactNode }) {
   return (
     <div className="bg-background min-h-screen">
       <header className="px-4 lg:px-6 h-14 flex items-center bg-card shadow-sm z-10 sticky top-0">
@@ -23,16 +23,12 @@ export default function TeamLayout({ children }: { children: ReactNode }) {
               fill="currentColor"
             />
           </svg>
-          <span className="sr-only">Gabon Relief Hub</span>
+          <span className="sr-only">Croix-Rouge Gabonaise</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
             <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Accueil</Link>
-            <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
-                Équipe
-            </Link>
-            <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
-                Contact
-            </Link>
+            <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4">Équipe</Link>
+            <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">Contact</Link>
             <Button asChild variant="ghost">
                 <Link href="/login">Connexion</Link>
             </Button>
@@ -44,6 +40,17 @@ export default function TeamLayout({ children }: { children: ReactNode }) {
       <main className="container mx-auto px-4 py-8 md:py-16">
         {children}
       </main>
+       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t bg-card">
+        <p className="text-xs text-muted-foreground">&copy; 2024 Croix-Rouge Gabonaise. Tous droits réservés.</p>
+        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
+          <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
+            Termes & Conditions
+          </Link>
+          <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
+            Politique de confidentialité
+          </Link>
+        </nav>
+      </footer>
     </div>
   );
 }
