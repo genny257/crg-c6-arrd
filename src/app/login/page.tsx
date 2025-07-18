@@ -1,11 +1,27 @@
+"use client"
+
+import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useAuth, UserRole } from "@/hooks/use-auth"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { login } = useAuth();
+  const [role, setRole] = React.useState<UserRole>('user');
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    login({ name: 'Utilisateur Simulé', role });
+    router.push('/dashboard');
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
       <Card className="mx-auto max-w-sm w-full relative">
@@ -37,7 +53,7 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4">
+          <form onSubmit={handleLogin} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -45,6 +61,7 @@ export default function LoginPage() {
                 type="email"
                 placeholder="nom@exemple.com"
                 required
+                defaultValue="test@example.com"
               />
             </div>
             <div className="grid gap-2">
@@ -57,15 +74,34 @@ export default function LoginPage() {
                   Mot de passe oublié ?
                 </Link>
               </div>
-              <Input id="password" type="password" required />
+              <Input id="password" type="password" required defaultValue="password" />
             </div>
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90" asChild>
-              <Link href="/dashboard">Se connecter</Link>
+
+            <div className="grid gap-2">
+                <Label>Simuler le rôle :</Label>
+                 <RadioGroup defaultValue="user" onValueChange={(value: UserRole) => setRole(value)} className="grid grid-cols-3 gap-4">
+                    <div>
+                        <RadioGroupItem value="user" id="role-user" className="sr-only" />
+                        <Label htmlFor="role-user" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary">Utilisateur</Label>
+                    </div>
+                    <div>
+                        <RadioGroupItem value="admin" id="role-admin" className="sr-only" />
+                        <Label htmlFor="role-admin" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary">Admin</Label>
+                    </div>
+                    <div>
+                        <RadioGroupItem value="superadmin" id="role-superadmin" className="sr-only" />
+                        <Label htmlFor="role-superadmin" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary">Super Admin</Label>
+                    </div>
+                </RadioGroup>
+            </div>
+
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
+              Se connecter
             </Button>
             <Button variant="outline" className="w-full">
               Se connecter avec Google
             </Button>
-          </div>
+          </form>
           <div className="mt-4 text-center text-sm">
             Pas encore de compte ?{" "}
             <Link href="/register" className="underline">

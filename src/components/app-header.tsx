@@ -13,8 +13,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "./ui/sidebar"
+import { useAuth } from "@/hooks/use-auth"
 
 export function AppHeader() {
+  const { user, logout } = useAuth();
+
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
         <SidebarTrigger className="md:hidden" />
@@ -39,14 +42,16 @@ export function AppHeader() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Mon Compte</DropdownMenuLabel>
+            <DropdownMenuLabel>
+              {user ? `Connecté en tant que ${user.role}` : 'Mon Compte'}
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
                 <Link href="/dashboard/profile">Profil</Link>
             </DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem onClick={logout} asChild>
                 <Link href="/">Déconnexion</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>

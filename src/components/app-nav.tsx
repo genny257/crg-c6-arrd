@@ -25,12 +25,13 @@ import {
   SidebarFooter,
   SidebarSeparator,
 } from "@/components/ui/sidebar"
+import { useAuth } from "@/hooks/use-auth"
 
 const mainNavItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Tableau de bord" },
   { href: "/dashboard/missions", icon: Briefcase, label: "Missions" },
   { href: "/dashboard/volunteers", icon: Users, label: "Volontaires" },
-  { href: "/team", icon: Network, label: "Équipe" },
+  { href: "/dashboard/team", icon: Network, label: "Équipe", adminOnly: true },
   { href: "/dashboard/calendar", icon: Calendar, label: "Calendrier" },
 ]
 
@@ -41,6 +42,12 @@ const reportsNavItems = [
 
 export function AppNav() {
   const pathname = usePathname()
+  const { user, logout } = useAuth();
+
+  const filteredMainNav = mainNavItems.filter(item => {
+    if (!item.adminOnly) return true;
+    return user?.role === 'admin' || user?.role === 'superadmin';
+  });
 
   return (
     <>
@@ -68,7 +75,7 @@ export function AppNav() {
       </SidebarHeader>
       <SidebarContent className="p-2">
         <SidebarMenu>
-          {mainNavItems.map((item) => (
+          {filteredMainNav.map((item) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild
@@ -124,7 +131,7 @@ export function AppNav() {
             </SidebarMenuItem>
             <SidebarSeparator />
             <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Déconnexion" asChild>
+                <SidebarMenuButton tooltip="Déconnexion" asChild onClick={logout}>
                     <Link href="/">
                         <LogOut className="h-4 w-4" />
                         <span>Déconnexion</span>

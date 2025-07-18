@@ -1,7 +1,15 @@
+
+"use client"
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Sitemap } from "lucide-react";
+import { Sitemap, ShieldAlert } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 type Member = {
     name: string;
@@ -53,6 +61,32 @@ const MemberCard = ({ member, size = 'default' }: { member: Member, size?: 'defa
 );
 
 export default function TeamPage() {
+    const { user, loading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!loading && user?.role !== 'admin' && user?.role !== 'superadmin') {
+            router.push('/dashboard');
+        }
+    }, [user, loading, router]);
+
+    if (loading) {
+        return <div>Chargement...</div>;
+    }
+    
+    if (user?.role !== 'admin' && user?.role !== 'superadmin') {
+        return (
+            <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
+                <ShieldAlert className="w-16 h-16 text-destructive" />
+                <h1 className="text-2xl font-bold">Accès non autorisé</h1>
+                <p className="text-muted-foreground">Vous n'avez pas les permissions nécessaires pour voir cette page.</p>
+                <Button asChild>
+                    <Link href="/dashboard">Retour au tableau de bord</Link>
+                </Button>
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-col gap-8">
             <h1 className="text-3xl font-headline font-bold flex items-center gap-2">

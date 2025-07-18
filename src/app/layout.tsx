@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { Belleza, Alegreya } from 'next/font/google'
+import { AuthProvider } from '@/hooks/use-auth';
 
 const belleza = Belleza({
   subsets: ['latin'],
@@ -28,8 +29,10 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={`${alegreya.variable} ${belleza.variable} font-body antialiased`}>
-        {children}
-        <Toaster />
+        <AuthProvider>
+            {children}
+            <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );
