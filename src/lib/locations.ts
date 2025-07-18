@@ -163,7 +163,7 @@ export const locations = {
         "communes": { "Léconi": { "arrondissements": {}, "quartiers": [] } },
         "cantons": { "ALANGA": [], "LEBALADOUBA": [], "LEKALA": [], "LIMI": [] }
     }
-},
+  },
   "Moyen-Ogooué": {
     "Abanga-Bigne": {
       "communes": {
@@ -303,7 +303,7 @@ export const locations = {
             "Dibwa (District Ikobey)": ["Lekita", "Londene", "Egono", "École Catholique Matadi 7", "Guediba-Divinde", "École Nimbie", "I-F-L", "Chantier Egg-Sud (Kawa)"]
         }
     }
-},
+  },
   "Nyanga": {
     "Basse-Banio": { "communes": {}, "cantons": {} },
     "Douigni": { "communes": {}, "cantons": {} },
@@ -548,4 +548,4 @@ export const locations = {
     }
   }
 }
-};
+
