@@ -23,7 +23,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { cn } from "@/lib/utils"
 import { locations } from "@/lib/locations"
 import { useToast } from "@/hooks/use-toast"
-import { registerUser, RegisterUserInputSchema } from "@/ai/flows/register-flow"
+import { registerUser } from "@/ai/flows/register-flow"
+import { RegisterUserInputSchema } from "@/ai/schemas/register-user-schema"
 
 const totalSteps = 5
 
@@ -663,4 +664,3 @@ export default function RegisterPage() {
     )
 }
 
-    
