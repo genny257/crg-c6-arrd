@@ -1,5 +1,7 @@
 
 "use client"
+import * as React from "react";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -12,14 +14,12 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel
 } from "@/components/ui/dropdown-menu";
-
-const donations = [
-    { id: "DON001", name: "John Doe", amount: 10000, type: "Ponctuel", method: "Mobile Money", date: "2024-07-15", status: "Confirmé" },
-    { id: "DON002", name: "Jane Smith", amount: 5000, type: "Mensuel", method: "Carte Bancaire", date: "2024-07-14", status: "Confirmé" },
-    { id: "DON003", name: "Anonymous", amount: 20000, type: "Ponctuel", method: "Carte Bancaire", date: "2024-07-13", status: "Confirmé" },
-    { id: "DON004", name: "Paul Dubois", amount: 2000, type: "Ponctuel", method: "Mobile Money", date: "2024-07-12", status: "En attente" },
-    { id: "DON005", name: "Aïcha Traoré", amount: 5000, type: "Mensuel", method: "Carte Bancaire", date: "2024-07-11", status: "Échoué" },
-];
+import { db } from "@/lib/firebase/client";
+import { useToast } from "@/hooks/use-toast";
+import type { Donation } from "@/types/donation";
+import { Skeleton } from "@/components/ui/skeleton";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -31,6 +31,34 @@ const getStatusBadgeVariant = (status: string) => {
 };
 
 export default function DonationPage() {
+    const [donations, setDonations] = React.useState<Donation[]>([]);
+    const [loading, setLoading] = React.useState(true);
+    const { toast } = useToast();
+
+    const fetchDonations = React.useCallback(async () => {
+        setLoading(true);
+        try {
+            const q = query(collection(db, "donations"), orderBy("date", "desc"));
+            const querySnapshot = await getDocs(q);
+            const donationsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Donation));
+            setDonations(donationsData);
+        } catch (error) {
+            console.error("Error fetching donations: ", error);
+            toast({
+                title: "Erreur",
+                description: "Impossible de charger les dons.",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
+    }, [toast]);
+
+    React.useEffect(() => {
+        fetchDonations();
+    }, [fetchDonations]);
+
+
     return (
         <div className="flex flex-col gap-8">
             <div className="flex items-center justify-between">
@@ -57,37 +85,51 @@ export default function DonationPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {donations.map((donation) => (
-                                <TableRow key={donation.id}>
-                                    <TableCell className="font-medium">{donation.name}</TableCell>
-                                    <TableCell className="hidden md:table-cell">{donation.amount.toLocaleString('fr-FR')}</TableCell>
-                                    <TableCell className="hidden lg:table-cell">{donation.date}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={getStatusBadgeVariant(donation.status)}>{donation.status}</Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                       <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button aria-haspopup="true" size="icon" variant="ghost">
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                    <span className="sr-only">Ouvrir le menu</span>
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem>Voir le détail</DropdownMenuItem>
-                                                <DropdownMenuItem>Envoyer un reçu</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                             {loading ? (
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <TableRow key={i}>
+                                        <TableCell><Skeleton className="h-4 w-28" /></TableCell>
+                                        <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-20" /></TableCell>
+                                        <TableCell className="hidden lg:table-cell"><Skeleton className="h-4 w-24" /></TableCell>
+                                        <TableCell><Skeleton className="h-6 w-20 rounded-full" /></TableCell>
+                                        <TableCell><Skeleton className="h-8 w-8" /></TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                donations.map((donation) => (
+                                    <TableRow key={donation.id}>
+                                        <TableCell className="font-medium">{donation.name}</TableCell>
+                                        <TableCell className="hidden md:table-cell">{donation.amount.toLocaleString('fr-FR')}</TableCell>
+                                        <TableCell className="hidden lg:table-cell">
+                                            {format(new Date(donation.date), "d MMM yyyy", { locale: fr })}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant={getStatusBadgeVariant(donation.status)}>{donation.status}</Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                        <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button aria-haspopup="true" size="icon" variant="ghost">
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                        <span className="sr-only">Ouvrir le menu</span>
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                    <DropdownMenuItem>Voir le détail</DropdownMenuItem>
+                                                    <DropdownMenuItem>Envoyer un reçu</DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
                         </TableBody>
                     </Table>
                 </CardContent>
                  <CardFooter>
                     <div className="text-xs text-muted-foreground">
-                        Affichage de <strong>1-5</strong> sur <strong>{donations.length}</strong> dons.
+                        { !loading && `Affichage de <strong>${donations.length}</strong> sur <strong>${donations.length}</strong> dons.`}
                     </div>
                 </CardFooter>
             </Card>
