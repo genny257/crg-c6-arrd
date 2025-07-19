@@ -59,7 +59,7 @@ export function AppNav() {
   const [isMediaOpen, setIsMediaOpen] = React.useState(false);
 
   React.useEffect(() => {
-    if (pathname.startsWith('/blog') || pathname.startsWith('/reports') || pathname.startsWith('/events')) {
+    if (pathname.startsWith('/blog') || pathname.startsWith('/reports') || pathname.startsWith('/events') || pathname.startsWith('/dashboard/events') || pathname.startsWith('/dashboard/blog')) {
       setIsMediaOpen(true);
     }
   }, [pathname]);
@@ -115,7 +115,7 @@ export function AppNav() {
                 <SidebarMenuButton
                   variant="ghost"
                   className="w-full justify-start"
-                  isActive={pathname.startsWith('/blog') || pathname.startsWith('/reports') || pathname.startsWith('/events')}
+                  isActive={isMediaOpen}
                   tooltip="Média"
                 >
                   <Newspaper className="h-4 w-4" />
@@ -124,13 +124,13 @@ export function AppNav() {
                 </SidebarMenuButton>
               </CollapsibleTrigger>
               <CollapsibleContent className="pl-8 py-1 space-y-1">
-                 <Link href="/blog" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", pathname === '/blog' && 'bg-sidebar-accent')}>
+                 <Link href="/blog" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname === '/blog' || pathname.startsWith('/dashboard/blog')) && 'bg-sidebar-accent')}>
                     Blog
                   </Link>
-                  <Link href="/reports" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", pathname === '/reports' && 'bg-sidebar-accent')}>
+                  <Link href="/reports" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname === '/reports' || pathname.startsWith('/dashboard/reports')) && 'bg-sidebar-accent')}>
                     Rapports
                   </Link>
-                   <Link href="/events" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", pathname === '/events' && 'bg-sidebar-accent')}>
+                   <Link href="/events" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname === '/events' || pathname.startsWith('/dashboard/events')) && 'bg-sidebar-accent')}>
                     Évènements
                   </Link>
               </CollapsibleContent>
