@@ -65,26 +65,13 @@ export default function TeamPage() {
     const router = useRouter();
 
     useEffect(() => {
-        if (!loading && user?.role !== 'admin' && user?.role !== 'superadmin') {
-            router.push('/dashboard');
+        if (!loading && !user) {
+            router.push('/login');
         }
     }, [user, loading, router]);
 
-    if (loading) {
+    if (loading || !user) {
         return <div>Chargement...</div>;
-    }
-    
-    if (user?.role !== 'admin' && user?.role !== 'superadmin') {
-        return (
-            <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
-                <ShieldAlert className="w-16 h-16 text-destructive" />
-                <h1 className="text-2xl font-bold">Accès non autorisé</h1>
-                <p className="text-muted-foreground">Vous n'avez pas les permissions nécessaires pour voir cette page.</p>
-                <Button asChild>
-                    <Link href="/dashboard">Retour au tableau de bord</Link>
-                </Button>
-            </div>
-        );
     }
 
     return (
