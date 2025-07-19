@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { db } from "@/lib/firebase/client";
 import type { Volunteer } from "@/types/volunteer";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 
 
 const getStatusBadgeVariant = (status: string) => {
@@ -28,22 +29,49 @@ const getStatusBadgeVariant = (status: string) => {
 export default function VolunteersPage() {
     const [volunteers, setVolunteers] = React.useState<Volunteer[]>([]);
     const [loading, setLoading] = React.useState(true);
+    const { toast } = useToast();
+
+    const fetchVolunteers = async () => {
+        setLoading(true);
+        try {
+            const querySnapshot = await getDocs(collection(db, "volunteers"));
+            const volunteersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Volunteer));
+            setVolunteers(volunteersData);
+        } catch (error) {
+            console.error("Error fetching volunteers: ", error);
+             toast({
+                title: "Erreur",
+                description: "Impossible de charger les volontaires.",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     React.useEffect(() => {
-        const fetchVolunteers = async () => {
-            try {
-                const querySnapshot = await getDocs(collection(db, "volunteers"));
-                const volunteersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Volunteer));
-                setVolunteers(volunteersData);
-            } catch (error) {
-                console.error("Error fetching volunteers: ", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchVolunteers();
     }, []);
+
+    const updateVolunteerStatus = async (id: string, status: 'Actif' | 'Rejeté') => {
+        try {
+            const volunteerRef = doc(db, "volunteers", id);
+            await updateDoc(volunteerRef, { status: status });
+            setVolunteers(volunteers.map(v => v.id === id ? { ...v, status } : v));
+            toast({
+                title: "Statut mis à jour",
+                description: `Le volontaire a été marqué comme ${status.toLowerCase()}.`,
+            });
+        } catch (error) {
+            console.error("Error updating volunteer status: ", error);
+            toast({
+                title: "Erreur de mise à jour",
+                description: "Le statut du volontaire n'a pas pu être modifié.",
+                variant: "destructive",
+            });
+        }
+    };
+
 
     return (
         <div className="flex flex-col gap-8">
@@ -130,8 +158,8 @@ export default function VolunteersPage() {
                                                     <DropdownMenuItem>Voir le profil</DropdownMenuItem>
                                                     <DropdownMenuItem>Assigner à une mission</DropdownMenuItem>
                                                     <DropdownMenuSeparator />
-                                                    <DropdownMenuItem>Approuver</DropdownMenuItem>
-                                                    <DropdownMenuItem className="text-destructive">Rejeter</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => updateVolunteerStatus(volunteer.id, 'Actif')}>Approuver</DropdownMenuItem>
+                                                    <DropdownMenuItem className="text-destructive" onClick={() => updateVolunteerStatus(volunteer.id, 'Rejeté')}>Rejeter</DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </TableCell>
