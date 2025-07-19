@@ -134,21 +134,23 @@ export default function BlogPage() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
-              <CardHeader className="p-0">
-                <Image
-                  src={post.image || "https://placehold.co/600x400.png"}
-                  alt={post.title}
-                  data-ai-hint={post.imageHint}
-                  width={600}
-                  height={400}
-                  className="rounded-t-lg object-cover aspect-video"
-                />
-              </CardHeader>
-              <CardContent className="p-6 flex-1">
-                <p className="text-sm text-muted-foreground mb-1">{new Date(post.date).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                <CardTitle className="font-headline text-xl mb-2">{post.title}</CardTitle>
-                <CardDescription>{post.excerpt}</CardDescription>
-              </CardContent>
+              <Link href={`/blog/${post.slug}`} className="contents">
+                <CardHeader className="p-0">
+                  <Image
+                    src={post.image || "https://placehold.co/600x400.png"}
+                    alt={post.title}
+                    data-ai-hint={post.imageHint}
+                    width={600}
+                    height={400}
+                    className="rounded-t-lg object-cover aspect-video"
+                  />
+                </CardHeader>
+                <CardContent className="p-6 flex-1">
+                  <p className="text-sm text-muted-foreground mb-1">{new Date(post.date).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                  <CardTitle className="font-headline text-xl mb-2 group-hover:underline">{post.title}</CardTitle>
+                  <CardDescription>{post.excerpt}</CardDescription>
+                </CardContent>
+              </Link>
               <CardFooter className="p-6 pt-0 flex justify-between items-center">
                 <Button asChild variant="secondary">
                   <Link href={`/blog/${post.slug}`}>Lire la suite</Link>
@@ -162,3 +164,5 @@ export default function BlogPage() {
     </div>
   );
 }
+
+    

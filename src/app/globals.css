@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -82,3 +83,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Add prose styles for markdown rendering */
+@layer base {
+    .prose {
+        @apply text-foreground;
+    }
+
+    .prose a {
+        @apply text-primary hover:underline;
+    }
+
+    .prose h1, .prose h2, .prose h3, .prose h4 {
+        @apply text-foreground font-headline;
+    }
+    
+     .prose blockquote {
+        @apply border-l-4 border-primary pl-4 text-muted-foreground italic;
+     }
+
+    .prose code {
+        @apply rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold;
+    }
+}
+
+    
