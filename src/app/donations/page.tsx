@@ -14,18 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Lock, CreditCard, Smartphone, Users, ChevronDown, Menu, X, LayoutDashboard, HeartHandshake, Loader2 } from "lucide-react";
+import { Lock, CreditCard, Smartphone, Users, HeartHandshake, Loader2 } from "lucide-react";
 import Link from "next/link";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useAuth } from "@/hooks/use-auth";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
+import { PublicLayout } from "@/components/public-layout";
 
 
 const donationAmounts = [
@@ -35,14 +28,11 @@ const donationAmounts = [
 ];
 
 export default function DonationPage() {
-    const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-    const { user, loading } = useAuth();
     const [isSuccess, setIsSuccess] = React.useState(false);
 
     if (isSuccess) {
         return (
-             <div className="bg-background min-h-screen">
-                <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} user={user} loading={loading} />
+             <PublicLayout>
                 <main className="container mx-auto px-4 py-8 md:py-16 flex items-center justify-center text-center">
                     <Card className="w-full max-w-lg p-8">
                         <CardHeader>
@@ -62,14 +52,12 @@ export default function DonationPage() {
                         </CardContent>
                     </Card>
                 </main>
-                <Footer />
-            </div>
+            </PublicLayout>
         )
     }
 
     return (
-        <div className="bg-background min-h-screen">
-            <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} user={user} loading={loading} />
+        <PublicLayout>
             <main className="container mx-auto px-4 py-8 md:py-16">
                 <div className="grid lg:grid-cols-2 gap-12">
                     <div className="space-y-8">
@@ -146,80 +134,9 @@ export default function DonationPage() {
                     </aside>
                 </div>
             </main>
-            <Footer />
-        </div>
+        </PublicLayout>
     );
 }
-
-const Header = ({ isMenuOpen, setIsMenuOpen, user, loading }: { isMenuOpen: boolean, setIsMenuOpen: (isOpen: boolean) => void, user: any, loading: boolean }) => (
-    <header className="px-4 lg:px-6 h-14 flex items-center bg-card shadow-sm z-20 sticky top-0">
-        <Link href="/" className="flex items-center justify-center" prefetch={false}>
-            <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={32} height={32} />
-            <span className="sr-only">Croix-Rouge Gabonaise</span>
-        </Link>
-        <nav className="ml-auto hidden md:flex gap-4 sm:gap-6 items-center">
-            <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Accueil</Link>
-            <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4">Équipe</Link>
-            <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4">Contact</Link>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="text-sm font-medium hover:underline underline-offset-4 px-0">
-                        Média <ChevronDown className="w-4 h-4" />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild><Link href="/blog">Blog</Link></DropdownMenuItem>
-                    <DropdownMenuItem asChild><Link href="/reports">Rapports</Link></DropdownMenuItem>
-                    <DropdownMenuItem asChild><Link href="/events">Évènements</Link></DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-            {!loading && user ? (
-                <Button asChild variant="ghost"><Link href="/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link></Button>
-            ) : (
-                <Button asChild variant="ghost"><Link href="/login">Connexion</Link></Button>
-            )}
-            <Button asChild>
-                <Link href="/register">Devenir Volontaire</Link>
-            </Button>
-        </nav>
-        <div className="ml-auto md:hidden">
-            <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                <span className="sr-only">Ouvrir le menu</span>
-            </Button>
-        </div>
-        {isMenuOpen && (
-            <div className="fixed top-14 left-0 w-full md:hidden bg-background shadow-md z-50">
-                <nav className="flex flex-col items-center gap-4 p-4">
-                    <Link href="/" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Accueil</Link>
-                    <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Équipe</Link>
-                    <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Contact</Link>
-                    <Link href="/blog" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Blog</Link>
-                    <Link href="/reports" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Rapports</Link>
-                    <Link href="/events" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>Évènements</Link>
-                    <div className="flex flex-col gap-4 w-full items-center mt-4 border-t pt-4">
-                        {!loading && user ? (
-                            <Button asChild variant="ghost" className="w-full"><Link href="/dashboard" onClick={() => setIsMenuOpen(false)}><LayoutDashboard className="mr-2 h-4 w-4" />Dashboard</Link></Button>
-                        ) : (
-                            <Button asChild variant="ghost" className="w-full"><Link href="/login" onClick={() => setIsMenuOpen(false)}>Connexion</Link></Button>
-                        )}
-                        <Button asChild className="w-full"><Link href="/register" onClick={() => setIsMenuOpen(false)}>Devenir Volontaire</Link></Button>
-                    </div>
-                </nav>
-            </div>
-        )}
-    </header>
-);
-
-const Footer = () => (
-     <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t bg-card">
-        <p className="text-xs text-muted-foreground">&copy; 2024 Croix-Rouge Gabonaise. Tous droits réservés.</p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-            <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>Termes & Conditions</Link>
-            <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>Politique de confidentialité</Link>
-        </nav>
-    </footer>
-);
 
 const donationSchema = z.object({
     amount: z.coerce.number().min(1000, "Le montant minimum est de 1 000 FCFA."),
@@ -425,3 +342,5 @@ const DonationForm = ({ onFormSuccess, isMonthly }: { onFormSuccess: () => void,
         </Form>
     );
 };
+
+    

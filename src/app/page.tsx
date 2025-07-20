@@ -4,7 +4,7 @@ import * as React from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
-import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users, Menu, X, HandHeart, ChevronDown, CheckCircle2, Droplets, LayoutDashboard } from "lucide-react"
+import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users, HandHeart, CheckCircle2, Droplets, Siren, Soup, ClipboardCheck, GraduationCap, Archive, Truck, Banknote, Shield } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   Dialog,
@@ -14,17 +14,12 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { useAuth } from "@/hooks/use-auth"
 import { doc, getDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase/client"
 import type { HomePageContent } from "@/types/homepage"
 import { Skeleton } from "@/components/ui/skeleton"
+import { PublicLayout } from "@/components/public-layout"
 
 const initialContent: HomePageContent = {
     heroTitle: "Comité-6-Arrondissement",
@@ -57,14 +52,18 @@ const actionIcons: { [key: string]: React.ElementType } = {
 
 
 export default function Home() {
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const { user, loading: authLoading } = useAuth();
-  const [content, setContent] = React.useState<HomePageContent>(initialContent);
+  const [content, setContent] = React.useState<HomePageContent | null>(null);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchContent = async () => {
-      if (!db) return;
+      if (!db) {
+        console.warn("Home page content not loaded: Firestore not initialized.");
+        setContent(initialContent);
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       try {
         const docRef = doc(db, "pages", "home");
@@ -73,9 +72,11 @@ export default function Home() {
           setContent(docSnap.data() as HomePageContent);
         } else {
           console.warn("Home page content not found in Firestore, using initial content.");
+          setContent(initialContent);
         }
       } catch (error) {
         console.error("Error fetching home page content: ", error);
+        setContent(initialContent); // Fallback to initial content on error
       } finally {
         setLoading(false);
       }
@@ -83,113 +84,10 @@ export default function Home() {
     fetchContent();
   }, []);
 
+  const displayContent = content || initialContent;
+
   return (
-    <div className="flex flex-col min-h-[100dvh] bg-background">
-      <header className="px-4 lg:px-6 h-14 flex items-center bg-card shadow-sm z-20 sticky top-0">
-        <Link href="/" className="flex items-center justify-center" prefetch={false}>
-          <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={32} height={32} />
-          <span className="sr-only">Croix-Rouge Gabonaise</span>
-        </Link>
-        <nav className="ml-auto hidden md:flex gap-4 sm:gap-6 items-center">
-          <Link href="#actions" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
-            Nos Actions
-          </Link>
-          <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
-            Équipe
-          </Link>
-          <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
-            Contact
-          </Link>
-           <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="text-sm font-medium hover:underline underline-offset-4 px-0">
-                  Média <ChevronDown className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link href="/blog">Blog</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/reports">Rapports</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/events">Évènements</Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          <Link href="#engagement" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
-            S'engager
-          </Link>
-          {!authLoading && user ? (
-            <Button asChild variant="ghost">
-              <Link href="/dashboard">
-                <LayoutDashboard className="mr-2 h-4 w-4" />
-                Dashboard
-              </Link>
-            </Button>
-          ) : (
-            <Button asChild variant="ghost">
-                <Link href="/login">Connexion</Link>
-            </Button>
-          )}
-          <Button asChild>
-            <Link href="/donations">Faire un Don</Link>
-          </Button>
-        </nav>
-        <div className="ml-auto md:hidden">
-            <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                <span className="sr-only">Ouvrir le menu</span>
-            </Button>
-        </div>
-      </header>
-
-       {isMenuOpen && (
-          <div className="fixed top-14 left-0 w-full md:hidden bg-background shadow-md z-50">
-              <nav className="flex flex-col items-center gap-4 p-4">
-                  <Link href="#actions" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
-                      Nos Actions
-                  </Link>
-                  <Link href="/team" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
-                      Équipe
-                  </Link>
-                  <Link href="/contact" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
-                      Contact
-                  </Link>
-                   <Link href="/blog" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
-                      Blog
-                  </Link>
-                   <Link href="/reports" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
-                      Rapports
-                  </Link>
-                  <Link href="/events" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
-                      Évènements
-                  </Link>
-                  <Link href="#engagement" className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>
-                      S'engager
-                  </Link>
-                   <div className="flex flex-col gap-4 w-full items-center mt-4 border-t pt-4">
-                        {!authLoading && user ? (
-                            <Button asChild variant="ghost" className="w-full">
-                                <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                                    Dashboard
-                                </Link>
-                            </Button>
-                        ) : (
-                            <Button asChild variant="ghost" className="w-full">
-                                <Link href="/login" onClick={() => setIsMenuOpen(false)}>Connexion</Link>
-                            </Button>
-                        )}
-                        <Button asChild className="w-full">
-                            <Link href="/donations" onClick={() => setIsMenuOpen(false)}>Faire un Don</Link>
-                        </Button>
-                   </div>
-              </nav>
-          </div>
-      )}
-
+    <PublicLayout>
       <main className="flex-1">
         <section className="w-full h-[60vh] md:h-[70vh] relative">
             <Image
@@ -212,13 +110,13 @@ export default function Home() {
                 ) : (
                     <>
                         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-headline font-bold drop-shadow-lg">
-                            {content.heroTitle}
+                            {displayContent.heroTitle}
                         </h1>
                         <h2 className="text-xl md:text-2xl font-headline mt-2 mb-6 drop-shadow-md">
-                            {content.heroSubtitle}
+                            {displayContent.heroSubtitle}
                         </h2>
                         <p className="max-w-2xl text-lg md:text-xl text-neutral-200 mb-8">
-                            {content.heroDescription}
+                            {displayContent.heroDescription}
                         </p>
                     </>
                 )}
@@ -242,7 +140,7 @@ export default function Home() {
                 Découvrez comment nous intervenons sur le terrain pour apporter une aide concrète et un soutien essentiel aux communautés.
               </p>
             </div>
-             {content.actions.map((action, index) => {
+             {displayContent.actions.map((action, index) => {
                 const Icon = actionIcons[action.title] || ShieldCheck;
                 return (
                     <div key={index} className={`mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-2 lg:gap-12`}>
@@ -305,9 +203,9 @@ export default function Home() {
                 </>
               ) : (
                 <>
-                  <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">{content.engagement.title}</h2>
+                  <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">{displayContent.engagement.title}</h2>
                   <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                    {content.engagement.description}
+                    {displayContent.engagement.description}
                   </p>
                 </>
               )}
@@ -324,9 +222,9 @@ export default function Home() {
                        </>
                     ) : (
                         <>
-                        <h3 className="mt-2 text-lg font-bold font-headline">{content.engagement.volunteerTitle}</h3>
+                        <h3 className="mt-2 text-lg font-bold font-headline">{displayContent.engagement.volunteerTitle}</h3>
                         <p className="max-w-xs text-sm text-muted-foreground">
-                            {content.engagement.volunteerDescription}
+                            {displayContent.engagement.volunteerDescription}
                         </p>
                         <Button asChild className="mt-4">
                             <Link href="/register">S'inscrire</Link>
@@ -345,9 +243,9 @@ export default function Home() {
                        </>
                     ) : (
                         <>
-                            <h3 className="mt-2 text-lg font-bold font-headline">{content.engagement.donationTitle}</h3>
+                            <h3 className="mt-2 text-lg font-bold font-headline">{displayContent.engagement.donationTitle}</h3>
                             <p className="max-w-xs text-sm text-muted-foreground">
-                                {content.engagement.donationDescription}
+                                {displayContent.engagement.donationDescription}
                             </p>
                             <Button asChild variant="secondary" className="mt-4">
                                 <Link href="/donations">Contribuer</Link>
@@ -359,17 +257,8 @@ export default function Home() {
           </div>
         </section>
       </main>
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t bg-card">
-        <p className="text-xs text-muted-foreground">&copy; 2024 Croix-Rouge Gabonaise. Tous droits réservés.</p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
-            Termes & Conditions
-          </Link>
-          <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
-            Politique de confidentialité
-          </Link>
-        </nav>
-      </footer>
-    </div>
+    </PublicLayout>
   )
 }
+
+    
