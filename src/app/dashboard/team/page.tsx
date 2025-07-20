@@ -90,6 +90,7 @@ const MemberCard = ({ member, size = 'default' }: { member: Member, size?: 'defa
 const VolunteerCard = ({ volunteer }: { volunteer: Volunteer }) => (
     <div className="flex flex-col items-center text-center">
         <Avatar className={"h-16 w-16 mb-2"}>
+             <AvatarImage src={volunteer.photo} alt={`${volunteer.firstName} ${volunteer.lastName}`} />
             <AvatarFallback>{volunteer.firstName?.[0]}{volunteer.lastName?.[0]}</AvatarFallback>
         </Avatar>
         <p className="font-semibold text-sm">{volunteer.firstName} {volunteer.lastName}</p>

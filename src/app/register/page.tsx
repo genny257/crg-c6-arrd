@@ -3,7 +3,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { ArrowLeft, Check, Upload, X, ChevronsUpDown } from "lucide-react"
+import { ArrowLeft, Check, Upload, X, ChevronsUpDown, UserSquare2 } from "lucide-react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -26,6 +26,7 @@ import { useToast } from "@/hooks/use-toast"
 import { registerUser } from "@/ai/flows/register-flow"
 import { RegisterUserInputSchema } from "@/ai/schemas/register-user-schema"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const totalSteps = 5
 
@@ -53,7 +54,7 @@ const skillsList = [
     { group: "Nutrition & alimentation", skills: ["Dépistage de la malnutrition", "Préparation de bouillie nutritionnelle", "Sensibilisation à la nutrition infantile", "Promotion de l’allaitement exclusif", "Calcul de ration alimentaire", "Suivi de croissance infantile", "Lutte contre les carences", "Campagnes de distribution alimentaire", "Sélection des bénéficiaires vulnérables", "Promotion de l’agriculture familiale", "Cuisine en situation de crise", "Repas adaptés aux personnes âgées", "Éducation nutritionnelle", "Préparation de menus équilibrés", "Sécurité alimentaire", "Tri et conservation des denrées", "Prévention de l’obésité infantile", "Diagnostic nutritionnel communautaire", "Partage de recettes locales saines", "Soutien aux cantines scolaires"] },
     { group: "Administration & gestion financière", skills: ["Tenue de caisse simple", "Rédaction de reçus/dépenses", "Gestion de budget associatif", "Justificatifs de dépenses", "Gestion des pièces comptables", "Classement de documents", "Gestion administrative d’un site", "Suivi de feuilles de présence", "Appui logistique à une réunion", "Rédaction de comptes-rendus", "Traitement des remboursements", "Connaissances de base en comptabilité", "Organisation d’un planning d’activités", "Archivage physique ou numérique", "Suivi de contrats de bénévoles", "Rédaction de rapports financiers", "Utilisation d’un petit logiciel de gestion", "Établissement de budgets prévisionnels", "Réconciliation de dépenses", "Préparation de documents pour audit"] },
     { group: "Artisanat & activités pratiques", skills: ["Couture de base", "Fabrication de masques/barrières", "Tricotage de vêtements pour bébés", "Teinture naturelle", "Réparation de vêtements", "Fabrication de savon", "Création d’objets artisanaux à vendre", "Broderie communautaire", "Activités manuelles pour enfants", "Réalisation de sacs à dos recyclés", "Travail du bois (niveau simple)", "Montage de meubles simples", "Conception de supports éducatifs faits main", "Fabrication de jeux éducatifs", "Cuisiner avec peu de ressources", "Décoration communautaire", "Création de kits hygiène faits main", "Réutilisation de matériaux recyclés", "Organisation d’ateliers artisanaux", "Réparation de chaussures/sandales"] },
-    { group: "Leadership & coordination associative", skills: ["Organisation d’un planning d’équipe", "Motivation de bénévoles", "Résolution de conflits", "Coordination d’activités solidaires", "Leadership positif", "Prise de décision en groupe", "Esprit d’équipe", "Accompagnement de nouveaux volontaires", "Transmission de savoirs", "Gestion d’un comité local", "Animation d’une assemblée associative", "Communication intergénérationnelle", "Gestion de ressources humaines locales", "Organisation d’un planning d’activités efficaces", "Gestion des dynamiques de groupe", "Autonomie dans la mission", "Gestion de la pression terrain", "Sens de l’organisation", "Éthique du leadership", "Travail collaboratif"] },
+    { group: "Leadership & coordination associative", skills: ["Organisation d’un planning d’équipe", "Motivation de bénévoles", "Résolution de conflits", "Coordination d’activités solidaires", "Leadership positif", "Prise de décision en groupe", "Esprit d’équipe", "Accompagnement de nouveaux volontaires", "Transmission de savoirs", "Gestion d’un comité local", "Animation d’une assemblée associative", "Communication intergénérationnelle", "Gestion de ressources humaines locales", "Organisation d’un planning d’activités efficaces", "Gestion de dynamiques de groupe", "Autonomie dans la mission", "Gestion de la pression terrain", "Sens de l’organisation", "Éthique du leadership", "Travail collaboratif"] },
     { group: "Mobilisation & plaidoyer", skills: ["Organisation de campagnes de don", "Mobilisation communautaire", "Préparation d’événements solidaires", "Collecte de signatures/pétitions", "Coordination de groupes de jeunes", "Animation de stands", "Communication avec les élus", "Participation à des forums locaux", "Mise en réseau avec d’autres ONG", "Élaboration de messages clés", "Préparation d’un dossier de plaidoyer", "Relais des besoins des populations", "Communication avec les partenaires techniques", "Animation de campagnes de sensibilisation", "Soutien à la mobilisation humanitaire", "Coordination de volontaires terrain", "Représentation associative", "Diffusion d’alertes", "Organisation de marches solidaires", "Création d’un mouvement local de soutien"] },
 ];
 
@@ -245,9 +246,9 @@ export default function RegisterPage() {
             volunteerExperience: "",
             availability: [],
             causes: [],
-            motivation: "",
             assignedCell: "",
             residence: { province: "", departement: "", communeCanton: "", arrondissement: "", quartierVillage: "" },
+            photo: "",
             idCardFront: "",
             idCardBack: "",
             termsAccepted: false,
@@ -266,7 +267,7 @@ export default function RegisterPage() {
     const handleNext = () => setStep((prev) => Math.min(prev + 1, totalSteps))
     const handlePrevious = () => setStep((prev) => Math.max(prev - 1, 1))
 
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, fieldName: "idCardFront" | "idCardBack") => {
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, fieldName: "photo" | "idCardFront" | "idCardBack") => {
         const file = e.target.files?.[0];
         if (file) {
             const reader = new FileReader();
@@ -316,6 +317,8 @@ export default function RegisterPage() {
         setSkillsInputValue("");
         setSkillsPopoverOpen(true);
     }
+    
+    const photoPreview = form.watch("photo");
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
@@ -660,8 +663,32 @@ export default function RegisterPage() {
                             )}
 
                             {step === 5 && (
-                                <div className="space-y-6 text-center">
-                                    <h3 className="text-lg font-semibold">Pièces à joindre & Finalisation</h3>
+                                <div className="space-y-6">
+                                    <h3 className="text-lg font-semibold text-center">Pièces à joindre & Finalisation</h3>
+                                    <div className="flex flex-col items-center gap-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="photo"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel htmlFor="photo-upload">Photo d'identité</FormLabel>
+                                                    <FormControl>
+                                                         <div className="flex items-center gap-4">
+                                                            <Avatar className="h-24 w-24">
+                                                                <AvatarImage src={photoPreview} alt="Aperçu de la photo" />
+                                                                <AvatarFallback>
+                                                                    <UserSquare2 className="h-12 w-12 text-muted-foreground" />
+                                                                </AvatarFallback>
+                                                            </Avatar>
+                                                            <Input id="photo-upload" type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "photo")} className="max-w-xs"/>
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormDescription>Facultatif, pour votre profil.</FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
                                     <div className="grid gap-4 md:w-2/3 mx-auto">
                                         <FormField
                                             control={form.control}
@@ -755,6 +782,3 @@ export default function RegisterPage() {
         </div>
     )
 }
-
-
-    

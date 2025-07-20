@@ -13,7 +13,6 @@ export interface Volunteer {
   volunteerExperience?: string;
   availability?: string[];
   causes?: string[];
-  motivation?: string;
   assignedCell?: string;
   residence: {
     province?: string;
@@ -29,6 +28,7 @@ export interface Volunteer {
     arrondissement?: string;
     quartierVillage?: string;
   };
+  photo?: string;
   idCardFront?: string;
   idCardBack?: string;
   termsAccepted: boolean;

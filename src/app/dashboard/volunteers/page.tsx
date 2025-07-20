@@ -216,7 +216,7 @@ export default function VolunteersPage() {
                                     <TableRow key={volunteer.id}>
                                         <TableCell className="hidden sm:table-cell">
                                             <Avatar className="h-10 w-10">
-                                                {/* Assuming no avatar URL for now */}
+                                                <AvatarImage src={volunteer.photo} alt={`${volunteer.firstName} ${volunteer.lastName}`} />
                                                 <AvatarFallback>{volunteer.firstName?.[0]}{volunteer.lastName?.[0]}</AvatarFallback>
                                             </Avatar>
                                         </TableCell>
