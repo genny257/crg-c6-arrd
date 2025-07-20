@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
+import { collection, getDocs, doc, updateDoc, query, orderBy } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -31,10 +31,11 @@ export default function VolunteersPage() {
     const [loading, setLoading] = React.useState(true);
     const { toast } = useToast();
 
-    const fetchVolunteers = async () => {
+    const fetchVolunteers = React.useCallback(async () => {
         setLoading(true);
         try {
-            const querySnapshot = await getDocs(collection(db, "volunteers"));
+            const q = query(collection(db, "volunteers"), orderBy("createdAt", "desc"));
+            const querySnapshot = await getDocs(q);
             const volunteersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Volunteer));
             setVolunteers(volunteersData);
         } catch (error) {
@@ -47,20 +48,20 @@ export default function VolunteersPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [toast]);
 
     React.useEffect(() => {
         fetchVolunteers();
-    }, []);
+    }, [fetchVolunteers]);
 
-    const updateVolunteerStatus = async (id: string, status: 'Actif' | 'Rejeté') => {
+    const updateVolunteerStatus = async (id: string, status: 'Actif' | 'Rejeté' | 'Inactif' | 'En attente') => {
         try {
             const volunteerRef = doc(db, "volunteers", id);
             await updateDoc(volunteerRef, { status: status });
             setVolunteers(volunteers.map(v => v.id === id ? { ...v, status } : v));
             toast({
                 title: "Statut mis à jour",
-                description: `Le volontaire a été marqué comme ${status.toLowerCase()}.`,
+                description: `Le statut du volontaire a été modifié.`,
             });
         } catch (error) {
             console.error("Error updating volunteer status: ", error);
@@ -158,8 +159,18 @@ export default function VolunteersPage() {
                                                     <DropdownMenuItem>Voir le profil</DropdownMenuItem>
                                                     <DropdownMenuItem>Assigner à une mission</DropdownMenuItem>
                                                     <DropdownMenuSeparator />
-                                                    <DropdownMenuItem onClick={() => updateVolunteerStatus(volunteer.id, 'Actif')}>Approuver</DropdownMenuItem>
-                                                    <DropdownMenuItem className="text-destructive" onClick={() => updateVolunteerStatus(volunteer.id, 'Rejeté')}>Rejeter</DropdownMenuItem>
+                                                    {volunteer.status === 'En attente' && (
+                                                        <>
+                                                            <DropdownMenuItem onClick={() => updateVolunteerStatus(volunteer.id, 'Actif')}>Approuver</DropdownMenuItem>
+                                                            <DropdownMenuItem className="text-destructive" onClick={() => updateVolunteerStatus(volunteer.id, 'Rejeté')}>Rejeter</DropdownMenuItem>
+                                                        </>
+                                                    )}
+                                                    {volunteer.status === 'Actif' && (
+                                                        <DropdownMenuItem className="text-destructive" onClick={() => updateVolunteerStatus(volunteer.id, 'Inactif')}>Rendre Inactif</DropdownMenuItem>
+                                                    )}
+                                                    {(volunteer.status === 'Inactif' || volunteer.status === 'Rejeté') && (
+                                                        <DropdownMenuItem onClick={() => updateVolunteerStatus(volunteer.id, 'Actif')}>Réactiver</DropdownMenuItem>
+                                                    )}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </TableCell>
@@ -173,3 +184,4 @@ export default function VolunteersPage() {
         </div>
     );
 }
+
