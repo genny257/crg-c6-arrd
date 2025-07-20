@@ -272,6 +272,23 @@ export default function TeamPage() {
                     
                     <Separator />
 
+                    {/* Pools */}
+                    <div className="w-full">
+                        <CardHeader className="p-0 mb-4">
+                            <CardTitle className="text-center font-headline text-xl flex items-center justify-center gap-2">
+                            <Briefcase className="w-6 h-6"/> Coordinateurs des Pools
+                            </CardTitle>
+                            <CardDescription className="text-center">Les pôles de compétences du comité et leurs coordinateurs.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {pools.map(pool => <PoolCard key={pool.name} pool={pool} />)}
+                            </div>
+                        </CardContent>
+                    </div>
+
+                    <Separator />
+
                     {/* Coordinators */}
                     <div className="w-full max-w-5xl">
                         <CardHeader className="p-0 mb-4">
@@ -285,22 +302,6 @@ export default function TeamPage() {
                         </CardContent>
                     </div>
 
-                    <Separator />
-
-                    {/* Pools */}
-                    <div className="w-full">
-                        <CardHeader className="p-0 mb-4">
-                            <CardTitle className="text-center font-headline text-xl flex items-center justify-center gap-2">
-                            <Briefcase className="w-6 h-6"/> Nos Pools de Compétences
-                            </CardTitle>
-                            <CardDescription className="text-center">Les pôles de compétences du comité et leurs coordinateurs.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {pools.map(pool => <PoolCard key={pool.name} pool={pool} />)}
-                            </div>
-                        </CardContent>
-                    </div>
                  </CardContent>
             </Card>
 
