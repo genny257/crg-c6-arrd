@@ -1,4 +1,5 @@
 
+
 export interface Mission {
   id: string;
   title: string;
@@ -8,5 +9,5 @@ export interface Mission {
   endDate: string;   // ISO 8601 format
   status: 'Planifiée' | 'En cours' | 'Terminée' | 'Annulée';
   requiredSkills: string[];
-  assignedVolunteers?: string[]; // Array of volunteer IDs
+  participants?: string[]; // Array of volunteer IDs
 }

@@ -53,7 +53,9 @@ export default function MissionsPage() {
     }, [toast]);
 
     React.useEffect(() => {
-        fetchMissions();
+        if (db) {
+            fetchMissions();
+        }
     }, [fetchMissions]);
 
     const updateMissionStatus = async (id: string, status: 'Annulée' | 'Planifiée') => {
@@ -121,7 +123,11 @@ export default function MissionsPage() {
                                 ) : (
                                     missions.map((mission) => (
                                         <TableRow key={mission.id}>
-                                            <TableCell className="font-medium">{mission.title}</TableCell>
+                                            <TableCell className="font-medium">
+                                                <Link href={`/dashboard/missions/${mission.id}`} className="hover:underline">
+                                                    {mission.title}
+                                                </Link>
+                                            </TableCell>
                                             <TableCell className="hidden md:table-cell">{mission.location}</TableCell>
                                             <TableCell className="hidden lg:table-cell">
                                                 {format(new Date(mission.startDate), "d MMM yyyy", { locale: fr })}
@@ -137,9 +143,10 @@ export default function MissionsPage() {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                        <DropdownMenuItem>Voir</DropdownMenuItem>
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/dashboard/missions/${mission.id}`}>Voir les détails</Link>
+                                                        </DropdownMenuItem>
                                                         <DropdownMenuItem>Modifier</DropdownMenuItem>
-                                                        <DropdownMenuItem>Assigner des volontaires</DropdownMenuItem>
                                                         <DropdownMenuSeparator />
                                                         {mission.status !== 'Annulée' ? (
                                                             <DropdownMenuItem className="text-destructive" onClick={() => updateMissionStatus(mission.id, 'Annulée')}>
@@ -180,4 +187,3 @@ export default function MissionsPage() {
         </div>
     );
 }
-
