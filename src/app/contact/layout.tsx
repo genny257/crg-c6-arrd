@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown, Menu, X, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import Image from "next/image";
 
 export default function ContactLayout({ children }: { children: ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -22,21 +23,7 @@ export default function ContactLayout({ children }: { children: ReactNode }) {
     <div className="bg-background min-h-screen">
       <header className="px-4 lg:px-6 h-14 flex items-center bg-card shadow-sm z-20 sticky top-0">
         <Link href="/" className="flex items-center justify-center" prefetch={false}>
-          <svg
-            width="32"
-            height="32"
-            viewBox="0 0 48 48"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="text-primary"
-          >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M24 4C12.96 4 4 12.96 4 24C4 35.04 12.96 44 24 44C35.04 44 44 35.04 44 24C44 12.96 35.04 4 24 4ZM24 40C15.16 40 8 32.84 8 24C8 15.16 15.16 8 24 8C32.84 8 40 15.16 40 24C40 32.84 32.84 40 24 40ZM26 22V12H22V22H12V26H22V36H26V26H36V22H26Z"
-              fill="currentColor"
-            />
-          </svg>
+          <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={32} height={32} />
           <span className="sr-only">Croix-Rouge Gabonaise</span>
         </Link>
         <nav className="ml-auto hidden md:flex gap-4 sm:gap-6 items-center">

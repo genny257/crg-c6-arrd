@@ -30,6 +30,7 @@ export const RegisterUserInputSchema = z.object({
   availability: z.array(z.string()).optional(),
   causes: z.array(z.string()).optional(),
   motivation: z.string().optional(),
+  assignedCell: z.string().optional(),
   residence: LocationSchema,
   interventionZone: LocationSchema,
   idCardFront: z.string().optional().describe("A data URI of the front of the ID card."),

@@ -155,7 +155,8 @@ export default function VolunteersPage() {
                                 </TableHead>
                                 <TableHead>Nom</TableHead>
                                 <TableHead>Statut</TableHead>
-                                <TableHead className="hidden md:table-cell">Compétences</TableHead>
+                                <TableHead className="hidden md:table-cell">Cellule</TableHead>
+                                <TableHead className="hidden lg:table-cell">Compétences</TableHead>
                                 <TableHead>
                                     <span className="sr-only">Actions</span>
                                 </TableHead>
@@ -176,6 +177,9 @@ export default function VolunteersPage() {
                                             <Skeleton className="h-6 w-20 rounded-full" />
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
+                                            <Skeleton className="h-4 w-24" />
+                                        </TableCell>
+                                        <TableCell className="hidden lg:table-cell">
                                             <Skeleton className="h-6 w-24 rounded-full" />
                                         </TableCell>
                                         <TableCell>
@@ -197,10 +201,11 @@ export default function VolunteersPage() {
                                             <div className="text-sm text-muted-foreground">{volunteer.email}</div>
                                         </TableCell>
                                         <TableCell><Badge variant={getStatusBadgeVariant(volunteer.status || 'En attente')}>{volunteer.status || 'En attente'}</Badge></TableCell>
-                                        <TableCell className="hidden md:table-cell">
+                                        <TableCell className="hidden md:table-cell">{volunteer.assignedCell || 'N/A'}</TableCell>
+                                        <TableCell className="hidden lg:table-cell">
                                             <div className="flex flex-wrap gap-1">
-                                                {volunteer.skills?.slice(0, 3).map(skill => <Badge key={skill} variant="secondary">{skill}</Badge>)}
-                                                {volunteer.skills && volunteer.skills.length > 3 && <Badge variant="outline">...</Badge>}
+                                                {volunteer.skills?.slice(0, 2).map(skill => <Badge key={skill} variant="secondary">{skill}</Badge>)}
+                                                {volunteer.skills && volunteer.skills.length > 2 && <Badge variant="outline">...</Badge>}
                                             </div>
                                         </TableCell>
                                         <TableCell>
@@ -236,7 +241,7 @@ export default function VolunteersPage() {
                             )}
                              {!loading && filteredAndSortedVolunteers.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="h-24 text-center">
+                                    <TableCell colSpan={6} className="h-24 text-center">
                                     {searchTerm ? "Aucun volontaire ne correspond à votre recherche." : "Aucun volontaire trouvé."}
                                     </TableCell>
                                 </TableRow>

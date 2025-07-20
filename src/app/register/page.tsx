@@ -28,6 +28,12 @@ import { RegisterUserInputSchema } from "@/ai/schemas/register-user-schema"
 
 const totalSteps = 5
 
+const pools = [
+    "Secrétariat", "Logistique", "Trésorerie", "Santé", 
+    "Jeunesse et Volontariat", "Étude de Projet", "Secours", "Action Sociale", 
+    "Assainissement et Hygiène", "Discipline", "Formation"
+];
+
 const skillsList = [
     { group: "Compétences médicales & paramédicales", skills: ["Prise de tension artérielle", "Injection intramusculaire", "Désinfection des plaies", "Réalisation de pansements", "Suivi de patients diabétiques", "Réalisation de glycémie capillaire", "Connaissance des premiers soins", "Lecture d’une ordonnance", "Prise de température", "Gestion des constantes vitales", "Accompagnement de patients en fin de vie", "Éducation thérapeutique du patient", "Notions de pharmacologie", "Prévention des infections nosocomiales", "Suivi de femmes enceintes", "Santé maternelle et infantile", "Promotion de la santé", "Sensibilisation au VIH/SIDA", "Hygiène hospitalière", "Prise en charge en urgence médicale"] },
     { group: "Secourisme & gestes d’urgence", skills: ["Gestes de premiers secours (PSC1)", "Réanimation cardio-pulmonaire (RCP)", "Utilisation d’un défibrillateur (DAE)", "Position latérale de sécurité (PLS)", "Arrêt des hémorragies", "Désobstruction des voies aériennes", "Transport d’un blessé", "Prévention des accidents domestiques", "Évacuation d’urgence", "Organisation d’un poste de secours", "Évaluation des risques immédiats", "Soins de base aux brûlures", "Soutien lors de catastrophes naturelles", "Simulation de catastrophe", "Secourisme en équipe (PSE1, PSE2)", "Secours aquatique (BNSSA)", "Aide à la population sinistrée", "Gestion de l’afflux massif de victimes", "Secours en zones difficiles", "Coordination sur zone d’intervention"] },
@@ -233,6 +239,7 @@ export default function RegisterPage() {
             availability: [],
             causes: [],
             motivation: "",
+            assignedCell: "",
             residence: { province: "", departement: "", communeCanton: "", arrondissement: "", quartierVillage: "" },
             interventionZone: { province: "", departement: "", communeCanton: "", arrondissement: "", quartierVillage: "" },
             idCardFront: "",
@@ -531,6 +538,28 @@ export default function RegisterPage() {
                                             </FormItem>
                                         )}
                                     />
+                                     <FormField
+                                        control={form.control}
+                                        name="assignedCell"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Cellule souhaitée</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Choisir une cellule d'affectation" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {pools.map(pool => (
+                                                            <SelectItem key={pool} value={pool}>{pool}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                     <div className="space-y-4">
                                       <LocationSelector form={form} title="Lieu de résidence" fieldPrefix="residence" />
                                       <LocationSelector form={form} title="Secteur d’intervention souhaité" fieldPrefix="interventionZone" />
@@ -663,4 +692,3 @@ export default function RegisterPage() {
         </div>
     )
 }
-

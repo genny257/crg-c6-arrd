@@ -14,6 +14,7 @@ export interface Volunteer {
   availability?: string[];
   causes?: string[];
   motivation?: string;
+  assignedCell?: string;
   residence: {
     province?: string;
     departement?: string;
