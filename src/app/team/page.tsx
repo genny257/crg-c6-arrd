@@ -4,12 +4,15 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Network, Users, Briefcase } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Network, Users, Briefcase, Search, ArrowDownUp } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import type { Volunteer } from "@/types/volunteer";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 type Member = {
     name: string;
@@ -106,6 +109,8 @@ const PoolCard = ({ pool }: { pool: Pool }) => (
 export default function TeamPage() {
     const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [sortConfig, setSortConfig] = useState<{ key: 'name' | 'date'; direction: 'asc' | 'desc' }>({ key: 'date', direction: 'desc' });
     
     useEffect(() => {
         const fetchVolunteers = async () => {
@@ -124,6 +129,32 @@ export default function TeamPage() {
 
         fetchVolunteers();
     }, []);
+
+    const filteredAndSortedVolunteers = useMemo(() => {
+        let sortedVolunteers = [...volunteers];
+
+        if (searchTerm) {
+            sortedVolunteers = sortedVolunteers.filter(v =>
+                `${v.firstName} ${v.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        sortedVolunteers.sort((a, b) => {
+            if (sortConfig.key === 'name') {
+                const nameA = `${a.lastName} ${a.firstName}`.toLowerCase();
+                const nameB = `${b.lastName} ${b.firstName}`.toLowerCase();
+                if (nameA < nameB) return sortConfig.direction === 'asc' ? -1 : 1;
+                if (nameA > nameB) return sortConfig.direction === 'asc' ? 1 : -1;
+                return 0;
+            } else { // sort by date
+                const dateA = new Date(a.createdAt).getTime();
+                const dateB = new Date(b.createdAt).getTime();
+                return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA;
+            }
+        });
+
+        return sortedVolunteers;
+    }, [volunteers, searchTerm, sortConfig]);
 
     return (
         <div className="flex flex-col gap-8">
@@ -210,6 +241,31 @@ export default function TeamPage() {
                            <Users className="w-6 h-6"/> Nos Volontaires Actifs
                         </CardTitle>
                         <CardDescription className="text-center">La force vive de notre comité.</CardDescription>
+                        <div className="pt-4 flex flex-col md:flex-row items-center gap-4">
+                            <div className="relative w-full md:flex-1">
+                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                <Input 
+                                    placeholder="Rechercher par nom..." 
+                                    className="pl-8 w-full"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="w-full md:w-auto">
+                                        <ArrowDownUp className="mr-2 h-4 w-4" />
+                                        Trier par
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'desc' })}>Plus récent</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'asc' })}>Plus ancien</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'asc' })}>Nom (A-Z)</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'desc' })}>Nom (Z-A)</DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                     </CardHeader>
                     <CardContent>
                         {loading ? (
@@ -223,13 +279,15 @@ export default function TeamPage() {
                             </div>
                         ) : (
                              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-x-4 gap-y-6">
-                                {volunteers.map(volunteer => (
+                                {filteredAndSortedVolunteers.map(volunteer => (
                                     <VolunteerCard key={volunteer.id} volunteer={volunteer} />
                                 ))}
                             </div>
                         )}
-                         {!loading && volunteers.length === 0 && (
-                            <p className="text-center text-muted-foreground">Aucun volontaire actif pour le moment.</p>
+                         {!loading && filteredAndSortedVolunteers.length === 0 && (
+                            <p className="text-center text-muted-foreground py-8">
+                                {searchTerm ? "Aucun volontaire ne correspond à votre recherche." : "Aucun volontaire actif pour le moment."}
+                            </p>
                         )}
                     </CardContent>
                 </Card>

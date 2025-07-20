@@ -6,7 +6,8 @@ import { collection, getDocs, doc, updateDoc, query, orderBy } from "firebase/fi
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { UserPlus, MoreHorizontal } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { UserPlus, MoreHorizontal, Search, ArrowDownUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -30,10 +31,14 @@ export default function VolunteersPage() {
     const [volunteers, setVolunteers] = React.useState<Volunteer[]>([]);
     const [loading, setLoading] = React.useState(true);
     const { toast } = useToast();
+    const [searchTerm, setSearchTerm] = React.useState("");
+    const [sortConfig, setSortConfig] = React.useState<{ key: 'createdAt' | 'lastName'; direction: 'asc' | 'desc' }>({ key: 'createdAt', direction: 'desc' });
+
 
     const fetchVolunteers = React.useCallback(async () => {
         setLoading(true);
         try {
+            // Initial fetch is always ordered by creation date
             const q = query(collection(db, "volunteers"), orderBy("createdAt", "desc"));
             const querySnapshot = await getDocs(q);
             const volunteersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Volunteer));
@@ -53,6 +58,33 @@ export default function VolunteersPage() {
     React.useEffect(() => {
         fetchVolunteers();
     }, [fetchVolunteers]);
+
+    const filteredAndSortedVolunteers = React.useMemo(() => {
+        let sortedVolunteers = [...volunteers];
+    
+        if (searchTerm) {
+          sortedVolunteers = sortedVolunteers.filter(v => 
+            `${v.firstName} ${v.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            v.email.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+        }
+    
+        sortedVolunteers.sort((a, b) => {
+          if (sortConfig.key === 'lastName') {
+            const nameA = a.lastName.toLowerCase();
+            const nameB = b.lastName.toLowerCase();
+            if (nameA < nameB) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (nameA > nameB) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+          } else { // createdAt
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+            return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA;
+          }
+        });
+    
+        return sortedVolunteers;
+      }, [volunteers, searchTerm, sortConfig]);
 
     const updateVolunteerStatus = async (id: string, status: 'Actif' | 'Rejeté' | 'Inactif' | 'En attente') => {
         try {
@@ -88,6 +120,31 @@ export default function VolunteersPage() {
                 <CardHeader>
                     <CardTitle>Liste des Volontaires</CardTitle>
                     <CardDescription>Retrouvez, modifiez et gérez les profils de tous les volontaires.</CardDescription>
+                    <div className="pt-4 flex flex-col md:flex-row items-center gap-4">
+                        <div className="relative w-full md:flex-1">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                                placeholder="Rechercher par nom, prénom, email..." 
+                                className="pl-8 w-full"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="w-full md:w-auto">
+                                    <ArrowDownUp className="mr-2 h-4 w-4" />
+                                    Trier par
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => setSortConfig({ key: 'createdAt', direction: 'desc' })}>Plus récent</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setSortConfig({ key: 'createdAt', direction: 'asc' })}>Plus ancien</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setSortConfig({ key: 'lastName', direction: 'asc' })}>Nom (A-Z)</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setSortConfig({ key: 'lastName', direction: 'desc' })}>Nom (Z-A)</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -127,7 +184,7 @@ export default function VolunteersPage() {
                                     </TableRow>
                                 ))
                             ) : (
-                                volunteers.map((volunteer) => (
+                                filteredAndSortedVolunteers.map((volunteer) => (
                                     <TableRow key={volunteer.id}>
                                         <TableCell className="hidden sm:table-cell">
                                             <Avatar className="h-10 w-10">
@@ -177,6 +234,13 @@ export default function VolunteersPage() {
                                     </TableRow>
                                 ))
                             )}
+                             {!loading && filteredAndSortedVolunteers.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="h-24 text-center">
+                                    {searchTerm ? "Aucun volontaire ne correspond à votre recherche." : "Aucun volontaire trouvé."}
+                                    </TableCell>
+                                </TableRow>
+                            )}
                         </TableBody>
                     </Table>
                 </CardContent>
@@ -184,4 +248,3 @@ export default function VolunteersPage() {
         </div>
     );
 }
-
