@@ -42,9 +42,12 @@ export default function LoginPage() {
             <span className="sr-only">Retour à l'accueil</span>
         </Link>
         <CardHeader>
-          <Link href="/" className="flex justify-center mb-4 pt-8">
-            <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={48} height={48} />
-          </Link>
+          <div className="flex flex-col items-center justify-center mb-4 pt-8">
+            <Link href="/" className="flex items-center justify-center">
+              <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={48} height={48} />
+            </Link>
+            <span className="mt-2 font-bold text-center">Croix-Rouge Gabonaise</span>
+          </div>
           <CardTitle className="text-2xl font-headline text-center">Connexion</CardTitle>
           <CardDescription className="text-center">
             Accédez à votre espace ou inscrivez-vous
