@@ -4,7 +4,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Network, Users } from "lucide-react";
+import { Network, Users, Briefcase } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -20,6 +20,11 @@ type Member = {
     role: string;
     avatar: string;
     hint: string;
+};
+
+type Pool = {
+    name: string;
+    mission: string;
 };
 
 const president: Member = {
@@ -54,6 +59,20 @@ const coordinators: Member[] = [
     { name: "Alice Kengue", role: "PK9-Bikélé", avatar: "https://placehold.co/80x80.png", hint: "female portrait" },
 ];
 
+const pools: Pool[] = [
+  { name: "Secrétariat", mission: "Gestion administrative et coordination." },
+  { name: "Logistique", mission: "Gestion du matériel et des ressources." },
+  { name: "Trésorerie", mission: "Gestion financière." },
+  { name: "Santé", mission: "Promotion de la santé communautaire." },
+  { name: "Jeunesse et Volontariat", mission: "Mobilisation des jeunes et des volontaires." },
+  { name: "Étude de Projet", mission: "Conception et évaluation des projets." },
+  { name: "Secours", mission: "Interventions d'urgence." },
+  { name: "Action Sociale", mission: "Soutien aux populations vulnérables." },
+  { name: "Assainissement et Hygiène", mission: "Promotion de l'hygiène." },
+  { name: "Discipline", mission: "Renforcement de l'organisation interne." },
+  { name: "Formation", mission: "Développement des compétences." },
+];
+
 const MemberCard = ({ member, size = 'default' }: { member: Member, size?: 'default' | 'small' }) => (
     <div className="flex flex-col items-center text-center">
         <Avatar className={size === 'default' ? "h-24 w-24 mb-2" : "h-16 w-16 mb-2"}>
@@ -72,7 +91,22 @@ const VolunteerCard = ({ volunteer }: { volunteer: Volunteer }) => (
         </Avatar>
         <p className="font-semibold text-sm">{volunteer.firstName} {volunteer.lastName}</p>
     </div>
-)
+);
+
+const PoolCard = ({ pool }: { pool: Pool }) => (
+    <Card className="flex flex-col">
+        <CardHeader>
+            <CardTitle className="text-base font-headline flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-primary" />
+                {pool.name}
+            </CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1">
+            <p className="text-sm text-muted-foreground">{pool.mission}</p>
+        </CardContent>
+    </Card>
+);
+
 
 export default function TeamPage() {
     const { user, loading: authLoading } = useAuth();
@@ -168,6 +202,23 @@ export default function TeamPage() {
                 </Card>
 
                  <Separator />
+
+                {/* Pools */}
+                <Card className="w-full">
+                    <CardHeader>
+                        <CardTitle className="text-center font-headline text-xl flex items-center justify-center gap-2">
+                           <Briefcase className="w-6 h-6"/> Nos Pools
+                        </CardTitle>
+                        <CardDescription className="text-center">Les pôles de compétences du comité.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {pools.map(pool => <PoolCard key={pool.name} pool={pool} />)}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Separator />
 
                 {/* Active Volunteers */}
                 <Card className="w-full">
