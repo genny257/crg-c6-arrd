@@ -10,4 +10,5 @@ export interface Mission {
   status: 'Planifiée' | 'En cours' | 'Terminée' | 'Annulée';
   requiredSkills: string[];
   participants?: string[]; // Array of volunteer IDs
+  maxParticipants?: number;
 }

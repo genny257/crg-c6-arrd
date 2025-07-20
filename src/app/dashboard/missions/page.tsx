@@ -6,7 +6,7 @@ import { collection, getDocs, doc, updateDoc, query, orderBy } from "firebase/fi
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FilePlus2, MoreHorizontal } from "lucide-react";
+import { FilePlus2, MoreHorizontal, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
@@ -146,7 +146,12 @@ export default function MissionsPage() {
                                                         <DropdownMenuItem asChild>
                                                             <Link href={`/dashboard/missions/${mission.id}`}>Voir les détails</Link>
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem>Modifier</DropdownMenuItem>
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/dashboard/missions/${mission.id}/edit`}>
+                                                                <Pencil className="mr-2 h-4 w-4" />
+                                                                Modifier
+                                                            </Link>
+                                                        </DropdownMenuItem>
                                                         <DropdownMenuSeparator />
                                                         {mission.status !== 'Annulée' ? (
                                                             <DropdownMenuItem className="text-destructive" onClick={() => updateMissionStatus(mission.id, 'Annulée')}>

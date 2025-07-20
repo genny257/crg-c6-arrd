@@ -11,12 +11,13 @@ import type { Volunteer } from "@/types/volunteer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Users, Calendar, MapPin, ClipboardList, Share2, PlusCircle, CheckCircle } from "lucide-react";
+import { ArrowLeft, Users, Calendar, MapPin, ClipboardList, Share2, PlusCircle, CheckCircle, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
 
 const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -80,6 +81,10 @@ export default function MissionDetailPage() {
 
     if (!mission) return null;
 
+    const participantCount = participants.length;
+    const maxParticipants = mission.maxParticipants ?? 0;
+    const progressValue = maxParticipants > 0 ? (participantCount / maxParticipants) * 100 : 0;
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between gap-4">
@@ -92,6 +97,12 @@ export default function MissionDetailPage() {
                     {mission.title}
                 </h1>
                 <div className="flex gap-2">
+                    <Button variant="outline" asChild>
+                         <Link href={`/dashboard/missions/${mission.id}/edit`}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Modifier
+                        </Link>
+                    </Button>
                     <Button variant="outline">
                         <Share2 className="mr-2 h-4 w-4" />
                         Partager la liste
@@ -151,7 +162,8 @@ export default function MissionDetailPage() {
                             <div className="flex items-center justify-between">
                                 <CardTitle className="text-lg font-headline flex items-center gap-2">
                                     <Users className="h-5 w-5 text-primary" />
-                                    Participants à la Mission ({participants.length})
+                                    Participants
+                                    {mission.maxParticipants && <span className="text-base font-medium text-muted-foreground">({participantCount} / {mission.maxParticipants})</span>}
                                 </CardTitle>
                                  <Button size="sm">
                                     <PlusCircle className="mr-2 h-4 w-4" />
@@ -159,6 +171,11 @@ export default function MissionDetailPage() {
                                 </Button>
                             </div>
                              <CardDescription>Liste des volontaires ayant confirmé leur participation.</CardDescription>
+                             {mission.maxParticipants && (
+                                <div className="mt-4">
+                                    <Progress value={progressValue} aria-label={`${progressValue}% des places prises`}/>
+                                </div>
+                             )}
                         </CardHeader>
                         <CardContent>
                            {participants.length > 0 ? (
@@ -199,7 +216,10 @@ const MissionDetailSkeleton = () => (
         <div className="flex items-center justify-between gap-4">
             <Skeleton className="h-10 w-10" />
             <Skeleton className="h-8 w-1/2" />
-            <Skeleton className="h-10 w-32" />
+            <div className="flex gap-2">
+                <Skeleton className="h-10 w-28" />
+                <Skeleton className="h-10 w-32" />
+            </div>
         </div>
         <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-1 space-y-6">
@@ -222,6 +242,7 @@ const MissionDetailSkeleton = () => (
                             <Skeleton className="h-9 w-40" />
                         </div>
                          <Skeleton className="h-4 w-3/4" />
+                         <Skeleton className="h-4 w-full mt-2" />
                     </CardHeader>
                     <CardContent className="text-center py-12">
                          <Skeleton className="h-12 w-12 rounded-full mx-auto" />

@@ -5,26 +5,27 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
-import { addDoc, collection } from "firebase/firestore";
+import { useRouter, useParams } from "next/navigation";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/firebase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CalendarIcon } from "lucide-react";
 import Link from "next/link";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import type { Mission } from "@/types/mission";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const missionSchema = z.object({
   title: z.string().min(1, "Le titre est requis."),
@@ -33,46 +34,66 @@ const missionSchema = z.object({
   startDate: z.date({ required_error: "La date de début est requise." }),
   endDate: z.date({ required_error: "La date de fin est requise." }),
   maxParticipants: z.coerce.number().int().positive("Le nombre doit être positif.").optional(),
-  status: z.enum(['Planifiée', 'En cours', 'Terminée', 'Annulée']).default('Planifiée'),
+  status: z.enum(['Planifiée', 'En cours', 'Terminée', 'Annulée']),
 });
 
 type MissionFormValues = z.infer<typeof missionSchema>;
 
-export default function NewMissionPage() {
+export default function EditMissionPage() {
   const router = useRouter();
+  const params = useParams();
+  const { id } = params;
   const { toast } = useToast();
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [pageLoading, setPageLoading] = React.useState(true);
 
   const form = useForm<MissionFormValues>({
     resolver: zodResolver(missionSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      location: "",
-      status: "Planifiée",
-    },
   });
 
+  React.useEffect(() => {
+    if (typeof id !== 'string') return;
+    const fetchMission = async () => {
+        setPageLoading(true);
+        const missionRef = doc(db, "missions", id);
+        const missionSnap = await getDoc(missionRef);
+        if (missionSnap.exists()) {
+            const missionData = missionSnap.data() as Mission;
+            form.reset({
+                ...missionData,
+                startDate: new Date(missionData.startDate),
+                endDate: new Date(missionData.endDate),
+            });
+        } else {
+            toast({ title: "Erreur", description: "Mission non trouvée.", variant: "destructive" });
+            router.push('/dashboard/missions');
+        }
+        setPageLoading(false);
+    };
+    fetchMission();
+  }, [id, form, router, toast]);
+
   const onSubmit = async (data: MissionFormValues) => {
+    if(typeof id !== 'string') return;
     setIsSubmitting(true);
     try {
-      await addDoc(collection(db, "missions"), {
+      const missionRef = doc(db, "missions", id);
+      await updateDoc(missionRef, {
         ...data,
         startDate: data.startDate.toISOString(),
         endDate: data.endDate.toISOString(),
-        requiredSkills: [], // Add logic for skills if needed
       });
       toast({
-        title: "Mission créée",
-        description: "La nouvelle mission a été ajoutée avec succès.",
+        title: "Mission modifiée",
+        description: "La mission a été mise à jour avec succès.",
       });
-      router.push("/dashboard/missions");
+      router.push(`/dashboard/missions/${id}`);
     } catch (error) {
-      console.error("Error creating mission: ", error);
+      console.error("Error updating mission: ", error);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de la création de la mission.",
+        description: "Une erreur est survenue lors de la modification de la mission.",
         variant: "destructive",
       });
     } finally {
@@ -80,30 +101,50 @@ export default function NewMissionPage() {
     }
   };
   
-  if (loading) {
-    return <div>Chargement...</div>
-  }
-  
+  if (authLoading) return <div>Chargement...</div>;
   if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
      router.push('/login');
      return null;
+  }
+
+  if (pageLoading) {
+      return (
+          <div className="space-y-6">
+            <div className="flex items-center gap-4">
+                <Skeleton className="h-10 w-10" />
+                <Skeleton className="h-8 w-1/3" />
+            </div>
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-6 w-1/2" />
+                    <Skeleton className="h-4 w-3/4" />
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-10 w-32" />
+                </CardContent>
+            </Card>
+          </div>
+      )
   }
 
   return (
     <div className="flex flex-col gap-8">
         <div className="flex items-center gap-4">
              <Button asChild variant="outline" size="icon">
-                <Link href="/dashboard/missions">
+                <Link href={`/dashboard/missions/${id}`}>
                     <ArrowLeft className="h-4 w-4" />
                 </Link>
             </Button>
-            <h1 className="text-3xl font-headline font-bold">Nouvelle Mission</h1>
+            <h1 className="text-3xl font-headline font-bold">Modifier la Mission</h1>
         </div>
       
         <Card>
             <CardHeader>
-                <CardTitle>Planifier une nouvelle mission</CardTitle>
-                <CardDescription>Remplissez les champs ci-dessous pour créer une nouvelle mission.</CardDescription>
+                <CardTitle>Informations de la mission</CardTitle>
+                <CardDescription>Mettez à jour les détails de la mission ci-dessous.</CardDescription>
             </CardHeader>
             <CardContent>
             <Form {...form}>
@@ -180,9 +221,6 @@ export default function NewMissionPage() {
                                         mode="single"
                                         selected={field.value}
                                         onSelect={field.onChange}
-                                        disabled={(date) =>
-                                            date < new Date() || date < new Date("1900-01-01")
-                                        }
                                         initialFocus
                                         locale={fr}
                                     />
@@ -248,10 +286,33 @@ export default function NewMissionPage() {
                         </FormItem>
                         )}
                     />
-                    
 
+                    <FormField
+                        control={form.control}
+                        name="status"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Statut de la mission</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Changer le statut" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="Planifiée">Planifiée</SelectItem>
+                                        <SelectItem value="En cours">En cours</SelectItem>
+                                        <SelectItem value="Terminée">Terminée</SelectItem>
+                                        <SelectItem value="Annulée">Annulée</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    
                     <Button type="submit" disabled={isSubmitting}>
-                        {isSubmitting ? "Création..." : "Créer la mission"}
+                        {isSubmitting ? "Enregistrement..." : "Enregistrer les modifications"}
                     </Button>
                 </form>
             </Form>
