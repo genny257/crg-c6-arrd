@@ -17,7 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { utils, writeFile } from 'xlsx';
-import { cells } from "@/lib/locations";
+import { cells, professionsList, skillsList as allSkillsGroups } from "@/lib/locations";
 import Link from "next/link";
 
 
@@ -47,7 +47,10 @@ export default function VolunteersPage() {
     const [sortConfig, setSortConfig] = React.useState<{ key: 'createdAt' | 'lastName'; direction: 'asc' | 'desc' }>({ key: 'createdAt', direction: 'desc' });
     const [skillFilter, setSkillFilter] = React.useState<string | null>(null);
     const [cellFilter, setCellFilter] = React.useState<string | null>(null);
+    const [professionFilter, setProfessionFilter] = React.useState<string | null>(null);
+
     const [allSkills, setAllSkills] = React.useState<string[]>([]);
+    const [allProfessions, setAllProfessions] = React.useState<string[]>([]);
 
 
     const fetchVolunteers = React.useCallback(async () => {
@@ -59,10 +62,13 @@ export default function VolunteersPage() {
             setVolunteers(volunteersData);
 
             const skills = new Set<string>();
+            const professions = new Set<string>();
             volunteersData.forEach(v => {
                 v.skills?.forEach(skill => skills.add(skill));
+                if (v.profession) professions.add(v.profession);
             });
             setAllSkills(Array.from(skills).sort());
+            setAllProfessions(Array.from(professions).sort());
 
         } catch (error) {
             console.error("Error fetching volunteers: ", error);
@@ -85,6 +91,10 @@ export default function VolunteersPage() {
 
         if (skillFilter) {
             filteredVolunteers = filteredVolunteers.filter(v => v.skills?.includes(skillFilter));
+        }
+        
+        if (professionFilter) {
+            filteredVolunteers = filteredVolunteers.filter(v => v.profession === professionFilter);
         }
 
         if (cellFilter) {
@@ -113,7 +123,7 @@ export default function VolunteersPage() {
         });
     
         return filteredVolunteers;
-      }, [volunteers, searchTerm, sortConfig, skillFilter, cellFilter]);
+      }, [volunteers, searchTerm, sortConfig, skillFilter, cellFilter, professionFilter]);
 
     const updateVolunteerStatus = async (id: string, status: 'Actif' | 'Rejeté' | 'Inactif' | 'En attente') => {
         try {
@@ -177,7 +187,7 @@ export default function VolunteersPage() {
                     <CardTitle>Liste des Volontaires</CardTitle>
                     <CardDescription>Retrouvez, modifiez et gérez les profils de tous les volontaires.</CardDescription>
                     <div className="pt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="relative lg:col-span-2">
+                        <div className="relative lg:col-span-4">
                             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input 
                                 placeholder="Rechercher par nom, prénom, email..." 
@@ -205,6 +215,17 @@ export default function VolunteersPage() {
                                 <SelectItem value="all">Toutes les compétences</SelectItem>
                                 {allSkills.map(skill => (
                                     <SelectItem key={skill} value={skill}>{skill}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Select onValueChange={(value) => setProfessionFilter(value === 'all' ? null : value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Filtrer par profession" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Toutes les professions</SelectItem>
+                                {allProfessions.map(profession => (
+                                    <SelectItem key={profession} value={profession}>{profession}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
@@ -322,7 +343,7 @@ export default function VolunteersPage() {
                              {!loading && filteredAndSortedVolunteers.length === 0 && (
                                 <TableRow>
                                     <TableCell colSpan={6} className="h-24 text-center">
-                                    {searchTerm || skillFilter ? "Aucun volontaire ne correspond à votre recherche." : "Aucun volontaire trouvé."}
+                                    {searchTerm || skillFilter || cellFilter || professionFilter ? "Aucun volontaire ne correspond à votre recherche." : "Aucun volontaire trouvé."}
                                     </TableCell>
                                 </TableRow>
                             )}

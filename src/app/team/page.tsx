@@ -4,7 +4,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Network, Users, Briefcase, Search, ArrowDownUp } from "lucide-react";
+import { Network, Users, Briefcase, Search, ArrowDownUp, Archive, Truck, Banknote, HeartPulse, Lightbulb, LifeBuoy, HandHeart, Droplets, Shield, GraduationCap, ClipboardCheck } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
@@ -14,6 +14,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { Icon } from "lucide-react";
+
 
 type Member = {
     name: string;
@@ -26,6 +28,7 @@ type Pool = {
     name: string;
     mission: string;
     coordinator: Member;
+    icon: Icon;
 };
 
 const president: Member = {
@@ -68,17 +71,17 @@ const coordinators: Member[] = [
 const allCells = coordinators.map(c => c.role);
 
 const pools: Pool[] = [
-  { name: "Secrétariat", mission: "Gestion administrative et coordination.", coordinator: { name: "Hélène Obiang", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"} },
-  { name: "Logistique", mission: "Gestion du matériel et des ressources.", coordinator: { name: "Christian N'Goma", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"} },
-  { name: "Trésorerie", mission: "Gestion financière.", coordinator: { name: "Sylvie Mbadu", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"} },
-  { name: "Santé", mission: "Promotion de la santé communautaire.", coordinator: { name: "Dr. Moussa Traoré", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"} },
-  { name: "Jeunesse et Volontariat", mission: "Mobilisation des jeunes et des volontaires.", coordinator: { name: "Kevin Essono", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"} },
-  { name: "Étude de Projet", mission: "Conception et évaluation des projets.", coordinator: { name: "Carine Ibinga", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"} },
-  { name: "Secours", mission: "Interventions d'urgence.", coordinator: { name: "Gérard Lema", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"} },
-  { name: "Action Sociale", mission: "Soutien aux populations vulnérables.", coordinator: { name: "Estelle Koumba", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"} },
-  { name: "Assainissement et Hygiène", mission: "Promotion de l'hygiène.", coordinator: { name: "Thierry Ndong", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"} },
-  { name: "Discipline", mission: "Renforcement de l'organisation interne.", coordinator: { name: "Serge Moussavou", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"} },
-  { name: "Formation", mission: "Développement des compétences.", coordinator: { name: "Nathalie Ngouma", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"} },
+  { name: "Secrétariat", mission: "Gestion administrative et coordination.", coordinator: { name: "Hélène Obiang", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}, icon: Archive },
+  { name: "Logistique", mission: "Gestion du matériel et des ressources.", coordinator: { name: "Christian N'Goma", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: Truck },
+  { name: "Trésorerie", mission: "Gestion financière.", coordinator: { name: "Sylvie Mbadu", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}, icon: Banknote },
+  { name: "Santé", mission: "Promotion de la santé communautaire.", coordinator: { name: "Dr. Moussa Traoré", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: HeartPulse },
+  { name: "Jeunesse et Volontariat", mission: "Mobilisation des jeunes et des volontaires.", coordinator: { name: "Kevin Essono", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: Users },
+  { name: "Étude de Projet", mission: "Conception et évaluation des projets.", coordinator: { name: "Carine Ibinga", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}, icon: ClipboardCheck },
+  { name: "Secours", mission: "Interventions d'urgence.", coordinator: { name: "Gérard Lema", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: LifeBuoy },
+  { name: "Action Sociale", mission: "Soutien aux populations vulnérables.", coordinator: { name: "Estelle Koumba", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}, icon: HandHeart },
+  { name: "Assainissement et Hygiène", mission: "Promotion de l'hygiène.", coordinator: { name: "Thierry Ndong", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: Droplets },
+  { name: "Discipline", mission: "Renforcement de l'organisation interne.", coordinator: { name: "Serge Moussavou", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: Shield },
+  { name: "Formation", mission: "Développement des compétences.", coordinator: { name: "Nathalie Ngouma", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}, icon: GraduationCap },
 ];
 
 const MemberCard = ({ member, size = 'default' }: { member: Member, size?: 'default' | 'small' }) => (
@@ -106,7 +109,7 @@ const PoolCard = ({ pool }: { pool: Pool }) => (
     <Card className="flex flex-col">
         <CardHeader>
             <CardTitle className="text-base font-headline flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-primary" />
+                <pool.icon className="w-5 h-5 text-primary" />
                 {pool.name}
             </CardTitle>
             <Separator />

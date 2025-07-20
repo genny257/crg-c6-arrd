@@ -549,3 +549,29 @@ export const locations = {
   }
 }
 
+export const cells = [
+    "Nzeng-Ayong Lac",
+    "Nzeng-Ayong Village",
+    "Ondogo",
+    "PK6-PK9",
+    "PK9-Bikélé",
+];
+
+export const skillsList = [
+    { group: "Compétences générales", skills: ["Secourisme", "Logistique", "Communication", "Animation", "Gestion de projet", "Informatique (bureautique)", "Cuisine", "Conduite (Permis B)"] },
+    { group: "Compétences médicales", skills: ["Infirmier(e)", "Aide-soignant(e)", "Médecin", "Pharmacien(ne)", "Soutien psychologique", "Premiers secours avancés (PSE1/PSE2)"] },
+    { group: "Compétences techniques", skills: ["Électricité", "Plomberie", "Mécanique", "Menuiserie", "Informatique (réseau, dev)"] },
+    { group: "Langues", skills: ["Anglais", "Langue des signes", "Fang", "Myènè"] }
+];
+
+export const professionsList = [
+    { group: "Santé", professions: ["Médecin", "Infirmier(e)", "Aide-soignant(e)", "Pharmacien(ne)", "Psychologue"] },
+    { group: "Éducation", professions: ["Enseignant(e)", "Professeur(e)", "Éducateur(trice) spécialisé(e)"] },
+    { group: "Technique", professions: ["Électricien(ne)", "Plombier(e)", "Mécanicien(ne)", "Informaticien(ne)"] },
+    { group: "Administration & Commerce", professions: ["Comptable", "Secrétaire", "Commercial(e)", "Gestionnaire"] },
+    { group: "Autres", professions: ["Étudiant(e)", "Sans emploi", "Retraité(e)", "Artisan(e)", "Chauffeur"] }
+];
+
+export const educationLevels = [
+    { group: "Niveau", levels: ["Primaire", "Collège", "Lycée", "Baccalauréat", "Bac+2 (BTS, DUT)", "Bac+3 (Licence)", "Bac+5 (Master)", "Doctorat", "Autodidacte", "Formation professionnelle"] }
+];
