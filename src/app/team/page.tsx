@@ -4,7 +4,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Network, Users, Briefcase, Search, ArrowDownUp, Archive, Truck, Banknote, HeartPulse, Lightbulb, LifeBuoy, HandHeart, Droplets, Shield, GraduationCap, ClipboardCheck } from "lucide-react";
+import { Network, Users, Briefcase, Search, ArrowDownUp, Archive, Truck, Banknote, HeartPulse, LifeBuoy, HandHeart, Droplets, Shield, GraduationCap, ClipboardCheck, Siren, Soap } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
@@ -77,9 +77,9 @@ const pools: Pool[] = [
   { name: "Santé", mission: "Promotion de la santé communautaire.", coordinator: { name: "Dr. Moussa Traoré", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: HeartPulse },
   { name: "Jeunesse et Volontariat", mission: "Mobilisation des jeunes et des volontaires.", coordinator: { name: "Kevin Essono", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: Users },
   { name: "Étude de Projet", mission: "Conception et évaluation des projets.", coordinator: { name: "Carine Ibinga", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}, icon: ClipboardCheck },
-  { name: "Secours", mission: "Interventions d'urgence.", coordinator: { name: "Gérard Lema", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: LifeBuoy },
+  { name: "Secours", mission: "Interventions d'urgence.", coordinator: { name: "Gérard Lema", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: Siren },
   { name: "Action Sociale", mission: "Soutien aux populations vulnérables.", coordinator: { name: "Estelle Koumba", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}, icon: HandHeart },
-  { name: "Assainissement et Hygiène", mission: "Promotion de l'hygiène.", coordinator: { name: "Thierry Ndong", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: Droplets },
+  { name: "Assainissement et Hygiène", mission: "Promotion de l'hygiène.", coordinator: { name: "Thierry Ndong", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: Soap },
   { name: "Discipline", mission: "Renforcement de l'organisation interne.", coordinator: { name: "Serge Moussavou", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: Shield },
   { name: "Formation", mission: "Développement des compétences.", coordinator: { name: "Nathalie Ngouma", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}, icon: GraduationCap },
 ];
@@ -139,6 +139,11 @@ export default function TeamPage() {
     
     useEffect(() => {
         const fetchVolunteers = async () => {
+             if (!db) {
+                console.error("Firestore is not initialized");
+                setLoading(false);
+                return;
+            }
             setLoading(true);
             try {
                 const q = query(collection(db, "volunteers"), where("status", "==", "Actif"));
@@ -176,6 +181,7 @@ export default function TeamPage() {
                 if (nameA > nameB) return sortConfig.direction === 'asc' ? 1 : -1;
                 return 0;
             } else { // sort by date
+                if (!a.createdAt || !b.createdAt) return 0;
                 const dateA = new Date(a.createdAt).getTime();
                 const dateB = new Date(b.createdAt).getTime();
                 return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA;
@@ -193,158 +199,160 @@ export default function TeamPage() {
             </h1>
             <p className="text-muted-foreground -mt-6">Comité du Sixième Arrondissement de Libreville</p>
 
-            <div className="space-y-12 flex flex-col items-center">
-                {/* President */}
-                <MemberCard member={president} />
+             <Card className="w-full">
+                 <CardContent className="space-y-12 flex flex-col items-center pt-8">
+                    {/* President */}
+                    <MemberCard member={president} />
 
-                {/* Vice President */}
-                <div className="flex justify-center w-full">
-                    <div className="relative">
-                        <div className="absolute top-0 left-1/2 w-0.5 h-8 bg-border -translate-y-full"></div>
-                        <MemberCard member={vicePresident} />
-                    </div>
-                </div>
-
-                {/* Focal Points */}
-                <div className="w-full flex justify-center">
-                    <div className="relative grid grid-cols-2 gap-8">
-                        <div className="absolute -top-8 left-1/4 w-3/4 h-0.5 bg-border"></div>
-                        <div className="absolute -top-8 left-1/4 w-0.5 h-8 bg-border"></div>
-                        <div className="absolute -top-8 right-1/4 w-0.5 h-8 bg-border"></div>
-                        <div className="absolute -top-16 left-1/2 w-0.5 h-8 bg-border"></div>
-                        {focalPoints.map(member => <MemberCard key={member.name} member={member} />)}
-                    </div>
-                </div>
-
-                <Separator />
-
-                {/* Secretariat & Treasury */}
-                <div className="w-full grid md:grid-cols-2 gap-12">
-                     <div className="flex justify-center">
-                        <div className="relative grid grid-cols-2 gap-8">
-                             <div className="absolute -top-8 left-1/4 w-3/4 h-0.5 bg-border"></div>
-                             <div className="absolute -top-8 left-1/4 w-0.5 h-8 bg-border"></div>
-                             <div className="absolute -top-8 right-1/4 w-0.5 h-8 bg-border"></div>
-                             <div className="absolute -top-16 left-1/2 w-0.5 h-8 bg-border"></div>
-                            {secretariat.map(member => <MemberCard key={member.name} member={member} />)}
+                    {/* Vice President */}
+                    <div className="flex justify-center w-full">
+                        <div className="relative">
+                            <div className="absolute top-0 left-1/2 w-0.5 h-8 bg-border -translate-y-full"></div>
+                            <MemberCard member={vicePresident} />
                         </div>
                     </div>
-                     <div className="flex justify-center">
+                    
+                    {/* Focal Points */}
+                    <div className="w-full flex justify-center">
                         <div className="relative grid grid-cols-2 gap-8">
                             <div className="absolute -top-8 left-1/4 w-3/4 h-0.5 bg-border"></div>
-                             <div className="absolute -top-8 left-1/4 w-0.5 h-8 bg-border"></div>
-                             <div className="absolute -top-8 right-1/4 w-0.5 h-8 bg-border"></div>
-                             <div className="absolute -top-16 left-1/2 w-0.5 h-8 bg-border"></div>
-                           {treasury.map(member => <MemberCard key={member.name} member={member} />)}
+                            <div className="absolute -top-8 left-1/4 w-0.5 h-8 bg-border"></div>
+                            <div className="absolute -top-8 right-1/4 w-0.5 h-8 bg-border"></div>
+                            <div className="absolute -top-16 left-1/2 w-0.5 h-8 bg-border"></div>
+                            {focalPoints.map(member => <MemberCard key={member.name} member={member} />)}
                         </div>
                     </div>
-                </div>
-                
-                <Separator />
 
-                {/* Coordinators */}
-                <Card className="w-full max-w-5xl">
-                    <CardHeader>
-                        <CardTitle className="text-center font-headline text-xl">Coordinateurs des Cellules</CardTitle>
-                    </CardHeader>
-                    <CardContent className="relative">
-                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-0.5 h-4 bg-border"></div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-8">
-                            {coordinators.map(member => <MemberCard key={member.name} member={member} size="small" />)}
-                        </div>
-                    </CardContent>
-                </Card>
+                    <Separator />
 
-                 <Separator />
-
-                {/* Pools */}
-                <Card className="w-full">
-                    <CardHeader>
-                        <CardTitle className="text-center font-headline text-xl flex items-center justify-center gap-2">
-                           <Briefcase className="w-6 h-6"/> Nos Pools
-                        </CardTitle>
-                        <CardDescription className="text-center">Les pôles de compétences du comité et leurs coordinateurs.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {pools.map(pool => <PoolCard key={pool.name} pool={pool} />)}
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Separator />
-
-                {/* Active Volunteers */}
-                <Card className="w-full">
-                    <CardHeader>
-                        <CardTitle className="text-center font-headline text-xl flex items-center justify-center gap-2">
-                           <Users className="w-6 h-6"/> Nos Volontaires Actifs
-                        </CardTitle>
-                        <CardDescription className="text-center">La force vive de notre comité.</CardDescription>
-                        <div className="pt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-center">
-                            <div className="relative w-full lg:col-span-2">
-                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input 
-                                    placeholder="Rechercher par nom..." 
-                                    className="pl-8 w-full"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <Select onValueChange={(value) => setCellFilter(value === 'all' ? null : value)}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Filtrer par cellule" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">Toutes les cellules</SelectItem>
-                                        {allCells.map(cell => (
-                                            <SelectItem key={cell} value={cell}>{cell}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" className="w-full">
-                                            <ArrowDownUp className="mr-2 h-4 w-4" />
-                                            Trier par
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'desc' })}>Plus récent</DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'asc' })}>Plus ancien</DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'asc' })}>Nom (A-Z)</DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'desc' })}>Nom (Z-A)</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                    {/* Secretariat & Treasury */}
+                    <div className="w-full grid md:grid-cols-2 gap-12">
+                        <div className="flex justify-center">
+                            <div className="relative grid grid-cols-2 gap-8">
+                                <div className="absolute -top-8 left-1/4 w-3/4 h-0.5 bg-border"></div>
+                                <div className="absolute -top-8 left-1/4 w-0.5 h-8 bg-border"></div>
+                                <div className="absolute -top-8 right-1/4 w-0.5 h-8 bg-border"></div>
+                                <div className="absolute -top-16 left-1/2 w-0.5 h-8 bg-border"></div>
+                                {secretariat.map(member => <MemberCard key={member.name} member={member} />)}
                             </div>
                         </div>
-                    </CardHeader>
-                    <CardContent>
-                        {loading ? (
+                        <div className="flex justify-center">
+                            <div className="relative grid grid-cols-2 gap-8">
+                                <div className="absolute -top-8 left-1/4 w-3/4 h-0.5 bg-border"></div>
+                                <div className="absolute -top-8 left-1/4 w-0.5 h-8 bg-border"></div>
+                                <div className="absolute -top-8 right-1/4 w-0.5 h-8 bg-border"></div>
+                                <div className="absolute -top-16 left-1/2 w-0.5 h-8 bg-border"></div>
+                            {treasury.map(member => <MemberCard key={member.name} member={member} />)}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <Separator />
+
+                    {/* Coordinators */}
+                    <div className="w-full max-w-5xl">
+                        <CardHeader className="p-0 mb-4">
+                            <CardTitle className="text-center font-headline text-xl">Coordinateurs des Cellules</CardTitle>
+                        </CardHeader>
+                        <CardContent className="relative p-0">
+                            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-0.5 h-4 bg-border"></div>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-8">
+                                {coordinators.map(member => <MemberCard key={member.name} member={member} size="small" />)}
+                            </div>
+                        </CardContent>
+                    </div>
+
+                    <Separator />
+
+                    {/* Pools */}
+                    <div className="w-full">
+                        <CardHeader className="p-0 mb-4">
+                            <CardTitle className="text-center font-headline text-xl flex items-center justify-center gap-2">
+                            <Briefcase className="w-6 h-6"/> Nos Pools
+                            </CardTitle>
+                            <CardDescription className="text-center">Les pôles de compétences du comité et leurs coordinateurs.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {pools.map(pool => <PoolCard key={pool.name} pool={pool} />)}
+                            </div>
+                        </CardContent>
+                    </div>
+                 </CardContent>
+            </Card>
+
+            <Separator />
+
+            {/* Active Volunteers */}
+            <Card className="w-full">
+                <CardHeader>
+                    <CardTitle className="text-center font-headline text-xl flex items-center justify-center gap-2">
+                        <Users className="w-6 h-6"/> Nos Volontaires Actifs
+                    </CardTitle>
+                    <CardDescription className="text-center">La force vive de notre comité.</CardDescription>
+                    <div className="pt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-center">
+                        <div className="relative w-full lg:col-span-2">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                                placeholder="Rechercher par nom..." 
+                                className="pl-8 w-full"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <Select onValueChange={(value) => setCellFilter(value === 'all' ? null : value)}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Filtrer par cellule" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">Toutes les cellules</SelectItem>
+                                    {allCells.map(cell => (
+                                        <SelectItem key={cell} value={cell}>{cell}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="w-full">
+                                        <ArrowDownUp className="mr-2 h-4 w-4" />
+                                        Trier par
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'desc' })}>Plus récent</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'asc' })}>Plus ancien</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'asc' })}>Nom (A-Z)</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'desc' })}>Nom (Z-A)</DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    {loading ? (
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-x-4 gap-y-6">
+                            {Array.from({ length: 16 }).map((_, i) => (
+                                <div key={i} className="flex flex-col items-center text-center">
+                                    <Skeleton className="h-16 w-16 mb-2 rounded-full" />
+                                    <Skeleton className="h-4 w-20" />
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
                             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-x-4 gap-y-6">
-                                {Array.from({ length: 16 }).map((_, i) => (
-                                    <div key={i} className="flex flex-col items-center text-center">
-                                        <Skeleton className="h-16 w-16 mb-2 rounded-full" />
-                                        <Skeleton className="h-4 w-20" />
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-x-4 gap-y-6">
-                                {filteredAndSortedVolunteers.map(volunteer => (
-                                    <VolunteerCard key={volunteer.id} volunteer={volunteer} />
-                                ))}
-                            </div>
-                        )}
-                         {!loading && filteredAndSortedVolunteers.length === 0 && (
-                            <p className="text-center text-muted-foreground py-8">
-                                {searchTerm || cellFilter ? "Aucun volontaire ne correspond à votre recherche." : "Aucun volontaire actif pour le moment."}
-                            </p>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
+                            {filteredAndSortedVolunteers.map(volunteer => (
+                                <VolunteerCard key={volunteer.id} volunteer={volunteer} />
+                            ))}
+                        </div>
+                    )}
+                        {!loading && filteredAndSortedVolunteers.length === 0 && (
+                        <p className="text-center text-muted-foreground py-8">
+                            {searchTerm || cellFilter ? "Aucun volontaire ne correspond à votre recherche." : "Aucun volontaire actif pour le moment."}
+                        </p>
+                    )}
+                </CardContent>
+            </Card>
         </div>
     );
 }

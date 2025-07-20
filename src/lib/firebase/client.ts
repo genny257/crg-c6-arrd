@@ -1,6 +1,6 @@
 // src/lib/firebase/client.ts
 import { initializeApp, getApps, getApp, App } from "firebase/app";
-import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
+import { getFirestore, enableIndexedDbPersistence, Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,30 +11,33 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-let app: App;
-if (!getApps().length) {
-  app = initializeApp(firebaseConfig);
-} else {
-  app = getApp();
-}
+let app: App | undefined;
+let db: Firestore | undefined;
 
-const db = getFirestore(app);
-
-// Enable offline persistence
-enableIndexedDbPersistence(db)
-  .catch((err) => {
-    if (err.code == 'failed-precondition') {
-      // Multiple tabs open, persistence can only be enabled
-      // in one tab at a time.
-      // ...
-      console.warn("Firestore offline persistence failed: Multiple tabs open.");
-    } else if (err.code == 'unimplemented') {
-      // The current browser does not support all of the
-      // features required to enable persistence
-      // ...
-      console.warn("Firestore offline persistence not supported in this browser.");
+// This check prevents Firebase from initializing on the server side
+// where the env vars might not be available
+if (typeof window !== "undefined" && firebaseConfig.projectId) {
+    if (!getApps().length) {
+      try {
+        app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        enableIndexedDbPersistence(db)
+          .catch((err) => {
+            if (err.code == 'failed-precondition') {
+              console.warn("Firestore offline persistence failed: Multiple tabs open.");
+            } else if (err.code == 'unimplemented') {
+              console.warn("Firestore offline persistence not supported in this browser.");
+            }
+          });
+      } catch (e) {
+        console.error("Firebase initialization error", e);
+      }
+    } else {
+      app = getApp();
+      db = getFirestore(app);
     }
-  });
-
+} else {
+    console.warn("Firebase not initialized. Missing projectId or running on server.")
+}
 
 export { db };
