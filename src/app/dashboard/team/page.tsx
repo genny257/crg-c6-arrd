@@ -4,7 +4,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Network, Users, Briefcase, ArrowDownUp, Search, Archive, Truck, Banknote, HeartPulse, LifeBuoy, HandHeart, Droplets, Shield, GraduationCap, ClipboardCheck, Siren, Soap } from "lucide-react";
+import { Network, Users, Briefcase, ArrowDownUp, Search, Archive, Truck, Banknote, HeartPulse, LifeBuoy, HandHeart, Droplets, Shield, GraduationCap, ClipboardCheck, Siren, Soup } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
@@ -81,7 +81,7 @@ const pools: Pool[] = [
   { name: "Étude de Projet", mission: "Conception et évaluation des projets.", coordinator: { name: "Carine Ibinga", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}, icon: ClipboardCheck },
   { name: "Secours", mission: "Interventions d'urgence.", coordinator: { name: "Gérard Lema", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: Siren },
   { name: "Action Sociale", mission: "Soutien aux populations vulnérables.", coordinator: { name: "Estelle Koumba", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}, icon: HandHeart },
-  { name: "Assainissement et Hygiène", mission: "Promotion de l'hygiène.", coordinator: { name: "Thierry Ndong", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: Soap },
+  { name: "Assainissement et Hygiène", mission: "Promotion de l'hygiène.", coordinator: { name: "Thierry Ndong", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: Soup },
   { name: "Discipline", mission: "Renforcement de l'organisation interne.", coordinator: { name: "Serge Moussavou", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, icon: Shield },
   { name: "Formation", mission: "Développement des compétences.", coordinator: { name: "Nathalie Ngouma", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}, icon: GraduationCap },
 ];
@@ -207,14 +207,22 @@ export default function TeamPage() {
     }
 
     return (
-        <div className="flex flex-col gap-8">
-            <h1 className="text-3xl font-headline font-bold flex items-center gap-2">
-                <Network className="w-8 h-8 text-primary"/>
-                Organigramme du Comité
-            </h1>
-            <p className="text-muted-foreground -mt-6">Comité du Sixième Arrondissement de Libreville</p>
+        <div className="flex flex-col gap-12">
+             <div className="space-y-2">
+                <h1 className="text-3xl font-headline font-bold flex items-center gap-2">
+                    <Network className="w-8 h-8 text-primary"/>
+                    Notre Équipe
+                </h1>
+                <p className="text-muted-foreground">Découvrez l'organisation et les membres du Comité du Sixième Arrondissement.</p>
+            </div>
 
             <Card className="w-full">
+                <CardHeader>
+                    <CardTitle className="text-center font-headline text-2xl flex items-center justify-center gap-2">
+                        <Network className="w-7 h-7"/>
+                        Organigramme du Comité
+                    </CardTitle>
+                </CardHeader>
                  <CardContent className="space-y-12 flex flex-col items-center pt-8">
                     {/* President */}
                     <MemberCard member={president} />
@@ -283,7 +291,7 @@ export default function TeamPage() {
                     <div className="w-full">
                         <CardHeader className="p-0 mb-4">
                             <CardTitle className="text-center font-headline text-xl flex items-center justify-center gap-2">
-                            <Briefcase className="w-6 h-6"/> Nos Pools
+                            <Briefcase className="w-6 h-6"/> Nos Pools de Compétences
                             </CardTitle>
                             <CardDescription className="text-center">Les pôles de compétences du comité et leurs coordinateurs.</CardDescription>
                         </CardHeader>
@@ -296,9 +304,6 @@ export default function TeamPage() {
                  </CardContent>
             </Card>
 
-            <Separator />
-
-            {/* Active Volunteers */}
             <Card className="w-full">
                 <CardHeader>
                     <CardTitle className="text-center font-headline text-xl flex items-center justify-center gap-2">
