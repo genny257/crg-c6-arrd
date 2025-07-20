@@ -18,7 +18,7 @@ const alegreya = Alegreya({
 })
 
 export const metadata: Metadata = {
-  title: 'Gabon Relief Hub',
+  title: 'Comité-6-Arrondissement',
   description: 'Application de la Croix-Rouge Gabonaise pour la gestion des volontaires, missions et dons.',
 };
 

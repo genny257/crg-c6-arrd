@@ -76,7 +76,7 @@ export function AppNav() {
         <Link href="/" className="flex items-center gap-2 p-2">
             <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={32} height={32} />
             <span className="font-headline text-lg group-data-[collapsible=icon]:hidden">
-                Comité Sixième Arrondissement
+                CRG-6-Arrond.
             </span>
         </Link>
       </SidebarHeader>

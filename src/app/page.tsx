@@ -27,8 +27,8 @@ import type { HomePageContent } from "@/types/homepage"
 import { Skeleton } from "@/components/ui/skeleton"
 
 const initialContent: HomePageContent = {
-    heroTitle: "Croix-Rouge Gabonaise",
-    heroSubtitle: "Comité Sixième Arrondissement",
+    heroTitle: "Comité-6-Arrondissement",
+    heroSubtitle: "Croix-Rouge Gabonaise",
     heroDescription: "Ensemble, pour un avenir plus sûr. Rejoignez-nous pour gérer les missions, coordonner les volontaires et amplifier notre impact.",
     actions: [
         { title: "Urgences & Secourisme", description: "Intervention rapide lors de catastrophes naturelles, gestion des postes de secours pour les événements publics et assistance immédiate aux victimes.", image: "https://placehold.co/600x400.png", imageHint: "emergency rescue", dialogTitle: "Secourisme et Gestion de Catastrophes", dialogDescription: "Afin d'améliorer la résilience des communautés, nous menons des actions de préparation et de gestion des catastrophes à travers :", dialogList: ["La formation aux gestes de premiers secours.", "La sensibilisation sur les changements climatiques.", "La formation sur la sécurité et la santé au travail.", "Le déploiement des équipes de secouristes en situation d'urgence ou de catastrophe."] },
