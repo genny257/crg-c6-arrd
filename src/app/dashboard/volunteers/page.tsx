@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { UserPlus, MoreHorizontal, Search, ArrowDownUp } from "lucide-react";
+import { UserPlus, MoreHorizontal, Search, ArrowDownUp, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,7 +16,8 @@ import type { Volunteer } from "@/types/volunteer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
+import { utils, writeFile } from 'xlsx';
+import { cells } from "@/lib/locations";
 
 const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -28,6 +29,14 @@ const getStatusBadgeVariant = (status: string) => {
     }
 };
 
+const allCells = [
+    "Nzeng-Ayong Lac",
+    "Nzeng-Ayong Village",
+    "Ondogo",
+    "PK6-PK9",
+    "PK9-Bikélé",
+];
+
 export default function VolunteersPage() {
     const [volunteers, setVolunteers] = React.useState<Volunteer[]>([]);
     const [loading, setLoading] = React.useState(true);
@@ -35,6 +44,7 @@ export default function VolunteersPage() {
     const [searchTerm, setSearchTerm] = React.useState("");
     const [sortConfig, setSortConfig] = React.useState<{ key: 'createdAt' | 'lastName'; direction: 'asc' | 'desc' }>({ key: 'createdAt', direction: 'desc' });
     const [skillFilter, setSkillFilter] = React.useState<string | null>(null);
+    const [cellFilter, setCellFilter] = React.useState<string | null>(null);
     const [allSkills, setAllSkills] = React.useState<string[]>([]);
 
 
@@ -74,6 +84,10 @@ export default function VolunteersPage() {
         if (skillFilter) {
             filteredVolunteers = filteredVolunteers.filter(v => v.skills?.includes(skillFilter));
         }
+
+        if (cellFilter) {
+            filteredVolunteers = filteredVolunteers.filter(v => v.assignedCell === cellFilter);
+        }
     
         if (searchTerm) {
           filteredVolunteers = filteredVolunteers.filter(v => 
@@ -97,7 +111,7 @@ export default function VolunteersPage() {
         });
     
         return filteredVolunteers;
-      }, [volunteers, searchTerm, sortConfig, skillFilter]);
+      }, [volunteers, searchTerm, sortConfig, skillFilter, cellFilter]);
 
     const updateVolunteerStatus = async (id: string, status: 'Actif' | 'Rejeté' | 'Inactif' | 'En attente') => {
         try {
@@ -118,23 +132,47 @@ export default function VolunteersPage() {
         }
     };
 
+    const handleExport = () => {
+        const dataToExport = filteredAndSortedVolunteers.map(v => ({
+            "Nom": v.lastName,
+            "Prénom": v.firstName,
+            "Email": v.email,
+            "Téléphone": v.phone,
+            "Cellule": v.assignedCell,
+            "Statut": v.status,
+            "Date d'inscription": new Date(v.createdAt).toLocaleDateString('fr-FR'),
+            "Compétences": v.skills?.join(', '),
+        }));
+
+        const worksheet = utils.json_to_sheet(dataToExport);
+        const workbook = utils.book_new();
+        utils.book_append_sheet(workbook, worksheet, "Volontaires");
+        writeFile(workbook, "Liste_Volontaires.xlsx");
+    };
+
 
     return (
         <div className="flex flex-col gap-8">
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-headline font-bold">Gestion des Volontaires</h1>
-                <Button>
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Ajouter un Volontaire
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button onClick={handleExport}>
+                        <Download className="mr-2 h-4 w-4" />
+                        Exporter la liste
+                    </Button>
+                    <Button>
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        Ajouter un Volontaire
+                    </Button>
+                </div>
             </div>
 
             <Card>
                 <CardHeader>
                     <CardTitle>Liste des Volontaires</CardTitle>
                     <CardDescription>Retrouvez, modifiez et gérez les profils de tous les volontaires.</CardDescription>
-                    <div className="pt-4 flex flex-col md:flex-row items-center gap-4">
-                        <div className="relative w-full md:flex-1">
+                    <div className="pt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="relative lg:col-span-2">
                             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input 
                                 placeholder="Rechercher par nom, prénom, email..." 
@@ -143,8 +181,19 @@ export default function VolunteersPage() {
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
+                         <Select onValueChange={(value) => setCellFilter(value === 'all' ? null : value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Filtrer par cellule" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Toutes les cellules</SelectItem>
+                                {allCells.map(cell => (
+                                    <SelectItem key={cell} value={cell}>{cell}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                         <Select onValueChange={(value) => setSkillFilter(value === 'all' ? null : value)}>
-                            <SelectTrigger className="w-full md:w-[180px]">
+                            <SelectTrigger>
                                 <SelectValue placeholder="Filtrer par compétence" />
                             </SelectTrigger>
                             <SelectContent>
@@ -156,7 +205,7 @@ export default function VolunteersPage() {
                         </Select>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full md:w-auto">
+                                <Button variant="outline" className="w-full">
                                     <ArrowDownUp className="mr-2 h-4 w-4" />
                                     Trier par
                                 </Button>

@@ -16,6 +16,7 @@ import { db } from "@/lib/firebase/client";
 import type { Volunteer } from "@/types/volunteer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type Member = {
     name: string;
@@ -44,6 +45,11 @@ const vicePresident: Member = {
     hint: "female portrait"
 };
 
+const focalPoints: Member[] = [
+    { name: "Marc Ona Essang", role: "Point Focal 1", avatar: "https://placehold.co/100x100.png", hint: "male portrait" },
+    { name: "Juliette Bivigou", role: "Point Focal 2", avatar: "https://placehold.co/100x100.png", hint: "female portrait" },
+];
+
 const secretariat: Member[] = [
     { name: "Yves Moukagni", role: "Secrétaire Général", avatar: "https://placehold.co/100x100.png", hint: "male portrait" },
     { name: "Nadège Mboumba", role: "Secrétaire Adjointe", avatar: "https://placehold.co/100x100.png", hint: "female portrait" },
@@ -61,6 +67,8 @@ const coordinators: Member[] = [
     { name: "Gaston Bouanga", role: "PK6-PK9", avatar: "https://placehold.co/80x80.png", hint: "male portrait" },
     { name: "Alice Kengue", role: "PK9-Bikélé", avatar: "https://placehold.co/80x80.png", hint: "female portrait" },
 ];
+
+const allCells = coordinators.map(c => c.role);
 
 const pools: Pool[] = [
   { name: "Secrétariat", mission: "Gestion administrative et coordination.", coordinator: { name: "Hélène Obiang", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"} },
@@ -129,6 +137,7 @@ export default function TeamPage() {
     const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+    const [cellFilter, setCellFilter] = useState<string | null>(null);
     const [sortConfig, setSortConfig] = useState<{ key: 'name' | 'date'; direction: 'asc' | 'desc' }>({ key: 'date', direction: 'desc' });
 
     useEffect(() => {
@@ -157,6 +166,10 @@ export default function TeamPage() {
     
     const filteredAndSortedVolunteers = useMemo(() => {
         let sortedVolunteers = [...volunteers];
+        
+        if (cellFilter) {
+            sortedVolunteers = sortedVolunteers.filter(v => v.assignedCell === cellFilter);
+        }
 
         if (searchTerm) {
             sortedVolunteers = sortedVolunteers.filter(v =>
@@ -179,7 +192,7 @@ export default function TeamPage() {
         });
 
         return sortedVolunteers;
-    }, [volunteers, searchTerm, sortConfig]);
+    }, [volunteers, searchTerm, sortConfig, cellFilter]);
 
     if (authLoading || !user) {
         return <div>Chargement...</div>;
@@ -202,6 +215,17 @@ export default function TeamPage() {
                     <div className="relative">
                         <div className="absolute top-0 left-1/2 w-0.5 h-8 bg-border -translate-y-full"></div>
                         <MemberCard member={vicePresident} />
+                    </div>
+                </div>
+                
+                 {/* Focal Points */}
+                <div className="w-full flex justify-center">
+                    <div className="relative grid grid-cols-2 gap-8">
+                        <div className="absolute -top-8 left-1/4 w-3/4 h-0.5 bg-border"></div>
+                        <div className="absolute -top-8 left-1/4 w-0.5 h-8 bg-border"></div>
+                        <div className="absolute -top-8 right-1/4 w-0.5 h-8 bg-border"></div>
+                        <div className="absolute -top-16 left-1/2 w-0.5 h-8 bg-border"></div>
+                        {focalPoints.map(member => <MemberCard key={member.name} member={member} />)}
                     </div>
                 </div>
 
@@ -270,8 +294,8 @@ export default function TeamPage() {
                            <Users className="w-6 h-6"/> Nos Volontaires Actifs
                         </CardTitle>
                         <CardDescription className="text-center">La force vive de notre comité.</CardDescription>
-                        <div className="pt-4 flex flex-col md:flex-row items-center gap-4">
-                            <div className="relative w-full md:flex-1">
+                        <div className="pt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-center">
+                            <div className="relative w-full lg:col-span-2">
                                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                                 <Input 
                                     placeholder="Rechercher par nom..." 
@@ -280,20 +304,33 @@ export default function TeamPage() {
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="w-full md:w-auto">
-                                        <ArrowDownUp className="mr-2 h-4 w-4" />
-                                        Trier par
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'desc' })}>Plus récent</DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'asc' })}>Plus ancien</DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'asc' })}>Nom (A-Z)</DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'desc' })}>Nom (Z-A)</DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <Select onValueChange={(value) => setCellFilter(value === 'all' ? null : value)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Filtrer par cellule" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">Toutes les cellules</SelectItem>
+                                        {allCells.map(cell => (
+                                            <SelectItem key={cell} value={cell}>{cell}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" className="w-full">
+                                            <ArrowDownUp className="mr-2 h-4 w-4" />
+                                            Trier par
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'desc' })}>Plus récent</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'asc' })}>Plus ancien</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'asc' })}>Nom (A-Z)</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'desc' })}>Nom (Z-A)</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
                     </CardHeader>
                     <CardContent>
@@ -315,7 +352,7 @@ export default function TeamPage() {
                         )}
                          {!loading && filteredAndSortedVolunteers.length === 0 && (
                             <p className="text-center text-muted-foreground py-8">
-                                {searchTerm ? "Aucun volontaire ne correspond à votre recherche." : "Aucun volontaire actif pour le moment."}
+                                {searchTerm || cellFilter ? "Aucun volontaire ne correspond à votre recherche." : "Aucun volontaire actif pour le moment."}
                             </p>
                         )}
                     </CardContent>
