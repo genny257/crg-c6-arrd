@@ -20,6 +20,10 @@ export const RegisterUserInputSchema = z.object({
   firstName: z.string().min(1, "Le prénom est requis."),
   lastName: z.string().min(1, "Le nom est requis."),
   birthDate: z.string().min(1, "La date de naissance est requise."),
+  birthPlace: z.string().min(1, "Le lieu de naissance est requis."),
+  sex: z.enum(["masculin", "féminin"]),
+  maritalStatus: z.enum(["célibataire", "marié(e)", "divorcé(e)", "veuf(ve)"]),
+  idCardNumber: z.string().min(1, "Le numéro de carte d'identité est requis."),
   phone: z.string().min(1, "Le numéro de téléphone est requis."),
   email: z.string().email("L'adresse e-mail n'est pas valide."),
   address: z.string().min(1, "L'adresse est requise."),
@@ -29,10 +33,8 @@ export const RegisterUserInputSchema = z.object({
   volunteerExperience: z.string().optional(),
   availability: z.array(z.string()).optional(),
   causes: z.array(z.string()).optional(),
-  motivation: z.string().optional(),
   assignedCell: z.string().optional(),
   residence: LocationSchema,
-  interventionZone: LocationSchema,
   idCardFront: z.string().optional().describe("A data URI of the front of the ID card."),
   idCardBack: z.string().optional().describe("A data URI of the back of the ID card."),
   termsAccepted: z.literal(true, {
@@ -41,3 +43,5 @@ export const RegisterUserInputSchema = z.object({
 });
 
 export type RegisterUserInput = z.infer<typeof RegisterUserInputSchema>;
+
+    

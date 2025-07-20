@@ -19,19 +19,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Badge } from "@/components/ui/badge"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form"
 import { cn } from "@/lib/utils"
 import { locations } from "@/lib/locations"
 import { useToast } from "@/hooks/use-toast"
 import { registerUser } from "@/ai/flows/register-flow"
 import { RegisterUserInputSchema } from "@/ai/schemas/register-user-schema"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 const totalSteps = 5
 
-const pools = [
-    "Secrétariat", "Logistique", "Trésorerie", "Santé", 
-    "Jeunesse et Volontariat", "Étude de Projet", "Secours", "Action Sociale", 
-    "Assainissement et Hygiène", "Discipline", "Formation"
+const cells = [
+    "Nzeng-Ayong Lac",
+    "Nzeng-Ayong Village",
+    "Ondogo",
+    "PK6-PK9",
+    "PK9-Bikélé",
 ];
 
 const skillsList = [
@@ -229,6 +232,10 @@ export default function RegisterPage() {
             firstName: "",
             lastName: "",
             birthDate: "",
+            birthPlace: "",
+            sex: "masculin",
+            maritalStatus: "célibataire",
+            idCardNumber: "",
             phone: "",
             email: "",
             address: "",
@@ -241,7 +248,6 @@ export default function RegisterPage() {
             motivation: "",
             assignedCell: "",
             residence: { province: "", departement: "", communeCanton: "", arrondissement: "", quartierVillage: "" },
-            interventionZone: { province: "", departement: "", communeCanton: "", arrondissement: "", quartierVillage: "" },
             idCardFront: "",
             idCardBack: "",
             termsAccepted: false,
@@ -259,6 +265,21 @@ export default function RegisterPage() {
 
     const handleNext = () => setStep((prev) => Math.min(prev + 1, totalSteps))
     const handlePrevious = () => setStep((prev) => Math.max(prev - 1, 1))
+
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, fieldName: "idCardFront" | "idCardBack") => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (loadEvent) => {
+                form.setValue(fieldName, loadEvent.target?.result as string);
+                toast({
+                    title: "Fichier sélectionné",
+                    description: file.name,
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const onSubmit = async (data: z.infer<typeof RegisterUserInputSchema>) => {
         setIsSubmitting(true);
@@ -327,25 +348,65 @@ export default function RegisterPage() {
                                                 <FormItem><FormLabel>Nom</FormLabel><FormControl><Input placeholder="Votre nom" {...field} className="uppercase" /></FormControl><FormMessage /></FormItem>
                                             )} />
                                         </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <FormField control={form.control} name="birthDate" render={({ field }) => (
                                                 <FormItem><FormLabel>Date de naissance</FormLabel><FormControl><Input type="date" {...field} /></FormControl><FormMessage /></FormItem>
                                             )} />
-                                            <FormField control={form.control} name="phone" render={({ field }) => (
-                                                <FormItem><FormLabel>Numéro de téléphone</FormLabel><FormControl><Input type="tel" placeholder="+241 XX XX XX XX" {...field} /></FormControl><FormMessage /></FormItem>
+                                            <FormField control={form.control} name="birthPlace" render={({ field }) => (
+                                                <FormItem><FormLabel>Lieu de naissance</FormLabel><FormControl><Input placeholder="Lieu de naissance" {...field} className="capitalize" /></FormControl><FormMessage /></FormItem>
                                             )} />
                                         </div>
-                                        <FormField control={form.control} name="email" render={({ field }) => (
-                                            <FormItem><FormLabel>Adresse e-mail</FormLabel><FormControl><Input type="email" placeholder="nom@exemple.com" {...field} /></FormControl><FormMessage /></FormItem>
-                                        )} />
-                                        <FormField control={form.control} name="address" render={({ field }) => (
-                                            <FormItem><FormLabel>Adresse complète (Rue, Immeuble, etc.)</FormLabel><FormControl><Textarea placeholder="Ex: Rue de la Paix, Immeuble B, Porte 12" {...field} className="capitalize" /></FormControl><FormMessage /></FormItem>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                             <FormField control={form.control} name="sex" render={({ field }) => (
+                                                <FormItem><FormLabel>Sexe</FormLabel>
+                                                <FormControl>
+                                                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex items-center space-x-4">
+                                                        <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="masculin" /></FormControl><FormLabel className="font-normal">Masculin</FormLabel></FormItem>
+                                                        <FormItem className="flex items-center space-x-2 space-y-0"><FormControl><RadioGroupItem value="féminin" /></FormControl><FormLabel className="font-normal">Féminin</FormLabel></FormItem>
+                                                    </RadioGroup>
+                                                </FormControl>
+                                                <FormMessage /></FormItem>
+                                            )} />
+                                             <FormField control={form.control} name="maritalStatus" render={({ field }) => (
+                                                <FormItem><FormLabel>Situation de famille</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value="célibataire">Célibataire</SelectItem>
+                                                        <SelectItem value="marié(e)">Marié(e)</SelectItem>
+                                                        <SelectItem value="divorcé(e)">Divorcé(e)</SelectItem>
+                                                        <SelectItem value="veuf(ve)">Veuf(ve)</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage /></FormItem>
+                                            )} />
+                                        </div>
+                                        <FormField control={form.control} name="idCardNumber" render={({ field }) => (
+                                            <FormItem><FormLabel>N° de la carte d'identité</FormLabel><FormControl><Input placeholder="Numéro de votre pièce d'identité" {...field} /></FormControl><FormMessage /></FormItem>
                                         )} />
                                     </div>
                                 </div>
                             )}
 
                             {step === 2 && (
+                                <div className="space-y-4">
+                                    <h3 className="text-lg font-semibold">Coordonnées & Résidence</h3>
+                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <FormField control={form.control} name="phone" render={({ field }) => (
+                                            <FormItem><FormLabel>Numéro de téléphone</FormLabel><FormControl><Input type="tel" placeholder="+241 XX XX XX XX" {...field} /></FormControl><FormMessage /></FormItem>
+                                        )} />
+                                        <FormField control={form.control} name="email" render={({ field }) => (
+                                            <FormItem><FormLabel>Adresse e-mail</FormLabel><FormControl><Input type="email" placeholder="nom@exemple.com" {...field} /></FormControl><FormMessage /></FormItem>
+                                        )} />
+                                    </div>
+                                    <FormField control={form.control} name="address" render={({ field }) => (
+                                        <FormItem><FormLabel>Adresse complète (Boîte Postale, Rue, Immeuble, etc.)</FormLabel><FormControl><Textarea placeholder="Ex: BP 123, Rue de la Paix, Immeuble B" {...field} className="capitalize" /></FormControl><FormMessage /></FormItem>
+                                    )} />
+                                    <LocationSelector form={form} title="Lieu de résidence actuel" fieldPrefix="residence" />
+                                </div>
+                            )}
+
+                            {step === 3 && (
                                 <div className="space-y-4">
                                     <h3 className="text-lg font-semibold">Profil & compétences</h3>
                                     <div className="grid gap-4">
@@ -439,7 +500,7 @@ export default function RegisterPage() {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>Compétences spécifiques utiles</FormLabel>
-                                                     <p className="text-sm text-muted-foreground">Sélectionnez vos compétences ou ajoutez les vôtres.</p>
+                                                     <FormDescription>Sélectionnez vos compétences ou ajoutez les vôtres.</FormDescription>
                                                     <Popover open={skillsPopoverOpen} onOpenChange={setSkillsPopoverOpen}>
                                                         <PopoverTrigger asChild>
                                                              <FormControl>
@@ -489,25 +550,82 @@ export default function RegisterPage() {
                                                 </FormItem>
                                             )}
                                         />
-                                        <FormField control={form.control} name="volunteerExperience" render={({ field }) => (
-                                            <FormItem><FormLabel>Expérience bénévole ou associative (facultative)</FormLabel><FormControl><Textarea placeholder="Décrivez brièvement vos expériences passées..." {...field} /></FormControl><FormMessage /></FormItem>
-                                        )} />
+                                        
                                     </div>
                                 </div>
                             )}
 
-                            {step === 3 && (
-                                <div className="space-y-4">
-                                    <h3 className="text-lg font-semibold">Disponibilité & zone d’action</h3>
+                             {step === 4 && (
+                                <div className="space-y-6">
+                                    <h3 className="text-lg font-semibold">Engagement & Disponibilité</h3>
+                                    <FormField control={form.control} name="volunteerExperience" render={({ field }) => (
+                                            <FormItem><FormLabel>Avez-vous déjà été volontaire à la Croix-Rouge Gabonaise ?</FormLabel><FormControl><Textarea placeholder="Si oui, précisez dans quel domaine et en quelle année..." {...field} /></FormControl><FormMessage /></FormItem>
+                                    )} />
+                                     <FormField
+                                        control={form.control}
+                                        name="causes"
+                                        render={() => (
+                                            <FormItem>
+                                                <FormLabel>Dans quel(s) domaine(s) souhaiterez-vous servir ?</FormLabel>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                     {["Secourisme", "Santé", "Education", "Assainissement", "Etude et projet"].map((item) => (
+                                                        <FormField
+                                                            key={item}
+                                                            control={form.control}
+                                                            name="causes"
+                                                            render={({ field }) => {
+                                                                return (
+                                                                    <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
+                                                                        <FormControl>
+                                                                            <Checkbox
+                                                                                checked={field.value?.includes(item)}
+                                                                                onCheckedChange={(checked) => {
+                                                                                    return checked
+                                                                                        ? field.onChange([...(field.value || []), item])
+                                                                                        : field.onChange(field.value?.filter((value) => value !== item))
+                                                                                }}
+                                                                            />
+                                                                        </FormControl>
+                                                                        <FormLabel className="font-normal">{item}</FormLabel>
+                                                                    </FormItem>
+                                                                )
+                                                            }}
+                                                        />
+                                                    ))}
+                                                </div>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                     <FormField
+                                        control={form.control}
+                                        name="assignedCell"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Cellule d'intervention souhaitée</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Choisir une cellule d'affectation" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {cells.map(cell => (
+                                                            <SelectItem key={cell} value={cell}>{cell}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                     <FormField
                                         control={form.control}
                                         name="availability"
                                         render={() => (
                                             <FormItem>
-                                                <div className="mb-4">
-                                                    <FormLabel>Disponibilité</FormLabel>
-                                                    <p className="text-sm text-muted-foreground">Quand êtes-vous généralement disponible ?</p>
-                                                </div>
+                                                <FormLabel>Disponibilité</FormLabel>
+                                                <FormDescription>Quand êtes-vous généralement disponible ?</FormDescription>
                                                 <div className="grid grid-cols-2 gap-4">
                                                     {["Jour (semaine)", "Soir (semaine)", "Week-end", "Missions longues"].map((item) => (
                                                         <FormField
@@ -538,100 +656,41 @@ export default function RegisterPage() {
                                             </FormItem>
                                         )}
                                     />
-                                     <FormField
-                                        control={form.control}
-                                        name="assignedCell"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Cellule souhaitée</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Choisir une cellule d'affectation" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {pools.map(pool => (
-                                                            <SelectItem key={pool} value={pool}>{pool}</SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <div className="space-y-4">
-                                      <LocationSelector form={form} title="Lieu de résidence" fieldPrefix="residence" />
-                                      <LocationSelector form={form} title="Secteur d’intervention souhaité" fieldPrefix="interventionZone" />
-                                    </div>
-                                </div>
-                            )}
-
-                            {step === 4 && (
-                                <div className="space-y-4">
-                                    <h3 className="text-lg font-semibold">Motivation</h3>
-                                    <FormField control={form.control} name="motivation" render={({ field }) => (
-                                        <FormItem><FormLabel>Pourquoi souhaitez-vous devenir volontaire ?</FormLabel><FormControl><Textarea placeholder="Expliquez brièvement vos motivations..." rows={5} {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField
-                                        control={form.control}
-                                        name="causes"
-                                        render={() => (
-                                            <FormItem>
-                                                <div className="mb-4">
-                                                    <FormLabel>Quelles causes vous tiennent particulièrement à cœur ?</FormLabel>
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-4">
-                                                     {["Urgences", "Aide alimentaire", "Santé", "Jeunesse", "Soutien social", "Formation"].map((item) => (
-                                                        <FormField
-                                                            key={item}
-                                                            control={form.control}
-                                                            name="causes"
-                                                            render={({ field }) => {
-                                                                return (
-                                                                    <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
-                                                                        <FormControl>
-                                                                            <Checkbox
-                                                                                checked={field.value?.includes(item)}
-                                                                                onCheckedChange={(checked) => {
-                                                                                    return checked
-                                                                                        ? field.onChange([...(field.value || []), item])
-                                                                                        : field.onChange(field.value?.filter((value) => value !== item))
-                                                                                }}
-                                                                            />
-                                                                        </FormControl>
-                                                                        <FormLabel className="font-normal">{item}</FormLabel>
-                                                                    </FormItem>
-                                                                )
-                                                            }}
-                                                        />
-                                                    ))}
-                                                </div>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
                                 </div>
                             )}
 
                             {step === 5 && (
                                 <div className="space-y-6 text-center">
-                                    <h3 className="text-lg font-semibold">Pièces à joindre</h3>
+                                    <h3 className="text-lg font-semibold">Pièces à joindre & Finalisation</h3>
                                     <div className="grid gap-4 md:w-2/3 mx-auto">
-                                        <div className="grid gap-2 text-left">
-                                            <Label htmlFor="idCard">Pièce d’identité (Recto)</Label>
-                                            <Button variant="outline" asChild className="cursor-pointer">
-                                                <div><Upload className="mr-2" /> Télécharger un fichier</div>
-                                            </Button>
-                                            <Input id="idCard" type="file" className="hidden" />
-                                        </div>
-                                        <div className="grid gap-2 text-left">
-                                            <Label htmlFor="idCardBack">Pièce d’identité (Verso)</Label>
-                                            <Button variant="outline" asChild className="cursor-pointer">
-                                                <div><Upload className="mr-2" /> Télécharger un fichier</div>
-                                            </Button>
-                                            <Input id="idCardBack" type="file" className="hidden" />
-                                        </div>
+                                        <FormField
+                                            control={form.control}
+                                            name="idCardFront"
+                                            render={({ field }) => (
+                                                <FormItem className="text-left">
+                                                    <FormLabel>Pièce d’identité (Recto)</FormLabel>
+                                                    <FormDescription>Facultatif, vous pourrez la fournir plus tard.</FormDescription>
+                                                    <FormControl>
+                                                        <Input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "idCardFront")} className="pt-2"/>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="idCardBack"
+                                            render={({ field }) => (
+                                                <FormItem className="text-left">
+                                                    <FormLabel>Pièce d’identité (Verso)</FormLabel>
+                                                     <FormDescription>Facultatif.</FormDescription>
+                                                    <FormControl>
+                                                        <Input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "idCardBack")} className="pt-2"/>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
                                     </div>
                                     <FormField
                                         control={form.control}
@@ -641,10 +700,14 @@ export default function RegisterPage() {
                                                  <FormControl>
                                                     <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                                                 </FormControl>
-                                                <div className="space-y-1 leading-none">
-                                                    <FormLabel className="text-left">
-                                                        Je certifie l'exactitude des informations fournies et j'accepte les termes et conditions de l'engagement volontaire au sein de la Croix-Rouge Gabonaise.
+                                                <div className="space-y-1 leading-none text-left">
+                                                    <FormLabel>
+                                                        Je certifie l'exactitude des informations et j'accepte les termes de l'engagement volontaire.
                                                     </FormLabel>
+                                                    <FormDescription>
+                                                        Cette demande d'adhésion ne confère pas systématiquement le statut de membre de la Croix-Rouge Gabonaise.
+                                                    </FormDescription>
+                                                    <FormMessage />
                                                 </div>
                                             </FormItem>
                                         )}
@@ -665,7 +728,7 @@ export default function RegisterPage() {
                                     )}
 
                                     {step === totalSteps && (
-                                        <Button type="submit" disabled={isSubmitting}>
+                                        <Button type="submit" disabled={isSubmitting || !form.getValues('termsAccepted')}>
                                             {isSubmitting ? "Soumission..." : "Soumettre ma candidature"}
                                         </Button>
                                     )}
@@ -692,3 +755,6 @@ export default function RegisterPage() {
         </div>
     )
 }
+
+
+    
