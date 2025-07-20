@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Icon } from "lucide-react";
+import { professionsList, skillsList as allSkillsGroups } from "@/lib/locations";
 
 type Member = {
     name: string;
@@ -133,6 +134,11 @@ export default function TeamPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [cellFilter, setCellFilter] = useState<string | null>(null);
     const [sortConfig, setSortConfig] = useState<{ key: 'name' | 'date'; direction: 'asc' | 'desc' }>({ key: 'date', direction: 'desc' });
+    const [skillFilter, setSkillFilter] = React.useState<string | null>(null);
+    const [professionFilter, setProfessionFilter] = React.useState<string | null>(null);
+
+    const [allSkills, setAllSkills] = React.useState<string[]>([]);
+    const [allProfessions, setAllProfessions] = React.useState<string[]>([]);
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -153,6 +159,16 @@ export default function TeamPage() {
                 const querySnapshot = await getDocs(q);
                 const volunteersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Volunteer));
                 setVolunteers(volunteersData);
+
+                const skills = new Set<string>();
+                const professions = new Set<string>();
+                volunteersData.forEach(v => {
+                    v.skills?.forEach(skill => skills.add(skill));
+                    if (v.profession) professions.add(v.profession);
+                });
+                setAllSkills(Array.from(skills).sort());
+                setAllProfessions(Array.from(professions).sort());
+
             } catch (error) {
                 console.error("Error fetching active volunteers: ", error);
             } finally {
@@ -168,6 +184,14 @@ export default function TeamPage() {
         
         if (cellFilter) {
             sortedVolunteers = sortedVolunteers.filter(v => v.assignedCell === cellFilter);
+        }
+
+        if (skillFilter) {
+            sortedVolunteers = sortedVolunteers.filter(v => v.skills?.includes(skillFilter));
+        }
+        
+        if (professionFilter) {
+            sortedVolunteers = sortedVolunteers.filter(v => v.profession === professionFilter);
         }
 
         if (searchTerm) {
@@ -192,7 +216,7 @@ export default function TeamPage() {
         });
 
         return sortedVolunteers;
-    }, [volunteers, searchTerm, sortConfig, cellFilter]);
+    }, [volunteers, searchTerm, sortConfig, cellFilter, skillFilter, professionFilter]);
 
     if (authLoading || !user) {
         return <div>Chargement...</div>;
@@ -228,7 +252,7 @@ export default function TeamPage() {
                     </div>
                     
                     {/* Focal Points */}
-                    <div className="w-full flex justify-center">
+                     <div className="w-full flex justify-center">
                         <div className="relative grid grid-cols-2 gap-8">
                             <div className="absolute -top-8 left-1/4 w-3/4 h-0.5 bg-border"></div>
                             <div className="absolute -top-8 left-1/4 w-0.5 h-8 bg-border"></div>
@@ -242,17 +266,9 @@ export default function TeamPage() {
                     
                     {/* Pools */}
                     <div className="w-full">
-                        <CardHeader className="p-0 mb-4">
-                            <CardTitle className="text-center font-headline text-xl flex items-center justify-center gap-2">
-                            <Briefcase className="w-6 h-6"/> Coordinateurs des Pools
-                            </CardTitle>
-                            <CardDescription className="text-center">Les pôles de compétences du comité et leurs coordinateurs.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {pools.map(pool => <PoolCard key={pool.name} pool={pool} />)}
-                            </div>
-                        </CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {pools.map(pool => <PoolCard key={pool.name} pool={pool} />)}
+                        </div>
                     </div>
 
                     <Separator />
@@ -279,43 +295,63 @@ export default function TeamPage() {
                         <Users className="w-6 h-6"/> Nos Volontaires Actifs
                     </CardTitle>
                     <CardDescription className="text-center">La force vive de notre comité.</CardDescription>
-                    <div className="pt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-center">
-                        <div className="relative w-full lg:col-span-2">
+                     <div className="pt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="relative lg:col-span-4">
                             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input 
-                                placeholder="Rechercher par nom..." 
+                                placeholder="Rechercher par nom, prénom, email..." 
                                 className="pl-8 w-full"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <Select onValueChange={(value) => setCellFilter(value === 'all' ? null : value)}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Filtrer par cellule" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">Toutes les cellules</SelectItem>
-                                    {allCells.map(cell => (
-                                        <SelectItem key={cell} value={cell}>{cell}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="w-full">
-                                        <ArrowDownUp className="mr-2 h-4 w-4" />
-                                        Trier par
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'desc' })}>Plus récent</DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'asc' })}>Plus ancien</DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'asc' })}>Nom (A-Z)</DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'desc' })}>Nom (Z-A)</DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
+                         <Select onValueChange={(value) => setCellFilter(value === 'all' ? null : value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Filtrer par cellule" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Toutes les cellules</SelectItem>
+                                {allCells.map(cell => (
+                                    <SelectItem key={cell} value={cell}>{cell}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Select onValueChange={(value) => setSkillFilter(value === 'all' ? null : value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Filtrer par compétence" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Toutes les compétences</SelectItem>
+                                {allSkills.map(skill => (
+                                    <SelectItem key={skill} value={skill}>{skill}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Select onValueChange={(value) => setProfessionFilter(value === 'all' ? null : value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Filtrer par profession" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Toutes les professions</SelectItem>
+                                {allProfessions.map(profession => (
+                                    <SelectItem key={profession} value={profession}>{profession}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="w-full">
+                                    <ArrowDownUp className="mr-2 h-4 w-4" />
+                                    Trier par
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'desc' })}>Plus récent</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'asc' })}>Plus ancien</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'asc' })}>Nom (A-Z)</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'desc' })}>Nom (Z-A)</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </CardHeader>
                 <CardContent>
@@ -337,7 +373,7 @@ export default function TeamPage() {
                     )}
                         {!loading && filteredAndSortedVolunteers.length === 0 && (
                         <p className="text-center text-muted-foreground py-8">
-                            {searchTerm || cellFilter ? "Aucun volontaire ne correspond à votre recherche." : "Aucun volontaire actif pour le moment."}
+                            {searchTerm || cellFilter || skillFilter || professionFilter ? "Aucun volontaire ne correspond à votre recherche." : "Aucun volontaire actif pour le moment."}
                         </p>
                     )}
                 </CardContent>
@@ -346,3 +382,4 @@ export default function TeamPage() {
         </div>
     );
 }
+
