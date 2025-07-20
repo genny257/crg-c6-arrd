@@ -2,14 +2,18 @@
 "use client"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Network, ShieldAlert } from "lucide-react";
+import { Network, Users } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
+import type { Volunteer } from "@/types/volunteer";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Member = {
     name: string;
@@ -60,17 +64,46 @@ const MemberCard = ({ member, size = 'default' }: { member: Member, size?: 'defa
     </div>
 );
 
+const VolunteerCard = ({ volunteer }: { volunteer: Volunteer }) => (
+    <div className="flex flex-col items-center text-center">
+        <Avatar className={"h-16 w-16 mb-2"}>
+            <AvatarFallback>{volunteer.firstName?.[0]}{volunteer.lastName?.[0]}</AvatarFallback>
+        </Avatar>
+        <p className="font-semibold text-sm">{volunteer.firstName} {volunteer.lastName}</p>
+    </div>
+)
+
 export default function TeamPage() {
-    const { user, loading } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const router = useRouter();
+    const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!loading && !user) {
+        if (!authLoading && !user) {
             router.push('/login');
         }
-    }, [user, loading, router]);
+    }, [user, authLoading, router]);
 
-    if (loading || !user) {
+    useEffect(() => {
+        const fetchVolunteers = async () => {
+            setLoading(true);
+            try {
+                const q = query(collection(db, "volunteers"), where("status", "==", "Actif"));
+                const querySnapshot = await getDocs(q);
+                const volunteersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Volunteer));
+                setVolunteers(volunteersData);
+            } catch (error) {
+                console.error("Error fetching active volunteers: ", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchVolunteers();
+    }, []);
+
+    if (authLoading || !user) {
         return <div>Chargement...</div>;
     }
 
@@ -132,6 +165,40 @@ export default function TeamPage() {
                         </div>
                     </CardContent>
                 </Card>
+
+                 <Separator />
+
+                {/* Active Volunteers */}
+                <Card className="w-full">
+                    <CardHeader>
+                        <CardTitle className="text-center font-headline text-xl flex items-center justify-center gap-2">
+                           <Users className="w-6 h-6"/> Nos Volontaires Actifs
+                        </CardTitle>
+                        <CardDescription className="text-center">La force vive de notre comité.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {loading ? (
+                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-x-4 gap-y-6">
+                                {Array.from({ length: 16 }).map((_, i) => (
+                                    <div key={i} className="flex flex-col items-center text-center">
+                                        <Skeleton className="h-16 w-16 mb-2 rounded-full" />
+                                        <Skeleton className="h-4 w-20" />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-x-4 gap-y-6">
+                                {volunteers.map(volunteer => (
+                                    <VolunteerCard key={volunteer.id} volunteer={volunteer} />
+                                ))}
+                            </div>
+                        )}
+                         {!loading && volunteers.length === 0 && (
+                            <p className="text-center text-muted-foreground">Aucun volontaire actif pour le moment.</p>
+                        )}
+                    </CardContent>
+                </Card>
+
             </div>
         </div>
     );
