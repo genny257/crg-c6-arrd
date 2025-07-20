@@ -60,16 +60,19 @@ const coordinators: Member[] = [
 
 const allCells = coordinators.map(c => c.role);
 
-const pools: Pool[] = [
+const operationalPools: Pool[] = [
+    { name: "Santé", mission: "Promotion de la santé communautaire.", coordinators: [{ name: "Dr. Moussa Traoré", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}], icon: HeartPulse },
+    { name: "Jeunesse et Volontariat", mission: "Mobilisation des jeunes et des volontaires.", coordinators: [{ name: "Kevin Essono", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}], icon: Users },
+    { name: "Étude de Projet", mission: "Conception et évaluation des projets.", coordinators: [{ name: "Carine Ibinga", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}], icon: ClipboardCheck },
+    { name: "Secours", mission: "Interventions d'urgence.", coordinators: [{ name: "Gérard Lema", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}], icon: Siren },
+    { name: "Action Sociale", mission: "Soutien aux populations vulnérables.", coordinators: [{ name: "Estelle Koumba", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}], icon: HandHeart },
+    { name: "Assainissement et Hygiène", mission: "Promotion de l'hygiène.", coordinators: [{ name: "Thierry Ndong", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}], icon: Soup },
+]
+
+const supportPools: Pool[] = [
   { name: "Secrétariat", mission: "Gestion administrative et coordination.", coordinators: [{ name: "Yves Moukagni", role: "Secrétaire Général", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}, { name: "Nadège Mboumba", role: "Secrétaire Adjointe", avatar: "https://placehold.co/80x80.png", hint: "female portrait" }], icon: Archive },
   { name: "Trésorerie", mission: "Gestion financière.", coordinators: [{ name: "Martin Okouyi", role: "Trésorier Général", avatar: "https://placehold.co/80x80.png", hint: "male portrait" }, { name: "Fatima Diallo", role: "Trésorière Adjointe", avatar: "https://placehold.co/80x80.png", hint: "female portrait" }], icon: Banknote },
   { name: "Logistique", mission: "Gestion du matériel et des ressources.", coordinators: [{ name: "Christian N'Goma", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}], icon: Truck },
-  { name: "Santé", mission: "Promotion de la santé communautaire.", coordinators: [{ name: "Dr. Moussa Traoré", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}], icon: HeartPulse },
-  { name: "Jeunesse et Volontariat", mission: "Mobilisation des jeunes et des volontaires.", coordinators: [{ name: "Kevin Essono", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}], icon: Users },
-  { name: "Étude de Projet", mission: "Conception et évaluation des projets.", coordinators: [{ name: "Carine Ibinga", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}], icon: ClipboardCheck },
-  { name: "Secours", mission: "Interventions d'urgence.", coordinators: [{ name: "Gérard Lema", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}], icon: Siren },
-  { name: "Action Sociale", mission: "Soutien aux populations vulnérables.", coordinators: [{ name: "Estelle Koumba", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}], icon: HandHeart },
-  { name: "Assainissement et Hygiène", mission: "Promotion de l'hygiène.", coordinators: [{ name: "Thierry Ndong", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}], icon: Soup },
   { name: "Discipline", mission: "Renforcement de l'organisation interne.", coordinators: [{ name: "Serge Moussavou", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"}], icon: Shield },
   { name: "Formation", mission: "Développement des compétences.", coordinators: [{ name: "Nathalie Ngouma", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"}], icon: GraduationCap },
 ];
@@ -121,6 +124,13 @@ const PoolCard = ({ pool }: { pool: Pool }) => (
         </CardContent>
     </Card>
 );
+
+const SectionTitle = ({ children }: { children: React.ReactNode }) => (
+    <div className="relative my-6">
+        <Separator />
+        <h2 className="absolute left-1/2 -translate-x-1/2 -top-3.5 bg-card px-2 text-center font-headline text-lg text-muted-foreground">{children}</h2>
+    </div>
+)
 
 export default function TeamPage() {
     const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
@@ -247,12 +257,17 @@ export default function TeamPage() {
                         </div>
                     </div>
 
-                    <Separator />
-
-                    {/* Pools */}
                     <div className="w-full">
-                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {pools.map(pool => <PoolCard key={pool.name} pool={pool} />)}
+                        <SectionTitle>Pôles Techniques & Opérationnels</SectionTitle>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {operationalPools.map(pool => <PoolCard key={pool.name} pool={pool} />)}
+                        </div>
+                    </div>
+
+                    <div className="w-full">
+                         <SectionTitle>Pôles Support & Administratifs</SectionTitle>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {supportPools.map(pool => <PoolCard key={pool.name} pool={pool} />)}
                         </div>
                     </div>
 
