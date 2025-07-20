@@ -47,12 +47,11 @@ const treasury: Member[] = [
 ];
 
 const coordinators: Member[] = [
-    { name: "Paul Abessolo", role: "Urgences & Secourisme", avatar: "https://placehold.co/80x80.png", hint: "male portrait" },
-    { name: "Sophie Mavoungou", role: "Santé & Action Sociale", avatar: "https://placehold.co/80x80.png", hint: "female portrait" },
-    { name: "Chantal Lendoye", role: "Formation & Développement", avatar: "https://placehold.co/80x80.png", hint: "female portrait" },
-    { name: "Gaston Bouanga", role: "Jeunesse", avatar: "https://placehold.co/80x80.png", hint: "male portrait" },
-    { name: "Alice Kengue", role: "Logistique & Communication", avatar: "https://placehold.co/80x80.png", hint: "female portrait" },
-    { name: "Marc Tonda", role: "Gestion & Administration", avatar: "https://placehold.co/80x80.png", hint: "male portrait" },
+    { name: "Paul Abessolo", role: "Nzeng-Ayong Lac", avatar: "https://placehold.co/80x80.png", hint: "male portrait" },
+    { name: "Sophie Mavoungou", role: "Nzeng-Ayong Village", avatar: "https://placehold.co/80x80.png", hint: "female portrait" },
+    { name: "Chantal Lendoye", role: "Ondogo", avatar: "https://placehold.co/80x80.png", hint: "female portrait" },
+    { name: "Gaston Bouanga", role: "PK6-PK9", avatar: "https://placehold.co/80x80.png", hint: "male portrait" },
+    { name: "Alice Kengue", role: "PK9-Bikélé", avatar: "https://placehold.co/80x80.png", hint: "female portrait" },
 ];
 
 const MemberCard = ({ member, size = 'default' }: { member: Member, size?: 'default' | 'small' }) => (
@@ -162,7 +161,7 @@ export default function TeamPage() {
                     </CardHeader>
                     <CardContent className="relative">
                         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-0.5 h-4 bg-border"></div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-8">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-8">
                             {coordinators.map(member => <MemberCard key={member.name} member={member} size="small" />)}
                         </div>
                     </CardContent>
