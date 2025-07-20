@@ -1,4 +1,6 @@
 
+"use client";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Briefcase, HeartHandshake, DollarSign } from "lucide-react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
@@ -97,7 +99,7 @@ export default function AnalyticsPage() {
                     <BarChart data={donationsData}>
                          <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="month" />
-                        <YAxis tickFormatter={(value) => `${value / 1000000}M`} />
+                        <YAxis tickFormatter={(value) => `${(value as number) / 1000000}M`} />
                         <Tooltip formatter={(value: number) => new Intl.NumberFormat('fr-FR').format(value) + ' FCFA'} />
                         <Bar dataKey="total" fill="hsl(var(--primary))" name="Dons" />
                     </BarChart>
