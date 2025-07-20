@@ -11,6 +11,28 @@ import { z } from 'zod';
 import { RegisterUserInputSchema, type RegisterUserInput } from '@/ai/schemas/register-user-schema';
 import { adminDb } from '@/lib/firebase/admin';
 
+// Helper function to generate a unique matricule
+const generateMatricule = async () => {
+    if (!adminDb) {
+        throw new Error("Firebase Admin is not initialized.");
+    }
+    const prefix = 'C6ARR';
+    let isUnique = false;
+    let newMatricule = '';
+
+    while (!isUnique) {
+        const randomPart = Math.floor(10000 + Math.random() * 90000).toString();
+        newMatricule = `${prefix}-${randomPart}`;
+
+        const snapshot = await adminDb.collection('volunteers').where('matricule', '==', newMatricule).limit(1).get();
+        if (snapshot.empty) {
+            isUnique = true;
+        }
+    }
+    return newMatricule;
+};
+
+
 const registerUserFlow = ai.defineFlow(
   {
     name: 'registerUserFlow',
@@ -27,15 +49,17 @@ const registerUserFlow = ai.defineFlow(
     }
 
     try {
-      // Save the user data to a 'volunteers' collection in Firestore.
+      const matricule = await generateMatricule();
+      
       const volunteerRef = adminDb.collection('volunteers').doc();
       await volunteerRef.set({
         ...input,
+        matricule,
         createdAt: new Date().toISOString(),
         status: 'En attente', // Set a default status
       });
 
-      console.log(`User data saved to Firestore with ID: ${volunteerRef.id}`);
+      console.log(`User data saved to Firestore with ID: ${volunteerRef.id} and Matricule: ${matricule}`);
 
       return { success: true, message: 'User registered successfully and saved to database.' };
     } catch (error) {

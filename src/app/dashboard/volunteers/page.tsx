@@ -18,6 +18,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { utils, writeFile } from 'xlsx';
 import { cells } from "@/lib/locations";
+import Link from "next/link";
+
 
 const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -134,6 +136,7 @@ export default function VolunteersPage() {
 
     const handleExport = () => {
         const dataToExport = filteredAndSortedVolunteers.map(v => ({
+            "Matricule": v.matricule || 'N/A',
             "Nom": v.lastName,
             "Prénom": v.firstName,
             "Email": v.email,
@@ -160,9 +163,11 @@ export default function VolunteersPage() {
                         <Download className="mr-2 h-4 w-4" />
                         Exporter la liste
                     </Button>
-                    <Button>
-                        <UserPlus className="mr-2 h-4 w-4" />
-                        Ajouter un Volontaire
+                    <Button asChild>
+                        <Link href="/register">
+                             <UserPlus className="mr-2 h-4 w-4" />
+                             Ajouter un Volontaire
+                        </Link>
                     </Button>
                 </div>
             </div>
@@ -291,7 +296,9 @@ export default function VolunteersPage() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                    <DropdownMenuItem>Voir le profil</DropdownMenuItem>
+                                                    <DropdownMenuItem asChild>
+                                                        <Link href={`/dashboard/volunteers/${volunteer.id}`}>Voir le profil</Link>
+                                                    </DropdownMenuItem>
                                                     <DropdownMenuItem>Assigner à une mission</DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     {volunteer.status === 'En attente' && (
