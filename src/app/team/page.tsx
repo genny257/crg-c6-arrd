@@ -43,10 +43,12 @@ const treasury: Member[] = [
 ];
 
 const coordinators: Member[] = [
-    { name: "Paul Abessolo", role: "Coordinateur Urgences", avatar: "https://placehold.co/80x80.png", hint: "male portrait" },
-    { name: "Sophie Mavoungou", role: "Coordinatrice Santé", avatar: "https://placehold.co/80x80.png", hint: "female portrait" },
-    { name: "Gaston Bouanga", role: "Coordinateur Jeunesse", avatar: "https://placehold.co/80x80.png", hint: "male portrait" },
-    { name: "Chantal Lendoye", role: "Coordinatrice Formation", avatar: "https://placehold.co/80x80.png", hint: "female portrait" },
+    { name: "Paul Abessolo", role: "Urgences & Secourisme", avatar: "https://placehold.co/80x80.png", hint: "male portrait" },
+    { name: "Sophie Mavoungou", role: "Santé & Action Sociale", avatar: "https://placehold.co/80x80.png", hint: "female portrait" },
+    { name: "Chantal Lendoye", role: "Formation & Développement", avatar: "https://placehold.co/80x80.png", hint: "female portrait" },
+    { name: "Gaston Bouanga", role: "Jeunesse", avatar: "https://placehold.co/80x80.png", hint: "male portrait" },
+    { name: "Alice Kengue", role: "Logistique & Communication", avatar: "https://placehold.co/80x80.png", hint: "female portrait" },
+    { name: "Marc Tonda", role: "Gestion & Administration", avatar: "https://placehold.co/80x80.png", hint: "male portrait" },
 ];
 
 const MemberCard = ({ member, size = 'default' }: { member: Member, size?: 'default' | 'small' }) => (
@@ -138,13 +140,13 @@ export default function TeamPage() {
                 <Separator />
 
                 {/* Coordinators */}
-                <Card className="w-full max-w-4xl">
+                <Card className="w-full max-w-5xl">
                     <CardHeader>
-                        <CardTitle className="text-center font-headline text-xl">Coordinateurs des Commissions</CardTitle>
+                        <CardTitle className="text-center font-headline text-xl">Coordinateurs des Cellules</CardTitle>
                     </CardHeader>
                     <CardContent className="relative">
                         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-0.5 h-4 bg-border"></div>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-8">
                             {coordinators.map(member => <MemberCard key={member.name} member={member} size="small" />)}
                         </div>
                     </CardContent>
