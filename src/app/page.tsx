@@ -64,6 +64,7 @@ export default function Home() {
 
   React.useEffect(() => {
     const fetchContent = async () => {
+      if (!db) return;
       setLoading(true);
       try {
         const docRef = doc(db, "pages", "home");

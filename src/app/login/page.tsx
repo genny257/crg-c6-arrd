@@ -30,7 +30,7 @@ export default function LoginPage() {
       name = 'Super Admin';
     }
 
-    login({ name: name, role });
+    login({ name: name, role, email: email });
     router.push('/dashboard');
   };
 
@@ -42,9 +42,9 @@ export default function LoginPage() {
             <span className="sr-only">Retour à l'accueil</span>
         </Link>
         <CardHeader>
-          <div className="flex justify-center mb-4 pt-8">
+          <Link href="/" className="flex justify-center mb-4 pt-8">
             <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={48} height={48} />
-          </div>
+          </Link>
           <CardTitle className="text-2xl font-headline text-center">Connexion</CardTitle>
           <CardDescription className="text-center">
             Accédez à votre espace ou inscrivez-vous

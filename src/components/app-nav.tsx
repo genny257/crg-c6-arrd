@@ -73,12 +73,12 @@ export function AppNav() {
   return (
     <>
       <SidebarHeader>
-        <div className="flex items-center gap-2 p-2">
+        <Link href="/" className="flex items-center gap-2 p-2">
             <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={32} height={32} />
             <span className="font-headline text-lg group-data-[collapsible=icon]:hidden">
-                Gabon Relief Hub
+                Comité Sixième Arrondissement
             </span>
-        </div>
+        </Link>
       </SidebarHeader>
       <SidebarContent className="p-2">
         <SidebarMenu>
@@ -108,7 +108,7 @@ export function AppNav() {
                   <Newspaper className="h-4 w-4" />
                   <span>Média</span>
                   <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", isMediaOpen && "rotate-180")} />
-                </SidebarMenuButton>
+                </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="pl-8 py-1 space-y-1">
                  <Link href="/blog" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname === '/blog' || pathname.startsWith('/dashboard/blog')) && 'bg-sidebar-accent')}>

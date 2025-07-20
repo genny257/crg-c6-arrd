@@ -9,6 +9,7 @@ export type UserRole = 'guest' | 'user' | 'admin' | 'superadmin';
 interface User {
   name: string;
   role: UserRole;
+  email: string;
 }
 
 interface AuthContextType {

@@ -246,6 +246,11 @@ const DonationForm = ({ onFormSuccess, isMonthly }: { onFormSuccess: () => void,
 
     const onSubmit = async (data: z.infer<typeof donationSchema>) => {
         setIsSubmitting(true);
+        if (!db) {
+            toast({ title: "Erreur de connexion", description: "Impossible de se connecter à la base de données. Veuillez réessayer plus tard.", variant: "destructive" });
+            setIsSubmitting(false);
+            return;
+        }
         try {
             await addDoc(collection(db, "donations"), {
                 name: `${data.firstName} ${data.lastName}`,
