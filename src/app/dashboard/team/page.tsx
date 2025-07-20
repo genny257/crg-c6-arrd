@@ -27,6 +27,7 @@ type Member = {
 type Pool = {
     name: string;
     mission: string;
+    coordinator: Member;
 };
 
 const president: Member = {
@@ -62,17 +63,17 @@ const coordinators: Member[] = [
 ];
 
 const pools: Pool[] = [
-  { name: "Secrétariat", mission: "Gestion administrative et coordination." },
-  { name: "Logistique", mission: "Gestion du matériel et des ressources." },
-  { name: "Trésorerie", mission: "Gestion financière." },
-  { name: "Santé", mission: "Promotion de la santé communautaire." },
-  { name: "Jeunesse et Volontariat", mission: "Mobilisation des jeunes et des volontaires." },
-  { name: "Étude de Projet", mission: "Conception et évaluation des projets." },
-  { name: "Secours", mission: "Interventions d'urgence." },
-  { name: "Action Sociale", mission: "Soutien aux populations vulnérables." },
-  { name: "Assainissement et Hygiène", mission: "Promotion de l'hygiène." },
-  { name: "Discipline", mission: "Renforcement de l'organisation interne." },
-  { name: "Formation", mission: "Développement des compétences." },
+  { name: "Secrétariat", mission: "Gestion administrative et coordination.", coordinator: { name: "Hélène Obiang", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"} },
+  { name: "Logistique", mission: "Gestion du matériel et des ressources.", coordinator: { name: "Christian N'Goma", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"} },
+  { name: "Trésorerie", mission: "Gestion financière.", coordinator: { name: "Sylvie Mbadu", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"} },
+  { name: "Santé", mission: "Promotion de la santé communautaire.", coordinator: { name: "Dr. Moussa Traoré", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"} },
+  { name: "Jeunesse et Volontariat", mission: "Mobilisation des jeunes et des volontaires.", coordinator: { name: "Kevin Essono", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"} },
+  { name: "Étude de Projet", mission: "Conception et évaluation des projets.", coordinator: { name: "Carine Ibinga", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"} },
+  { name: "Secours", mission: "Interventions d'urgence.", coordinator: { name: "Gérard Lema", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"} },
+  { name: "Action Sociale", mission: "Soutien aux populations vulnérables.", coordinator: { name: "Estelle Koumba", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"} },
+  { name: "Assainissement et Hygiène", mission: "Promotion de l'hygiène.", coordinator: { name: "Thierry Ndong", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"} },
+  { name: "Discipline", mission: "Renforcement de l'organisation interne.", coordinator: { name: "Serge Moussavou", role: "Coordinateur", avatar: "https://placehold.co/80x80.png", hint: "male portrait"} },
+  { name: "Formation", mission: "Développement des compétences.", coordinator: { name: "Nathalie Ngouma", role: "Coordinatrice", avatar: "https://placehold.co/80x80.png", hint: "female portrait"} },
 ];
 
 const MemberCard = ({ member, size = 'default' }: { member: Member, size?: 'default' | 'small' }) => (
@@ -102,6 +103,17 @@ const PoolCard = ({ pool }: { pool: Pool }) => (
                 <Briefcase className="w-5 h-5 text-primary" />
                 {pool.name}
             </CardTitle>
+             <Separator />
+            <div className="flex items-center gap-3 pt-2">
+                <Avatar className="h-10 w-10">
+                    <AvatarImage src={pool.coordinator.avatar} alt={pool.coordinator.name} data-ai-hint={pool.coordinator.hint} />
+                    <AvatarFallback>{pool.coordinator.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                </Avatar>
+                <div>
+                    <p className="font-semibold text-sm">{pool.coordinator.name}</p>
+                    <p className="text-xs text-muted-foreground">{pool.coordinator.role}</p>
+                </div>
+            </div>
         </CardHeader>
         <CardContent className="flex-1">
             <p className="text-sm text-muted-foreground">{pool.mission}</p>
@@ -239,7 +251,7 @@ export default function TeamPage() {
                         <CardTitle className="text-center font-headline text-xl flex items-center justify-center gap-2">
                            <Briefcase className="w-6 h-6"/> Nos Pools
                         </CardTitle>
-                        <CardDescription className="text-center">Les pôles de compétences du comité.</CardDescription>
+                        <CardDescription className="text-center">Les pôles de compétences du comité et leurs coordinateurs.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

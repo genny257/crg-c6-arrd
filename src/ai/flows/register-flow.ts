@@ -20,6 +20,12 @@ const registerUserFlow = ai.defineFlow(
   async (input) => {
     console.log('New user registration received:', JSON.stringify(input, null, 2));
 
+    if (!adminDb) {
+      const errorMessage = "Firebase Admin is not initialized. Cannot save to Firestore.";
+      console.error(errorMessage);
+      return { success: false, message: errorMessage };
+    }
+
     try {
       // Save the user data to a 'volunteers' collection in Firestore.
       const volunteerRef = adminDb.collection('volunteers').doc();

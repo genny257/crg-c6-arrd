@@ -15,6 +15,7 @@ import { db } from "@/lib/firebase/client";
 import type { Volunteer } from "@/types/volunteer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 
 const getStatusBadgeVariant = (status: string) => {
@@ -33,16 +34,24 @@ export default function VolunteersPage() {
     const { toast } = useToast();
     const [searchTerm, setSearchTerm] = React.useState("");
     const [sortConfig, setSortConfig] = React.useState<{ key: 'createdAt' | 'lastName'; direction: 'asc' | 'desc' }>({ key: 'createdAt', direction: 'desc' });
+    const [skillFilter, setSkillFilter] = React.useState<string | null>(null);
+    const [allSkills, setAllSkills] = React.useState<string[]>([]);
 
 
     const fetchVolunteers = React.useCallback(async () => {
         setLoading(true);
         try {
-            // Initial fetch is always ordered by creation date
             const q = query(collection(db, "volunteers"), orderBy("createdAt", "desc"));
             const querySnapshot = await getDocs(q);
             const volunteersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Volunteer));
             setVolunteers(volunteersData);
+
+            const skills = new Set<string>();
+            volunteersData.forEach(v => {
+                v.skills?.forEach(skill => skills.add(skill));
+            });
+            setAllSkills(Array.from(skills).sort());
+
         } catch (error) {
             console.error("Error fetching volunteers: ", error);
              toast({
@@ -60,16 +69,20 @@ export default function VolunteersPage() {
     }, [fetchVolunteers]);
 
     const filteredAndSortedVolunteers = React.useMemo(() => {
-        let sortedVolunteers = [...volunteers];
+        let filteredVolunteers = [...volunteers];
+
+        if (skillFilter) {
+            filteredVolunteers = filteredVolunteers.filter(v => v.skills?.includes(skillFilter));
+        }
     
         if (searchTerm) {
-          sortedVolunteers = sortedVolunteers.filter(v => 
+          filteredVolunteers = filteredVolunteers.filter(v => 
             `${v.firstName} ${v.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
             v.email.toLowerCase().includes(searchTerm.toLowerCase())
           );
         }
     
-        sortedVolunteers.sort((a, b) => {
+        filteredVolunteers.sort((a, b) => {
           if (sortConfig.key === 'lastName') {
             const nameA = a.lastName.toLowerCase();
             const nameB = b.lastName.toLowerCase();
@@ -83,8 +96,8 @@ export default function VolunteersPage() {
           }
         });
     
-        return sortedVolunteers;
-      }, [volunteers, searchTerm, sortConfig]);
+        return filteredVolunteers;
+      }, [volunteers, searchTerm, sortConfig, skillFilter]);
 
     const updateVolunteerStatus = async (id: string, status: 'Actif' | 'Rejeté' | 'Inactif' | 'En attente') => {
         try {
@@ -130,6 +143,17 @@ export default function VolunteersPage() {
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
+                        <Select onValueChange={(value) => setSkillFilter(value === 'all' ? null : value)}>
+                            <SelectTrigger className="w-full md:w-[180px]">
+                                <SelectValue placeholder="Filtrer par compétence" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Toutes les compétences</SelectItem>
+                                {allSkills.map(skill => (
+                                    <SelectItem key={skill} value={skill}>{skill}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="w-full md:w-auto">
@@ -242,7 +266,7 @@ export default function VolunteersPage() {
                              {!loading && filteredAndSortedVolunteers.length === 0 && (
                                 <TableRow>
                                     <TableCell colSpan={6} className="h-24 text-center">
-                                    {searchTerm ? "Aucun volontaire ne correspond à votre recherche." : "Aucun volontaire trouvé."}
+                                    {searchTerm || skillFilter ? "Aucun volontaire ne correspond à votre recherche." : "Aucun volontaire trouvé."}
                                     </TableCell>
                                 </TableRow>
                             )}
