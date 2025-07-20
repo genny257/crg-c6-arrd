@@ -128,11 +128,11 @@ export default function TeamPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [cellFilter, setCellFilter] = useState<string | null>(null);
     const [sortConfig, setSortConfig] = useState<{ key: 'name' | 'date'; direction: 'asc' | 'desc' }>({ key: 'date', direction: 'desc' });
-    const [skillFilter, setSkillFilter] = React.useState<string | null>(null);
-    const [professionFilter, setProfessionFilter] = React.useState<string | null>(null);
+    const [skillFilter, setSkillFilter] = useState<string | null>(null);
+    const [professionFilter, setProfessionFilter] = useState<string | null>(null);
 
-    const [allSkills, setAllSkills] = React.useState<string[]>([]);
-    const [allProfessions, setAllProfessions] = React.useState<string[]>([]);
+    const [allSkills, setAllSkills] = useState<string[]>([]);
+    const [allProfessions, setAllProfessions] = useState<string[]>([]);
     
     useEffect(() => {
         const fetchVolunteers = async () => {
