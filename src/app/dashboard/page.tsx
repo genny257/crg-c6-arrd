@@ -4,7 +4,7 @@
 import * as React from "react";
 import { collection, getDocs, query, where, orderBy, limit } from "firebase/firestore";
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Briefcase, HeartHandshake, ArrowRight, CheckCircle, Clock } from "lucide-react";
 import { db } from "@/lib/firebase/client";
 import type { Volunteer } from "@/types/volunteer";
