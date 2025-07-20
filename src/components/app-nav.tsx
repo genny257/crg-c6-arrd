@@ -108,7 +108,7 @@ export function AppNav() {
                   <Newspaper className="h-4 w-4" />
                   <span>Média</span>
                   <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", isMediaOpen && "rotate-180")} />
-                </Button>
+                </SidebarMenuButton>
               </CollapsibleTrigger>
               <CollapsibleContent className="pl-8 py-1 space-y-1">
                  <Link href="/blog" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname === '/blog' || pathname.startsWith('/dashboard/blog')) && 'bg-sidebar-accent')}>
