@@ -128,9 +128,9 @@ export default function DonationPage() {
                     </Table>
                 </CardContent>
                  <CardFooter>
-                    <div className="text-xs text-muted-foreground">
-                        { !loading && `Affichage de <strong>${donations.length}</strong> sur <strong>${donations.length}</strong> dons.`}
-                    </div>
+                    <div className="text-xs text-muted-foreground" dangerouslySetInnerHTML={{
+                        __html: !loading ? `Affichage de <strong>${donations.length}</strong> sur <strong>${donations.length}</strong> dons.` : ''
+                    }} />
                 </CardFooter>
             </Card>
         </div>
