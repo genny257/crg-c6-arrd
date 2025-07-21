@@ -105,7 +105,6 @@ export function AppNav() {
                 <Collapsible open={isMediaOpen} onOpenChange={setIsMediaOpen}>
                 <CollapsibleTrigger asChild>
                     <SidebarMenuButton
-                    variant="ghost"
                     className="w-full justify-start"
                     isActive={isMediaOpen}
                     tooltip="Média"

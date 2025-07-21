@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { collection, getDocs, query, orderBy, Timestamp } from "firebase/firestore";
+import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/lib/firebase/admin";
 import type { Volunteer } from "@/types/volunteer";
 import { VolunteersClientPage } from "./client-page";
@@ -11,8 +11,10 @@ async function getVolunteers(): Promise<Volunteer[]> {
         return [];
     }
     try {
-        const q = query(collection(adminDb, "volunteers"), orderBy("createdAt", "desc"));
-        const querySnapshot = await getDocs(q);
+        const volunteersRef = adminDb.collection("volunteers");
+        const q = volunteersRef.orderBy("createdAt", "desc");
+        const querySnapshot = await q.get();
+        
         const volunteersData = querySnapshot.docs.map(doc => {
             const data = doc.data();
             // Firestore Timestamps need to be converted to serializable format (ISO string)

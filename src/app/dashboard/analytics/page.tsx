@@ -21,12 +21,12 @@ async function getStatsData(db: any): Promise<StatsData> {
     const now = new Date();
     const sixMonthsAgo = startOfMonth(subMonths(now, 5));
 
-    const volunteersByMonth: MonthlyData[] = Array.from({ length: 6 }, (_, i) => {
+    const volunteersByMonth: { name: string; count: number }[] = Array.from({ length: 6 }, (_, i) => {
         const d = subMonths(now, 5 - i);
         return { name: format(d, 'MMM', { locale: fr }), count: 0 };
     });
 
-    const donationsByMonth: MonthlyData[] = Array.from({ length: 6 }, (_, i) => {
+    const donationsByMonth: { name: string; total: number }[] = Array.from({ length: 6 }, (_, i) => {
         const d = subMonths(now, 5 - i);
         return { name: format(d, 'MMM', { locale: fr }), total: 0 };
     });
@@ -41,18 +41,22 @@ async function getStatsData(db: any): Promise<StatsData> {
         const createdAt = (data.createdAt as any)?.toDate ? (data.createdAt as any).toDate() : new Date(data.createdAt);
         if (createdAt >= sixMonthsAgo) {
             const monthIndex = (getMonth(createdAt) - getMonth(sixMonthsAgo) + 12) % 12;
-            if (volunteersByMonth[monthIndex]) {
-                 volunteersByMonth[monthIndex].count++;
+            if (monthIndex >= 0 && monthIndex < volunteersByMonth.length) {
+                 volunteersByMonth[monthIndex]!.count++;
             }
         }
     });
 
     // Accumulate counts for volunteers
     for (let i = 1; i < volunteersByMonth.length; i++) {
-        volunteersByMonth[i].count += volunteersByMonth[i - 1].count;
+        const currentMonth = volunteersByMonth[i];
+        const prevMonth = volunteersByMonth[i - 1];
+        if (currentMonth && prevMonth) {
+            currentMonth.count = (currentMonth.count ?? 0) + (prevMonth.count ?? 0);
+        }
     }
     const totalVolunteersLastMonth = volunteersByMonth[4]?.count ?? 0;
-    const newVolunteersThisMonth = volunteersByMonth[5].count - totalVolunteersLastMonth;
+    const newVolunteersThisMonth = (volunteersByMonth[5]?.count ?? 0) - totalVolunteersLastMonth;
 
     let totalDonationsThisMonth = 0;
 

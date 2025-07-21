@@ -33,14 +33,10 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMissions = void 0;
+exports.deleteMission = exports.updateMission = exports.createMission = exports.getMissionById = exports.getMissions = void 0;
 const missionService = __importStar(require("../services/mission.service"));
 /**
- * Gère la requête pour obtenir toutes les missions.
- * Appelle le service de mission et renvoie les missions trouvées
- * ou un message d'erreur en cas de problème.
- * @param req - L'objet de requête Express.
- * @param res - L'objet de réponse Express.
+ * Récupère toutes les missions.
  */
 const getMissions = async (req, res) => {
     try {
@@ -48,8 +44,64 @@ const getMissions = async (req, res) => {
         res.status(200).json(missions);
     }
     catch (error) {
-        // En cas d'erreur, renvoyer une réponse 500 avec un message
-        res.status(500).json({ message: 'Error fetching missions', error });
+        res.status(500).json({ message: 'Erreur lors de la récupération des missions.', error });
     }
 };
 exports.getMissions = getMissions;
+/**
+ * Récupère une mission par son ID.
+ */
+const getMissionById = async (req, res) => {
+    try {
+        const mission = await missionService.getMissionById(req.params.id);
+        if (mission) {
+            res.status(200).json(mission);
+        }
+        else {
+            res.status(404).json({ message: 'Mission non trouvée.' });
+        }
+    }
+    catch (error) {
+        res.status(500).json({ message: 'Erreur lors de la récupération de la mission.', error });
+    }
+};
+exports.getMissionById = getMissionById;
+/**
+ * Crée une nouvelle mission.
+ */
+const createMission = async (req, res) => {
+    try {
+        const newMission = await missionService.createMission(req.body);
+        res.status(201).json(newMission);
+    }
+    catch (error) {
+        res.status(500).json({ message: 'Erreur lors de la création de la mission.', error });
+    }
+};
+exports.createMission = createMission;
+/**
+ * Met à jour une mission existante.
+ */
+const updateMission = async (req, res) => {
+    try {
+        const updatedMission = await missionService.updateMission(req.params.id, req.body);
+        res.status(200).json(updatedMission);
+    }
+    catch (error) {
+        res.status(500).json({ message: 'Erreur lors de la mise à jour de la mission.', error });
+    }
+};
+exports.updateMission = updateMission;
+/**
+ * Supprime une mission.
+ */
+const deleteMission = async (req, res) => {
+    try {
+        await missionService.deleteMission(req.params.id);
+        res.status(204).send(); // No Content
+    }
+    catch (error) {
+        res.status(500).json({ message: 'Erreur lors de la suppression de la mission.', error });
+    }
+};
+exports.deleteMission = deleteMission;

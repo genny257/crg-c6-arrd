@@ -14,22 +14,12 @@ const router = Router();
  *         id:
  *           type: string
  *           description: L'identifiant unique du volontaire.
- *         matricule:
- *           type: string
- *           description: Le numéro de matricule du volontaire.
  *         firstName:
  *           type: string
  *           description: Le prénom du volontaire.
  *         lastName:
  *           type: string
  *           description: Le nom de famille du volontaire.
- *         email:
- *           type: string
- *           format: email
- *           description: L'adresse e-mail du volontaire.
- *         phone:
- *           type: string
- *           description: Le numéro de téléphone du volontaire.
  *     Mission:
  *       type: object
  *       required:
@@ -41,57 +31,49 @@ const router = Router();
  *       properties:
  *         id:
  *           type: string
- *           description: L'identifiant unique de la mission.
+ *           description: L'identifiant auto-généré de la mission.
  *         title:
  *           type: string
  *           description: Le titre de la mission.
  *         description:
  *           type: string
- *           description: La description de la mission.
+ *           description: La description détaillée de la mission.
  *         location:
  *           type: string
- *           description: Le lieu de la mission.
+ *           description: Le lieu où se déroule la mission.
  *         startDate:
  *           type: string
  *           format: date-time
- *           description: La date de début de la mission.
+ *           description: La date et l'heure de début de la mission.
  *         endDate:
  *           type: string
  *           format: date-time
- *           description: La date de fin de la mission.
+ *           description: La date et l'heure de fin de la mission.
  *         status:
  *           type: string
  *           enum: [Planifiee, En_cours, Terminee, Annulee]
- *           description: Le statut de la mission.
+ *           description: Le statut actuel de la mission.
  *         requiredSkills:
  *           type: array
  *           items:
  *             type: string
- *           description: Les compétences requises pour la mission.
+ *           description: Les compétences requises pour participer.
  *         maxParticipants:
  *           type: integer
- *           description: Le nombre maximum de participants.
+ *           nullable: true
+ *           description: Le nombre maximum de participants autorisés.
  *         participants:
  *           type: array
  *           items:
  *             $ref: '#/components/schemas/Volunteer'
- *           description: La liste des volontaires participant à la mission.
- *         createdAt:
- *           type: string
- *           format: date-time
- *           description: La date de création de la mission.
- *         updatedAt:
- *           type: string
- *           format: date-time
- *           description: La date de la dernière mise à jour de la mission.
- */
-
-/**
- * @swagger
+ *           description: La liste des volontaires inscrits à la mission.
+ * 
  * tags:
  *   name: Missions
  *   description: API pour la gestion des missions
  */
+
+// --- Routes pour /missions ---
 
 /**
  * @swagger
@@ -101,16 +83,100 @@ const router = Router();
  *     tags: [Missions]
  *     responses:
  *       200:
- *         description: La liste de toutes les missions.
+ *         description: Une liste de missions.
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Mission'
+ *   post:
+ *     summary: Crée une nouvelle mission
+ *     tags: [Missions]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Mission'
+ *     responses:
+ *       201:
+ *         description: La mission a été créée avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Mission'
  *       500:
- *         description: Erreur serveur lors de la récupération des missions.
+ *         description: Erreur serveur.
  */
-router.get('/missions', missionController.getMissions);
+router.route('/missions')
+  .get(missionController.getMissions)
+  .post(missionController.createMission);
+
+// --- Routes pour /missions/:id ---
+
+/**
+ * @swagger
+ * /missions/{id}:
+ *   get:
+ *     summary: Récupère une mission par son ID
+ *     tags: [Missions]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: L'ID de la mission
+ *     responses:
+ *       200:
+ *         description: Les détails de la mission.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Mission'
+ *       404:
+ *         description: Mission non trouvée.
+ *   put:
+ *     summary: Met à jour une mission
+ *     tags: [Missions]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: L'ID de la mission
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Mission'
+ *     responses:
+ *       200:
+ *         description: Mission mise à jour avec succès.
+ *       404:
+ *         description: Mission non trouvée.
+ *   delete:
+ *     summary: Supprime une mission
+ *     tags: [Missions]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: L'ID de la mission
+ *     responses:
+ *       204:
+ *         description: Mission supprimée avec succès.
+ *       404:
+ *         description: Mission non trouvée.
+ */
+router.route('/missions/:id')
+  .get(missionController.getMissionById)
+  .put(missionController.updateMission)
+  .delete(missionController.deleteMission);
 
 export default router;

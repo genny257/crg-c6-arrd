@@ -14,7 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { db } from "@/lib/firebase/client"; 
 import type { Volunteer } from "@/types/volunteer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cells, professionsList, skillsList as allSkillsGroups } from "@/lib/locations";
+import { cells, professionsList, skillsList } from "@/lib/locations";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -199,7 +199,7 @@ export function VolunteersClientPage({ initialVolunteers, allSkills, allProfessi
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Toutes les compétences</SelectItem>
-                                    {allSkills.map(skill => (
+                                    {skillsList.flatMap(g => g.skills).map(skill => (
                                         <SelectItem key={skill} value={skill}>{skill}</SelectItem>
                                     ))}
                                 </SelectContent>
@@ -210,7 +210,7 @@ export function VolunteersClientPage({ initialVolunteers, allSkills, allProfessi
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Toutes les professions</SelectItem>
-                                    {allProfessions.map(profession => (
+                                    {professionsList.flatMap(g => g.professions).map(profession => (
                                         <SelectItem key={profession} value={profession}>{profession}</SelectItem>
                                     ))}
                                 </SelectContent>

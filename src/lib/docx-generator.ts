@@ -72,8 +72,8 @@ export const generateDocx = async (volunteer: Volunteer) => {
                                 children: [
                                     new TableCell({
                                         children: [
-                                            new Paragraph({ text: "CROIX-ROUGE GABONAISE", bold: true, alignment: AlignmentType.CENTER }),
-                                            new Paragraph({ text: "COMITE DU 6ème ARRONDISSEMENT", bold: true, alignment: AlignmentType.CENTER }),
+                                            new Paragraph({ children: [new TextRun({ text: "CROIX-ROUGE GABONAISE", bold: true })], alignment: AlignmentType.CENTER }),
+                                            new Paragraph({ children: [new TextRun({ text: "COMITE DU 6ème ARRONDISSEMENT", bold: true })], alignment: AlignmentType.CENTER }),
                                         ],
                                         verticalAlign: VerticalAlign.CENTER,
                                         borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
