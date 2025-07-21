@@ -397,4 +397,3 @@ export default function TeamPage() {
     );
 }
 
-    
