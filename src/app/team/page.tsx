@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Icon } from "lucide-react";
+import type { ElementType } from "react";
 
 type Member = {
     name: string;
@@ -27,7 +27,7 @@ type Pool = {
     name: string;
     mission: string;
     coordinators: Member[];
-    icon: Icon;
+    icon: ElementType;
 };
 
 const president: Member = {

@@ -1,7 +1,10 @@
 // src/lib/firebase/client.ts
-import { initializeApp, getApps, getApp, App } from "firebase/app";
-import { getFirestore, enableIndexedDbPersistence, Firestore } from "firebase/firestore";
-import { getStorage, FirebaseStorage } from "firebase/storage";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import type { FirebaseApp } from "firebase/app";
+import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
+import type { Firestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
+import type { FirebaseStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,9 +15,9 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-let app: App | undefined;
-let db: Firestore | undefined;
-let storage: FirebaseStorage | undefined;
+let app: FirebaseApp;
+let db: Firestore;
+let storage: FirebaseStorage;
 
 // This check prevents Firebase from initializing on the server side
 // where the env vars might not be available
@@ -22,24 +25,25 @@ if (typeof window !== "undefined" && firebaseConfig.projectId) {
     if (!getApps().length) {
       try {
         app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        storage = getStorage(app);
-        enableIndexedDbPersistence(db)
-          .catch((err) => {
-            if (err.code == 'failed-precondition') {
-              console.warn("Firestore offline persistence failed: Multiple tabs open.");
-            } else if (err.code == 'unimplemented') {
-              console.warn("Firestore offline persistence not supported in this browser.");
-            }
-          });
       } catch (e) {
         console.error("Firebase initialization error", e);
       }
     } else {
       app = getApp();
-      db = getFirestore(app);
-      storage = getStorage(app);
     }
+    
+    db = getFirestore(app!);
+    storage = getStorage(app!);
+
+    enableIndexedDbPersistence(db)
+      .catch((err) => {
+        if (err.code == 'failed-precondition') {
+          console.warn("Firestore offline persistence failed: Multiple tabs open.");
+        } else if (err.code == 'unimplemented') {
+          console.warn("Firestore offline persistence not supported in this browser.");
+        }
+      });
+
 } else {
     console.warn("Firebase not initialized. Missing projectId or running on server.")
 }

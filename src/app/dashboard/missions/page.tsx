@@ -2,7 +2,6 @@
 "use client";
 
 import * as React from "react";
-import { collection, getDocs, doc, updateDoc, query, orderBy } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -10,7 +9,6 @@ import { FilePlus2, MoreHorizontal, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
-import { db } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Mission } from "@/types/mission";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,47 +34,44 @@ export default function MissionsPage() {
     const fetchMissions = React.useCallback(async () => {
         setLoading(true);
         try {
-            const q = query(collection(db, "missions"), orderBy("startDate", "desc"));
-            const querySnapshot = await getDocs(q);
-            const missionsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Mission));
+            // L'URL de votre API backend. Assurez-vous que le serveur API tourne sur le port 3001.
+            const response = await fetch('http://localhost:3001/api/missions');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const missionsData: Mission[] = await response.json();
             setMissions(missionsData);
         } catch (error) {
-            console.error("Error fetching missions: ", error);
+            console.error("Error fetching missions from API: ", error);
             toast({
-                title: "Erreur",
-                description: "Impossible de charger les missions.",
+                title: "Erreur de connexion à l'API",
+                description: "Impossible de charger les missions depuis le serveur. Vérifiez que le serveur backend est démarré.",
                 variant: "destructive",
             });
         } finally {
             setLoading(false);
         }
     }, [toast]);
-
-    React.useEffect(() => {
-        if (db) {
-            fetchMissions();
-        }
-    }, [fetchMissions]);
-
+    
+    // Pour l'instant, la mise à jour du statut se fait en local.
+    // Prochaine étape : appeler un endpoint PATCH /api/missions/:id/status
     const updateMissionStatus = async (id: string, status: 'Annulée' | 'Planifiée') => {
         if (!id) return;
-        try {
-            const missionRef = doc(db, "missions", id);
-            await updateDoc(missionRef, { status: status });
-            setMissions(missions.map(m => m.id === id ? { ...m, status } : m));
-            toast({
-                title: "Statut mis à jour",
-                description: `La mission a été marquée comme ${status.toLowerCase()}.`,
-            });
-        } catch (error) {
-            console.error("Error updating mission status: ", error);
-            toast({
-                title: "Erreur",
-                description: "Le statut de la mission n'a pas pu être modifié.",
-                variant: "destructive",
-            });
-        }
+        
+        const originalMissions = [...missions];
+        const updatedMissions = missions.map(m => m.id === id ? { ...m, status } : m);
+        setMissions(updatedMissions);
+
+        toast({
+            title: "Action non connectée",
+            description: `Le statut a été mis à jour localement. Prochaine étape : connecter à l'API.`,
+            variant: "default"
+        });
     };
+    
+    React.useEffect(() => {
+        fetchMissions();
+    }, [fetchMissions]);
     
     return (
         <div className="flex flex-col gap-8">
@@ -192,3 +187,4 @@ export default function MissionsPage() {
         </div>
     );
 }
+
