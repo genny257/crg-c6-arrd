@@ -5,44 +5,101 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
+import { useToast } from "@/hooks/use-toast";
+import type { Mission } from "@/types/mission";
+import type { Event } from "@/types/event";
+import { Skeleton } from "@/components/ui/skeleton";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
-type Event = {
+type CalendarEvent = {
     date: Date;
     title: string;
-    category: 'Mission' | 'Formation' | 'Collecte' | 'Réunion';
+    type: 'Mission' | 'Événement';
+    status?: string;
+    id: string;
+    href: string;
 };
 
-const events: Event[] = [
-    { date: new Date(2024, 7, 1), title: "Distribution de nourriture", category: 'Mission' },
-    { date: new Date(2024, 7, 20), title: "Campagne de vaccination", category: 'Mission' },
-    { date: new Date(2024, 7, 15), title: "Grande Collecte de Sang", category: 'Collecte' },
-    { date: new Date(2024, 6, 25), title: "Réunion de coordination", category: 'Réunion'},
-    { date: new Date(2024, 7, 10), title: "Formation aux premiers secours", category: 'Formation'},
-    { date: new Date(2024, 8, 5), title: "Sensibilisation Paludisme", category: 'Mission' },
-];
-
-const getCategoryClass = (category: Event['category']) => {
-    switch (category) {
+const getEventTypeClass = (type: CalendarEvent['type']) => {
+    switch (type) {
         case 'Mission': return 'bg-blue-500';
-        case 'Formation': return 'bg-green-500';
-        case 'Collecte': return 'bg-red-500';
-        case 'Réunion': return 'bg-yellow-500';
+        case 'Événement': return 'bg-green-500';
     }
 };
 
 export default function CalendarPage() {
+    const { toast } = useToast();
     const [date, setDate] = React.useState<Date | undefined>(new Date());
     const [currentMonth, setCurrentMonth] = React.useState(new Date());
+    const [events, setEvents] = React.useState<CalendarEvent[]>([]);
+    const [loading, setLoading] = React.useState(true);
+
+    React.useEffect(() => {
+      const fetchEventsAndMissions = async () => {
+          if (!db) return;
+          setLoading(true);
+          try {
+              const missionsQuery = query(collection(db, "missions"), where("status", "in", ["Planifiée", "En cours"]));
+              const eventsQuery = query(collection(db, "events"), where("status", "==", "À venir"));
+
+              const [missionsSnapshot, eventsSnapshot] = await Promise.all([
+                  getDocs(missionsQuery),
+                  getDocs(eventsQuery)
+              ]);
+
+              const missionsData = missionsSnapshot.docs.map(doc => {
+                  const data = doc.data() as Mission;
+                  return {
+                      id: doc.id,
+                      date: new Date(data.startDate),
+                      title: data.title,
+                      type: 'Mission' as const,
+                      status: data.status,
+                      href: `/dashboard/missions/${doc.id}`
+                  };
+              });
+
+              const eventsData = eventsSnapshot.docs.map(doc => {
+                  const data = doc.data() as Event;
+                   return {
+                      id: doc.id,
+                      date: new Date(data.date),
+                      title: data.title,
+                      type: 'Événement' as const,
+                      status: data.status,
+                      href: `/events`
+                  };
+              });
+
+              setEvents([...missionsData, ...eventsData]);
+
+          } catch (error) {
+              console.error("Error fetching calendar data:", error);
+              toast({
+                  title: "Erreur",
+                  description: "Impossible de charger les données du calendrier.",
+                  variant: "destructive",
+              });
+          } finally {
+              setLoading(false);
+          }
+      };
+      fetchEventsAndMissions();
+    }, [toast]);
+
 
     const selectedDayEvents = React.useMemo(() => {
         return date ? events.filter(event => event.date.toDateString() === date.toDateString()) : [];
-    }, [date]);
+    }, [date, events]);
 
     const monthEvents = React.useMemo(() => {
         return events
             .filter(e => e.date.getMonth() === currentMonth.getMonth() && e.date.getFullYear() === currentMonth.getFullYear())
             .sort((a,b) => a.date.getTime() - b.date.getTime())
-    }, [currentMonth]);
+    }, [currentMonth, events]);
 
     return (
         <div className="flex flex-col gap-8">
@@ -79,8 +136,8 @@ export default function CalendarPage() {
                                             <span>{date.getDate()}</span>
                                             <div className="flex flex-col gap-1 mt-1">
                                             {dayEvents.map(event => (
-                                                <div key={event.title} className="flex items-center gap-1.5 w-full">
-                                                    <div className={cn("w-1.5 h-1.5 rounded-full", getCategoryClass(event.category))}></div>
+                                                <div key={event.id} className="flex items-center gap-1.5 w-full">
+                                                    <div className={cn("w-1.5 h-1.5 rounded-full", getEventTypeClass(event.type))}></div>
                                                     <span className="truncate text-xs">{event.title}</span>
                                                 </div>
                                             ))}
@@ -97,23 +154,31 @@ export default function CalendarPage() {
                         <CardHeader>
                             <CardTitle>Évènements du mois</CardTitle>
                             <CardDescription>
-                                {date ? date.toLocaleString('fr-FR', { month: 'long', year: 'numeric' }) : '...'}
+                                {currentMonth.toLocaleString('fr-FR', { month: 'long', year: 'numeric' })}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4 h-[30rem] overflow-y-auto">
-                           {(selectedDayEvents.length > 0 ? selectedDayEvents : monthEvents).map(event => (
-                                <div key={event.title} className="flex items-start gap-4 p-2 rounded-lg hover:bg-muted">
-                                    <div className="flex flex-col items-center justify-center bg-muted text-muted-foreground rounded-md p-2 w-16">
-                                        <span className="text-xs uppercase">{event.date.toLocaleString('fr-FR', { month: 'short' })}</span>
-                                        <span className="text-lg font-bold">{event.date.getDate()}</span>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-semibold">{event.title}</h4>
-                                        <Badge variant="secondary" className={cn("mt-1 text-xs", getCategoryClass(event.category), "text-white")}>{event.category}</Badge>
-                                    </div>
+                            {loading ? (
+                                <div className="space-y-4">
+                                    <Skeleton className="h-16 w-full" />
+                                    <Skeleton className="h-16 w-full" />
+                                    <Skeleton className="h-16 w-full" />
                                 </div>
-                            ))}
-                             {monthEvents.length === 0 && (
+                            ) : (
+                                (selectedDayEvents.length > 0 ? selectedDayEvents : monthEvents).map(event => (
+                                    <a href={event.href} key={event.id} className="flex items-start gap-4 p-2 rounded-lg hover:bg-muted cursor-pointer">
+                                        <div className="flex flex-col items-center justify-center bg-muted text-muted-foreground rounded-md p-2 w-16">
+                                            <span className="text-xs uppercase">{format(event.date, 'MMM', { locale: fr })}</span>
+                                            <span className="text-lg font-bold">{event.date.getDate()}</span>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold">{event.title}</h4>
+                                            <Badge variant="secondary" className={cn("mt-1 text-xs", getEventTypeClass(event.type), "text-white")}>{event.type}</Badge>
+                                        </div>
+                                    </a>
+                                ))
+                            )}
+                             {!loading && monthEvents.length === 0 && (
                                 <p className="text-muted-foreground text-sm text-center py-8">Aucun évènement pour ce mois.</p>
                             )}
                         </CardContent>
@@ -123,4 +188,3 @@ export default function CalendarPage() {
         </div>
     );
 }
-
