@@ -342,5 +342,3 @@ const DonationForm = ({ onFormSuccess, isMonthly }: { onFormSuccess: () => void,
         </Form>
     );
 };
-
-    

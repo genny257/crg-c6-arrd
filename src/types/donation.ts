@@ -7,4 +7,5 @@ export interface Donation {
   method: 'Mobile Money' | 'Carte Bancaire';
   date: string; // ISO 8601 format
   status: 'Confirmé' | 'En attente' | 'Échoué';
+  email: string;
 }

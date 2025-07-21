@@ -37,6 +37,15 @@ export default function DonationPage() {
 
     const fetchDonations = React.useCallback(async () => {
         setLoading(true);
+        if (!db) {
+             toast({
+                title: "Erreur de connexion",
+                description: "Impossible de se connecter à la base de données.",
+                variant: "destructive",
+            });
+            setLoading(false);
+            return;
+        }
         try {
             const q = query(collection(db, "donations"), orderBy("date", "desc"));
             const querySnapshot = await getDocs(q);
