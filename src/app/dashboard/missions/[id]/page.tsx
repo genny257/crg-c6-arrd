@@ -145,7 +145,7 @@ export default function MissionDetailPage() {
                              <div className="pt-2">
                                 <strong className="block mb-2">Compétences Requises</strong>
                                  <div className="flex flex-wrap gap-2">
-                                    {mission.requiredSkills.length > 0 ? 
+                                    {(mission.requiredSkills && mission.requiredSkills.length > 0) ? 
                                         mission.requiredSkills.map(skill => <Badge key={skill} variant="outline">{skill}</Badge>) :
                                         <p className="text-muted-foreground text-xs">Aucune compétence spécifique requise.</p>
                                     }
