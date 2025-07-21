@@ -31,5 +31,5 @@ export interface Volunteer {
   idCardBack?: string;
   termsAccepted: boolean;
   createdAt: string;
-  status?: string;
+  status?: 'En attente' | 'Actif' | 'Inactif' | 'Rejeté';
 }

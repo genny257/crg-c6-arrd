@@ -232,16 +232,24 @@ export default function RegisterPage() {
     const onSubmit = async (data: z.infer<typeof RegisterUserInputSchema>) => {
         setIsSubmitting(true);
         try {
-            await registerUser(data);
-            toast({
-                title: "Candidature Soumise",
-                description: "Votre inscription a été envoyée avec succès.",
-            });
-            setStep((prev) => prev + 1);
-        } catch (error) {
+            const result = await registerUser(data);
+            if (result.success) {
+                toast({
+                    title: "Candidature Soumise",
+                    description: "Votre inscription a été envoyée avec succès.",
+                });
+                setStep((prev) => prev + 1);
+            } else {
+                 toast({
+                    title: "Erreur de soumission",
+                    description: result.message || "Une erreur inconnue est survenue.",
+                    variant: "destructive",
+                });
+            }
+        } catch (error: any) {
             toast({
                 title: "Erreur",
-                description: "Une erreur est survenue lors de la soumission. Veuillez réessayer.",
+                description: error.message || "Une erreur est survenue lors de la soumission. Veuillez réessayer.",
                 variant: "destructive",
             });
         } finally {

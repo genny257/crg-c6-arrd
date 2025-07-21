@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -28,7 +29,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
-const getStatusBadgeVariant = (status?: string) => {
+const getStatusBadgeVariant = (status?: Volunteer['status']) => {
     switch (status) {
         case 'Actif': return 'default';
         case 'En attente': return 'secondary';

@@ -5,7 +5,9 @@ import type { Volunteer } from '@/types/volunteer';
 
 // Helper function to fetch image as buffer
 async function fetchImage(url: string): Promise<Buffer> {
-    const response = await fetch(url);
+    // This is a proxy to avoid CORS issues in development/client-side fetching.
+    // In a real production app, you might have a dedicated API route for this.
+    const response = await fetch(`https://images.weserv.nl/?url=${encodeURIComponent(url)}`);
     if (!response.ok) {
         throw new Error(`Failed to fetch image: ${response.statusText}`);
     }

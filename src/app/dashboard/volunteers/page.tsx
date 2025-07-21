@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { collection, getDocs, query, orderBy, Timestamp } from "firebase/firestore";
 import { adminDb } from "@/lib/firebase/admin";
@@ -40,7 +41,7 @@ export default async function VolunteersPage() {
 
     return (
         <VolunteersClientPage 
-            initialVolunteers={volunteers}
+            initialVolunteers={JSON.parse(JSON.stringify(volunteers))}
             allSkills={allSkills}
             allProfessions={allProfessions}
         />
