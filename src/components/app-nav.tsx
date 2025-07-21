@@ -20,6 +20,7 @@ import {
   CalendarClock,
   CalendarDays,
   Archive,
+  FileText,
 } from "lucide-react"
 
 import {
@@ -57,6 +58,7 @@ const reportsNavItems = [
 export function AppNav() {
   const pathname = usePathname()
   const { user, logout } = useAuth();
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
   const [isMediaOpen, setIsMediaOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -67,7 +69,7 @@ export function AppNav() {
 
   const filteredMainNav = mainNavItems.filter(item => {
     if (!item.adminOnly) return true;
-    return user?.role === 'admin' || user?.role === 'superadmin';
+    return isAdmin;
   });
 
   return (
@@ -86,7 +88,7 @@ export function AppNav() {
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild
-                isActive={pathname === item.href}
+                isActive={pathname.startsWith(item.href)}
                 tooltip={item.label}
               >
                 <Link href={item.href}>
@@ -96,33 +98,35 @@ export function AppNav() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
-           <SidebarMenuItem>
-            <Collapsible open={isMediaOpen} onOpenChange={setIsMediaOpen}>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton
-                  variant="ghost"
-                  className="w-full justify-start"
-                  isActive={isMediaOpen}
-                  tooltip="Média"
-                >
-                  <Newspaper className="h-4 w-4" />
-                  <span>Média</span>
-                  <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", isMediaOpen && "rotate-180")} />
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="pl-8 py-1 space-y-1">
-                 <Link href="/blog" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/blog') || pathname.includes('/dashboard/blog')) && 'bg-sidebar-accent')}>
-                    Blog
-                  </Link>
-                  <Link href="/dashboard/reports" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/reports') || pathname.includes('/dashboard/reports')) && 'bg-sidebar-accent')}>
-                    Rapports
-                  </Link>
-                   <Link href="/events" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/events') || pathname.includes('/dashboard/events')) && 'bg-sidebar-accent')}>
-                    Évènements
-                  </Link>
-              </CollapsibleContent>
-            </Collapsible>
-          </SidebarMenuItem>
+          {isAdmin && (
+             <SidebarMenuItem>
+                <Collapsible open={isMediaOpen} onOpenChange={setIsMediaOpen}>
+                <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                    variant="ghost"
+                    className="w-full justify-start"
+                    isActive={isMediaOpen}
+                    tooltip="Média"
+                    >
+                    <Newspaper className="h-4 w-4" />
+                    <span>Média</span>
+                    <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", isMediaOpen && "rotate-180")} />
+                    </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pl-8 py-1 space-y-1">
+                    <Link href="/blog" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/blog') || pathname.includes('/dashboard/blog')) && 'bg-sidebar-accent')}>
+                        Blog
+                    </Link>
+                    <Link href="/dashboard/reports" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/reports') || pathname.includes('/dashboard/reports')) && 'bg-sidebar-accent')}>
+                        Rapports
+                    </Link>
+                    <Link href="/events" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/events') || pathname.includes('/dashboard/events')) && 'bg-sidebar-accent')}>
+                        Évènements
+                    </Link>
+                </CollapsibleContent>
+                </Collapsible>
+            </SidebarMenuItem>
+          )}
         </SidebarMenu>
         <SidebarSeparator />
          <SidebarMenu>
