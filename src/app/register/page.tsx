@@ -3,7 +3,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { ArrowLeft, Check, Upload, X, ChevronsUpDown, UserSquare2 } from "lucide-react"
+import { ArrowLeft, Check, Upload, X, ChevronsUpDown, UserSquare2, Loader2, FileImage } from "lucide-react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -27,6 +27,7 @@ import { registerUser } from "@/ai/flows/register-flow"
 import { RegisterUserInputSchema } from "@/ai/schemas/register-user-schema"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { uploadFile } from "@/lib/firebase/storage"
 
 const totalSteps = 5
 
@@ -57,7 +58,7 @@ const LocationSelector = ({ form, title, fieldPrefix }: { form: any, title: stri
         : [];
 
     const quartiers = selectedArrondissement && selectedDepartement && communes.includes(selectedCommuneCanton)
-        ? locations[selectedProvince as keyof typeof locations]?.[selectedDepartement as keyof typeof locations[keyof typeof locations]]?.communes?.[selectedCommuneCanton as keyof typeof locations[keyof typeof locations]['communes']]?.arrondissements?.[selectedArrondissement as keyof any] || []
+        ? locations[selectedProvince as keyof typeof locations]?.[selectedDepartement as keyof typeof locations[keyof typeof locations]]?.communes?.[selectedCommuneCanton as keyof any]?.arrondissements?.[selectedArrondissement as keyof any] || []
         : (selectedCommuneCanton && selectedDepartement && communes.includes(selectedCommuneCanton))
             ? locations[selectedProvince as keyof typeof locations]?.[selectedDepartement as keyof typeof locations[keyof typeof locations]]?.communes?.[selectedCommuneCanton as keyof any]?.quartiers || []
             : [];
@@ -169,10 +170,15 @@ const LocationSelector = ({ form, title, fieldPrefix }: { form: any, title: stri
 };
 
 
+type UploadableField = "photo" | "idCardFront" | "idCardBack";
+
 export default function RegisterPage() {
     const [step, setStep] = React.useState(1)
     const { toast } = useToast()
     const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const [uploading, setUploading] = React.useState< Partial<Record<UploadableField, boolean>>>({});
+    const [uploadProgress, setUploadProgress] = React.useState<Partial<Record<UploadableField, number>>>({});
+
 
     const form = useForm<z.infer<typeof RegisterUserInputSchema>>({
         resolver: zodResolver(RegisterUserInputSchema),
@@ -214,20 +220,34 @@ export default function RegisterPage() {
     const handleNext = () => setStep((prev) => Math.min(prev + 1, totalSteps))
     const handlePrevious = () => setStep((prev) => Math.max(prev - 1, 1))
 
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, fieldName: "photo" | "idCardFront" | "idCardBack") => {
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldName: UploadableField) => {
         const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (loadEvent) => {
-                form.setValue(fieldName, loadEvent.target?.result as string);
-                toast({
-                    title: "Fichier sélectionné",
-                    description: file.name,
-                });
-            };
-            reader.readAsDataURL(file);
+        if (!file) return;
+
+        setUploading(prev => ({...prev, [fieldName]: true}));
+        setUploadProgress(prev => ({...prev, [fieldName]: 0}));
+
+        try {
+            const downloadURL = await uploadFile(file, `volunteers/${fieldName}`, (progress) => {
+                setUploadProgress(prev => ({...prev, [fieldName]: progress}));
+            });
+            form.setValue(fieldName, downloadURL);
+            toast({
+                title: "Fichier téléversé",
+                description: "Le fichier a été ajouté avec succès.",
+            });
+        } catch (error) {
+            console.error("Upload error:", error);
+            toast({
+                title: "Erreur de téléversement",
+                description: "Le fichier n'a pas pu être envoyé. Veuillez réessayer.",
+                variant: "destructive"
+            });
+        } finally {
+            setUploading(prev => ({...prev, [fieldName]: false}));
         }
     };
+
 
     const onSubmit = async (data: z.infer<typeof RegisterUserInputSchema>) => {
         setIsSubmitting(true);
@@ -274,6 +294,8 @@ export default function RegisterPage() {
     }
     
     const photoPreview = form.watch("photo");
+    const idCardFrontPreview = form.watch("idCardFront");
+    const idCardBackPreview = form.watch("idCardBack");
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
@@ -617,9 +639,10 @@ export default function RegisterPage() {
                                 </div>
                             )}
 
-                            {step === 5 && (
+                           {step === 5 && (
                                 <div className="space-y-6">
                                     <h3 className="text-lg font-semibold text-center">Pièces à joindre & Finalisation</h3>
+                                    
                                     <div className="flex flex-col items-center gap-4">
                                         <FormField
                                             control={form.control}
@@ -635,26 +658,48 @@ export default function RegisterPage() {
                                                                     <UserSquare2 className="h-12 w-12 text-muted-foreground" />
                                                                 </AvatarFallback>
                                                             </Avatar>
-                                                            <Input id="photo-upload" type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "photo")} className="max-w-xs"/>
+                                                            <Button asChild variant="outline">
+                                                                <label htmlFor="photo-upload" className="cursor-pointer">
+                                                                    <Upload className="mr-2 h-4 w-4" />
+                                                                    Choisir un fichier
+                                                                    <Input id="photo-upload" type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "photo")} className="hidden" disabled={uploading.photo}/>
+                                                                </label>
+                                                            </Button>
                                                         </div>
                                                     </FormControl>
+                                                    {uploading.photo && <Progress value={uploadProgress.photo} className="w-full mt-2" />}
                                                     <FormDescription>Facultatif, pour votre profil.</FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
                                     </div>
-                                    <div className="grid gap-4 md:w-2/3 mx-auto">
+
+                                    <div className="grid gap-6 md:grid-cols-2">
                                         <FormField
                                             control={form.control}
                                             name="idCardFront"
                                             render={({ field }) => (
-                                                <FormItem className="text-left">
+                                                <FormItem className="flex flex-col items-center gap-2 p-4 border rounded-lg">
                                                     <FormLabel>Pièce d’identité (Recto)</FormLabel>
-                                                    <FormDescription>Facultatif, vous pourrez la fournir plus tard.</FormDescription>
                                                     <FormControl>
-                                                        <Input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "idCardFront")} className="pt-2"/>
+                                                        {idCardFrontPreview ? (
+                                                            <img src={idCardFrontPreview} alt="Aperçu Recto CNI" className="w-full h-32 object-contain rounded-md" />
+                                                        ) : (
+                                                            <div className="w-full h-32 bg-muted rounded-md flex items-center justify-center">
+                                                                <FileImage className="h-12 w-12 text-muted-foreground" />
+                                                            </div>
+                                                        )}
                                                     </FormControl>
+                                                    <Button asChild variant="outline" size="sm">
+                                                        <label htmlFor="idCardFront-upload" className="cursor-pointer">
+                                                            <Upload className="mr-2 h-4 w-4" />
+                                                            Téléverser Recto
+                                                            <Input id="idCardFront-upload" type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "idCardFront")} className="hidden" disabled={uploading.idCardFront}/>
+                                                        </label>
+                                                    </Button>
+                                                    {uploading.idCardFront && <Progress value={uploadProgress.idCardFront} className="w-full mt-2" />}
+                                                    <FormDescription>Facultatif</FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
@@ -663,17 +708,32 @@ export default function RegisterPage() {
                                             control={form.control}
                                             name="idCardBack"
                                             render={({ field }) => (
-                                                <FormItem className="text-left">
+                                                <FormItem className="flex flex-col items-center gap-2 p-4 border rounded-lg">
                                                     <FormLabel>Pièce d’identité (Verso)</FormLabel>
-                                                     <FormDescription>Facultatif.</FormDescription>
                                                     <FormControl>
-                                                        <Input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "idCardBack")} className="pt-2"/>
+                                                        {idCardBackPreview ? (
+                                                            <img src={idCardBackPreview} alt="Aperçu Verso CNI" className="w-full h-32 object-contain rounded-md" />
+                                                        ) : (
+                                                            <div className="w-full h-32 bg-muted rounded-md flex items-center justify-center">
+                                                                <FileImage className="h-12 w-12 text-muted-foreground" />
+                                                            </div>
+                                                        )}
                                                     </FormControl>
+                                                    <Button asChild variant="outline" size="sm">
+                                                        <label htmlFor="idCardBack-upload" className="cursor-pointer">
+                                                            <Upload className="mr-2 h-4 w-4" />
+                                                             Téléverser Verso
+                                                            <Input id="idCardBack-upload" type="file" accept="image/*" onChange={(e) => handleFileUpload(e, "idCardBack")} className="hidden" disabled={uploading.idCardBack}/>
+                                                        </label>
+                                                    </Button>
+                                                     {uploading.idCardBack && <Progress value={uploadProgress.idCardBack} className="w-full mt-2" />}
+                                                    <FormDescription>Facultatif</FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
                                     </div>
+
                                     <FormField
                                         control={form.control}
                                         name="termsAccepted"
@@ -710,7 +770,7 @@ export default function RegisterPage() {
                                     )}
 
                                     {step === totalSteps && (
-                                        <Button type="submit" disabled={isSubmitting || !form.getValues('termsAccepted')}>
+                                        <Button type="submit" disabled={isSubmitting || Object.values(uploading).some(Boolean) || !form.getValues('termsAccepted')}>
                                             {isSubmitting ? "Soumission..." : "Soumettre ma candidature"}
                                         </Button>
                                     )}

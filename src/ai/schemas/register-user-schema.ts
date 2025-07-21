@@ -35,9 +35,9 @@ export const RegisterUserInputSchema = z.object({
   causes: z.array(z.string()).optional(),
   assignedCell: z.string().optional(),
   residence: LocationSchema,
-  photo: z.string().optional().describe("A data URI of the user's profile picture."),
-  idCardFront: z.string().optional().describe("A data URI of the front of the ID card."),
-  idCardBack: z.string().optional().describe("A data URI of the back of the ID card."),
+  photo: z.string().url().optional().or(z.literal("")).describe("A URL to the user's profile picture."),
+  idCardFront: z.string().url().optional().or(z.literal("")).describe("A URL to the front of the ID card."),
+  idCardBack: z.string().url().optional().or(z.literal("")).describe("A URL to the back of the ID card."),
   termsAccepted: z.literal(true, {
     errorMap: () => ({ message: "Vous devez accepter les termes et conditions." }),
   }),

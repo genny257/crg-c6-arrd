@@ -1,6 +1,7 @@
 // src/lib/firebase/client.ts
 import { initializeApp, getApps, getApp, App } from "firebase/app";
 import { getFirestore, enableIndexedDbPersistence, Firestore } from "firebase/firestore";
+import { getStorage, FirebaseStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -13,6 +14,7 @@ const firebaseConfig = {
 
 let app: App | undefined;
 let db: Firestore | undefined;
+let storage: FirebaseStorage | undefined;
 
 // This check prevents Firebase from initializing on the server side
 // where the env vars might not be available
@@ -21,6 +23,7 @@ if (typeof window !== "undefined" && firebaseConfig.projectId) {
       try {
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
+        storage = getStorage(app);
         enableIndexedDbPersistence(db)
           .catch((err) => {
             if (err.code == 'failed-precondition') {
@@ -35,9 +38,10 @@ if (typeof window !== "undefined" && firebaseConfig.projectId) {
     } else {
       app = getApp();
       db = getFirestore(app);
+      storage = getStorage(app);
     }
 } else {
     console.warn("Firebase not initialized. Missing projectId or running on server.")
 }
 
-export { db };
+export { db, storage };
