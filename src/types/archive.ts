@@ -6,5 +6,6 @@ export interface ArchiveItem {
     name: string;
     type: ArchiveItemType;
     parentId: string | null;
-    // We can add more fields later, like size, createdAt, etc.
+    createdAt: string;
+    // We can add more fields later, like size, etc.
 }

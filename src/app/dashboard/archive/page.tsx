@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -27,69 +26,172 @@ import {
 } from "lucide-react";
 import type { ArchiveItem } from "@/types/archive";
 import { FileIcon } from "@/components/file-icon";
-
-const initialItems: ArchiveItem[] = [
-  { id: "1", name: "Rapports Annuels", type: "folder", parentId: null },
-  { id: "2", name: "Projets 2024", type: "folder", parentId: null },
-  { id: "3", name: "Communication", type: "folder", parentId: null },
-  {
-    id: "4",
-    name: "budget_previsionnel_2024.xlsx",
-    type: "spreadsheet",
-    parentId: "2",
-  },
-  { id: "5", name: "rapport_activite_2023.docx", type: "document", parentId: "1" },
-  { id: "6", name: "flyer_collecte_sang.png", type: "image", parentId: "3" },
-  { id: "7", name: "notes_reunion_staff.txt", type: "text", parentId: "2" },
-  { id: "8", name: "Archives 2022", type: "folder", parentId: null },
-];
+import { collection, getDocs, addDoc, query, where, orderBy, deleteDoc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function ArchivePage() {
-  const [items] = React.useState<ArchiveItem[]>(initialItems);
+  const [items, setItems] = React.useState<ArchiveItem[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [view, setView] = React.useState<"grid" | "list">("grid");
+  const [currentFolderId, setCurrentFolderId] = React.useState<string | null>(null);
+  const [breadcrumbs, setBreadcrumbs] = React.useState<{ id: string | null; name: string }[]>([{ id: null, name: "Archives" }]);
+  const [newFolderName, setNewFolderName] = React.useState("");
+  const [isCreateFolderDialogOpen, setIsCreateFolderDialogOpen] = React.useState(false);
+  
+  const { toast } = useToast();
 
-  const currentFolderId = null; // For now, we are at the root
-  const breadcrumbs = ["Archives"]; // Static for now
+  const fetchItems = React.useCallback(async (folderId: string | null) => {
+    setLoading(true);
+    try {
+      const q = query(
+        collection(db, "archive"),
+        where("parentId", "==", folderId),
+        orderBy("type", "desc"), // folders first
+        orderBy("name", "asc")
+      );
+      const querySnapshot = await getDocs(q);
+      const itemsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ArchiveItem));
+      setItems(itemsData);
+    } catch (error) {
+      console.error("Error fetching archive items:", error);
+      toast({ title: "Erreur", description: "Impossible de charger les archives.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+  
+  React.useEffect(() => {
+    fetchItems(currentFolderId);
+  }, [currentFolderId, fetchItems]);
 
-  const visibleItems = items.filter((item) => item.parentId === currentFolderId);
+  const handleCreateFolder = async () => {
+    if (!newFolderName.trim()) {
+      toast({ title: "Erreur", description: "Le nom du dossier ne peut pas être vide.", variant: "destructive" });
+      return;
+    }
+    try {
+      await addDoc(collection(db, "archive"), {
+        name: newFolderName,
+        type: "folder",
+        parentId: currentFolderId,
+        createdAt: new Date().toISOString(),
+      });
+      toast({ title: "Succès", description: "Dossier créé avec succès." });
+      fetchItems(currentFolderId); // Refresh list
+    } catch (error) {
+        console.error("Error creating folder:", error);
+        toast({ title: "Erreur", description: "La création du dossier a échoué.", variant: "destructive" });
+    } finally {
+        setNewFolderName("");
+        setIsCreateFolderDialogOpen(false);
+    }
+  };
+
+  const navigateToFolder = (item: ArchiveItem) => {
+    if (item.type !== 'folder') return;
+    setCurrentFolderId(item.id);
+    setBreadcrumbs(prev => [...prev, { id: item.id, name: item.name }]);
+  };
+
+  const navigateToBreadcrumb = (crumbIndex: number) => {
+    const crumb = breadcrumbs[crumbIndex];
+    setCurrentFolderId(crumb.id);
+    setBreadcrumbs(breadcrumbs.slice(0, crumbIndex + 1));
+  };
+  
+  const visibleItems = items;
 
   return (
     <div className="flex flex-col h-full gap-4">
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold font-headline">Archives</h1>
-          <p className="text-muted-foreground">
-            {breadcrumbs.join(" / ")}
-          </p>
+          <nav className="text-sm text-muted-foreground">
+            {breadcrumbs.map((crumb, index) => (
+              <React.Fragment key={crumb.id || 'root'}>
+                {index > 0 && <span className="mx-1">/</span>}
+                <button
+                  onClick={() => navigateToBreadcrumb(index)}
+                  className="hover:underline disabled:no-underline disabled:cursor-default"
+                  disabled={index === breadcrumbs.length - 1}
+                >
+                  {crumb.name}
+                </button>
+              </React.Fragment>
+            ))}
+          </nav>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon" onClick={() => setView(view === "grid" ? "list" : "grid")}>
             {view === "grid" ? <List className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />}
           </Button>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button>
-                <FilePlus2 className="mr-2 h-4 w-4" />
-                Nouveau
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <FolderPlus className="mr-2 h-4 w-4" />
-                <span>Nouveau dossier</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <FileIcon type="document" className="mr-2 h-4 w-4" />
-                <span>Document Word</span>
-              </DropdownMenuItem>
-               <DropdownMenuItem>
-                <FileIcon type="spreadsheet" className="mr-2 h-4 w-4" />
-                <span>Fichier Excel</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <AlertDialog open={isCreateFolderDialogOpen} onOpenChange={setIsCreateFolderDialogOpen}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button>
+                  <FilePlus2 className="mr-2 h-4 w-4" />
+                  Nouveau
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                 <AlertDialogTrigger asChild>
+                    <DropdownMenuItem>
+                        <FolderPlus className="mr-2 h-4 w-4" />
+                        <span>Nouveau dossier</span>
+                    </DropdownMenuItem>
+                 </AlertDialogTrigger>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <FileIcon type="document" className="mr-2 h-4 w-4" />
+                  <span>Document Word</span>
+                </DropdownMenuItem>
+                 <DropdownMenuItem>
+                  <FileIcon type="spreadsheet" className="mr-2 h-4 w-4" />
+                  <span>Fichier Excel</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Nouveau Dossier</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Veuillez entrer un nom pour votre nouveau dossier.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div className="grid gap-2 py-4">
+                  <Label htmlFor="folder-name">Nom du dossier</Label>
+                  <Input 
+                    id="folder-name" 
+                    value={newFolderName}
+                    onChange={(e) => setNewFolderName(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()}
+                    autoFocus
+                  />
+              </div>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                <AlertDialogAction onClick={handleCreateFolder}>Créer</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
 
           <Button variant="outline">
             <Upload className="mr-2 h-4 w-4" />
@@ -99,20 +201,29 @@ export default function ArchivePage() {
       </header>
 
       <div className="flex-1 rounded-lg border border-dashed p-4">
-        {view === "grid" ? (
+       {loading ? (
+        <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
+            {Array.from({ length: 8 }).map((_, i) => (
+                 <div key={i} className="flex flex-col items-center justify-center text-center p-2 rounded-lg">
+                    <Skeleton className="w-16 h-16 mb-2" />
+                    <Skeleton className="h-4 w-20" />
+                </div>
+            ))}
+        </div>
+       ) : view === "grid" ? (
           <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
             {visibleItems.map((item) => (
-              <ItemGrid key={item.id} item={item} />
+              <ItemGrid key={item.id} item={item} onNavigate={navigateToFolder}/>
             ))}
           </div>
         ) : (
           <div className="flex flex-col gap-2">
              {visibleItems.map((item) => (
-              <ItemList key={item.id} item={item} />
+              <ItemList key={item.id} item={item} onNavigate={navigateToFolder}/>
             ))}
           </div>
         )}
-         {visibleItems.length === 0 && (
+         {!loading && visibleItems.length === 0 && (
             <div className="flex flex-col items-center justify-center text-center h-full text-muted-foreground">
                 <Folder className="h-16 w-16 mb-4"/>
                 <p className="font-semibold">Ce dossier est vide</p>
@@ -124,19 +235,27 @@ export default function ArchivePage() {
   );
 }
 
-const ItemGrid = ({ item }: { item: ArchiveItem }) => (
-  <div className="group relative flex flex-col items-center justify-center text-center p-2 rounded-lg hover:bg-accent cursor-pointer">
+const ItemGrid = ({ item, onNavigate }: { item: ArchiveItem, onNavigate: (item: ArchiveItem) => void }) => (
+  <div 
+    className="group relative flex flex-col items-center justify-center text-center p-2 rounded-lg hover:bg-accent cursor-pointer"
+    onDoubleClick={() => onNavigate(item)}
+  >
     <FileIcon type={item.type} className="w-16 h-16 mb-2" />
     <span className="text-sm font-medium truncate w-full">{item.name}</span>
     <ItemMenu />
   </div>
 );
 
-const ItemList = ({ item }: { item: ArchiveItem }) => (
-    <div className="group relative flex items-center p-2 rounded-lg hover:bg-accent cursor-pointer">
+const ItemList = ({ item, onNavigate }: { item: ArchiveItem, onNavigate: (item: ArchiveItem) => void }) => (
+    <div 
+        className="group relative flex items-center p-2 rounded-lg hover:bg-accent cursor-pointer"
+        onDoubleClick={() => onNavigate(item)}
+    >
         <FileIcon type={item.type} className="w-6 h-6 mr-4" />
         <span className="text-sm font-medium truncate flex-1">{item.name}</span>
-        <span className="text-sm text-muted-foreground mr-4">--</span>
+        <span className="text-sm text-muted-foreground mr-4">
+            {item.createdAt ? new Date(item.createdAt).toLocaleDateString('fr-FR') : '--'}
+        </span>
         <span className="text-sm text-muted-foreground mr-4">--</span>
         <ItemMenu />
     </div>
