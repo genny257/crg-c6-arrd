@@ -82,6 +82,17 @@ const allProfessions = professionsList.flatMap((group) => group.professions);
 
 type FormValues = z.infer<typeof RegisterUserInputSchema>;
 
+const idTypes = [
+    "CNI",
+    "RECEPICE CNI",
+    "CNIE",
+    "RECEPICE CNIE",
+    "PASSPORT",
+    "RECEPICE PASSPORT",
+    "CARTE DE SÉJOURS",
+    "RECEPICE CARTE DE SEJOURS",
+];
+
 const LocationSelector = ({
   form,
   title,
@@ -354,7 +365,8 @@ export default function RegisterPage() {
       birthPlace: "",
       sex: "masculin",
       maritalStatus: "célibataire",
-      idCardNumber: "",
+      idType: "",
+      idNumber: "",
       phone: "",
       email: "",
       address: "",
@@ -406,7 +418,7 @@ export default function RegisterPage() {
     try {
       const downloadURL = await uploadFile(
         file,
-        `volunteers/${fieldName}`,
+        `volunteers/${fieldName}/${file.name}-${Date.now()}`,
         (progress) => {
           setUploadProgress((prev) => ({ ...prev, [fieldName]: progress }));
         }
@@ -481,6 +493,7 @@ export default function RegisterPage() {
   const photoPreview = form.watch("photo");
   const idCardFrontPreview = form.watch("idCardFront");
   const idCardBackPreview = form.watch("idCardBack");
+  const selectedIdType = form.watch("idType");
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
@@ -650,22 +663,45 @@ export default function RegisterPage() {
                         )}
                       />
                     </div>
-                    <FormField
-                      control={form.control}
-                      name="idCardNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>N° de la carte d'identité</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Numéro de votre pièce d'identité"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       <FormField
+                          control={form.control}
+                          name="idType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Type de pièce d'identité</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Sélectionner une pièce" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {idTypes.map(type => (
+                                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        {selectedIdType && (
+                           <FormField
+                            control={form.control}
+                            name="idNumber"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Numéro de la pièce</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Numéro de votre pièce" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
+                    </div>
                   </div>
                 </div>
               )}

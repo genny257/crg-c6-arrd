@@ -19,7 +19,6 @@ import { doc, getDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase/client"
 import type { HomePageContent } from "@/types/homepage"
 import { Skeleton } from "@/components/ui/skeleton"
-import { PublicLayout } from "@/components/public-layout"
 
 const initialContent: HomePageContent = {
     heroTitle: "Comité du 6ème Arrondissement",
@@ -52,7 +51,6 @@ const actionIcons: { [key: string]: React.ElementType } = {
 
 
 export default function Home() {
-  const { user, loading: authLoading } = useAuth();
   const [content, setContent] = React.useState<HomePageContent | null>(null);
   const [loading, setLoading] = React.useState(true);
 
@@ -87,178 +85,174 @@ export default function Home() {
   const displayContent = content || initialContent;
 
   return (
-    <PublicLayout>
-      <main className="flex-1">
-        <section className="w-full h-[60vh] md:h-[70vh] relative">
-            <Image
-                src="https://placehold.co/1200x800.png"
-                alt="Volontaires de la Croix-Rouge"
-                data-ai-hint="red cross volunteers"
-                fill
-                className="object-cover"
-                priority
-            />
-            <div className="absolute inset-0 bg-black/50" />
-            <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4">
-                {loading ? (
-                    <>
-                        <Skeleton className="h-16 w-3/4 mb-4" />
-                        <Skeleton className="h-8 w-1/2 mb-6" />
-                        <Skeleton className="h-5 w-full max-w-2xl mb-2" />
-                        <Skeleton className="h-5 w-2/3 max-w-2xl mb-8" />
-                    </>
-                ) : (
-                    <>
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-headline font-bold drop-shadow-lg">
-                            {displayContent.heroTitle}
-                        </h1>
-                        <h2 className="text-xl md:text-2xl font-headline mt-2 mb-6 drop-shadow-md">
-                            {displayContent.heroSubtitle}
-                        </h2>
-                        <p className="max-w-2xl text-lg md:text-xl text-neutral-200 mb-8">
-                            {displayContent.heroDescription}
-                        </p>
-                    </>
-                )}
-                <div className="flex flex-col sm:flex-row gap-4">
-                    <Button asChild size="lg">
-                        <Link href="/register">Devenir Volontaire</Link>
-                    </Button>
-                    <Button asChild size="lg" variant="secondary">
-                        <Link href="/donations">Faire un Don</Link>
-                    </Button>
-                </div>
-            </div>
-        </section>
-        
-        <section id="actions" className="w-full py-12 md:py-24 lg:py-32 flex flex-col items-center">
-          <div className="container space-y-12 px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Nos Actions</div>
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Agir. Aider. Protéger.</h2>
-              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Découvrez comment nous intervenons sur le terrain pour apporter une aide concrète et un soutien essentiel aux communautés.
-              </p>
-            </div>
-             {displayContent.actions.map((action, index) => {
-                const Icon = actionIcons[action.title] || ShieldCheck;
-                return (
-                    <div key={index} className={`mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-2 lg:gap-12`}>
-                      <Image
-                        src={action.image}
-                        width={600}
-                        height={400}
-                        alt={action.title}
-                        data-ai-hint={action.imageHint}
-                        className={cn("mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full", index % 2 !== 0 && "lg:order-last")}
-                      />
-                      <div className="flex flex-col justify-center space-y-4">
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <Icon className="h-6 w-6 text-primary" />
-                             {loading ? <Skeleton className="h-8 w-48" /> : <h3 className="text-2xl font-bold font-headline">{action.title}</h3>}
-                          </div>
-                           {loading ? <> <Skeleton className="h-4 w-full" /> <Skeleton className="h-4 w-5/6" /> </> : <p className="text-muted-foreground">{action.description}</p>}
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="link" className="px-0">En savoir plus</Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[525px]">
-                              <DialogHeader>
-                                <DialogTitle className="font-headline text-2xl flex items-center gap-2">
-                                    <Icon className="h-6 w-6 text-primary" /> {action.dialogTitle}
-                                </DialogTitle>
-                                <DialogDescription className="pt-2 text-left">
-                                  {action.dialogDescription}
-                                </DialogDescription>
-                              </DialogHeader>
-                              <div className="grid gap-4 py-4">
-                                <ul className="space-y-3">
-                                  {action.dialogList.map((item, i) => (
-                                      <li key={i} className="flex items-start gap-3">
-                                        <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                                        <span>{item}</span>
-                                      </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
+    <main className="flex-1">
+      <section className="w-full h-[60vh] md:h-[70vh] relative">
+          <Image
+              src="https://placehold.co/1200x800.png"
+              alt="Volontaires de la Croix-Rouge"
+              data-ai-hint="red cross volunteers"
+              fill
+              className="object-cover"
+              priority
+          />
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4">
+              {loading ? (
+                  <>
+                      <Skeleton className="h-16 w-3/4 mb-4" />
+                      <Skeleton className="h-8 w-1/2 mb-6" />
+                      <Skeleton className="h-5 w-full max-w-2xl mb-2" />
+                      <Skeleton className="h-5 w-2/3 max-w-2xl mb-8" />
+                  </>
+              ) : (
+                  <>
+                      <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-headline font-bold drop-shadow-lg">
+                          {displayContent.heroTitle}
+                      </h1>
+                      <h2 className="text-xl md:text-2xl font-headline mt-2 mb-6 drop-shadow-md">
+                          {displayContent.heroSubtitle}
+                      </h2>
+                      <p className="max-w-2xl text-lg md:text-xl text-neutral-200 mb-8">
+                          {displayContent.heroDescription}
+                      </p>
+                  </>
+              )}
+              <div className="flex flex-col sm:flex-row gap-4">
+                  <Button asChild size="lg">
+                      <Link href="/register">Devenir Volontaire</Link>
+                  </Button>
+                  <Button asChild size="lg" variant="secondary">
+                      <Link href="/donations">Faire un Don</Link>
+                  </Button>
+              </div>
+          </div>
+      </section>
+      
+      <section id="actions" className="w-full py-12 md:py-24 lg:py-32 flex flex-col items-center">
+        <div className="container space-y-12 px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center">
+            <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Nos Actions</div>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Agir. Aider. Protéger.</h2>
+            <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              Découvrez comment nous intervenons sur le terrain pour apporter une aide concrète et un soutien essentiel aux communautés.
+            </p>
+          </div>
+           {displayContent.actions.map((action, index) => {
+              const Icon = actionIcons[action.title] || ShieldCheck;
+              return (
+                  <div key={index} className={`mx-auto grid max-w-5xl items-center gap-6 lg:grid-cols-2 lg:gap-12`}>
+                    <Image
+                      src={action.image}
+                      width={600}
+                      height={400}
+                      alt={action.title}
+                      data-ai-hint={action.imageHint}
+                      className={cn("mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full", index % 2 !== 0 && "lg:order-last")}
+                    />
+                    <div className="flex flex-col justify-center space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Icon className="h-6 w-6 text-primary" />
+                           {loading ? <Skeleton className="h-8 w-48" /> : <h3 className="text-2xl font-bold font-headline">{action.title}</h3>}
                         </div>
+                         {loading ? <> <Skeleton className="h-4 w-full" /> <Skeleton className="h-4 w-5/6" /> </> : <p className="text-muted-foreground">{action.description}</p>}
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="link" className="px-0">En savoir plus</Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-[525px]">
+                            <DialogHeader>
+                              <DialogTitle className="font-headline text-2xl flex items-center gap-2">
+                                  <Icon className="h-6 w-6 text-primary" /> {action.dialogTitle}
+                              </DialogTitle>
+                              <DialogDescription className="pt-2 text-left">
+                                {action.dialogDescription}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                              <ul className="space-y-3">
+                                {action.dialogList.map((item, i) => (
+                                    <li key={i} className="flex items-start gap-3">
+                                      <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                                      <span>{item}</span>
+                                    </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       </div>
                     </div>
-                )
-             })}
+                  </div>
+              )
+           })}
+        </div>
+      </section>
+      
+      <section id="engagement" className="w-full py-12 md:py-24 lg:py-32 flex flex-col items-center bg-muted/40">
+        <div className="container px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center">
+            {loading ? (
+              <>
+                <Skeleton className="h-10 w-64 mb-2" />
+                <Skeleton className="h-5 w-full max-w-xl" />
+                <Skeleton className="h-5 w-3/4 max-w-xl" />
+              </>
+            ) : (
+              <>
+                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">{displayContent.engagement.title}</h2>
+                <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  {displayContent.engagement.description}
+                </p>
+              </>
+            )}
           </div>
-        </section>
-        
-        <section id="engagement" className="w-full py-12 md:py-24 lg:py-32 flex flex-col items-center bg-muted/40">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              {loading ? (
-                <>
-                  <Skeleton className="h-10 w-64 mb-2" />
-                  <Skeleton className="h-5 w-full max-w-xl" />
-                  <Skeleton className="h-5 w-3/4 max-w-xl" />
-                </>
-              ) : (
-                <>
-                  <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">{displayContent.engagement.title}</h2>
-                  <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                    {displayContent.engagement.description}
-                  </p>
-                </>
-              )}
-            </div>
-            <div className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                <div className="grid w-full max-w-sm gap-2 rounded-lg border bg-card p-6 text-center transition-colors hover:bg-card/90">
-                    <Users className="mx-auto h-10 w-10 text-primary" />
-                    {loading ? (
-                       <>
-                        <Skeleton className="h-6 w-3/4 mx-auto mt-2" />
-                        <Skeleton className="h-4 w-full mx-auto mt-1" />
-                        <Skeleton className="h-4 w-5/6 mx-auto mt-1" />
-                        <Skeleton className="h-10 w-24 mx-auto mt-4" />
-                       </>
-                    ) : (
-                        <>
-                        <h3 className="mt-2 text-lg font-bold font-headline">{displayContent.engagement.volunteerTitle}</h3>
-                        <p className="max-w-xs text-sm text-muted-foreground">
-                            {displayContent.engagement.volunteerDescription}
-                        </p>
-                        <Button asChild className="mt-4">
-                            <Link href="/register">S'inscrire</Link>
-                        </Button>
-                        </>
-                    )}
-                </div>
-                <div className="grid w-full max-w-sm gap-2 rounded-lg border bg-card p-6 text-center transition-colors hover:bg-card/90">
-                    <HeartHandshake className="mx-auto h-10 w-10 text-primary" />
-                     {loading ? (
-                       <>
-                        <Skeleton className="h-6 w-3/4 mx-auto mt-2" />
-                        <Skeleton className="h-4 w-full mx-auto mt-1" />
-                        <Skeleton className="h-4 w-5/6 mx-auto mt-1" />
-                        <Skeleton className="h-10 w-24 mx-auto mt-4" />
-                       </>
-                    ) : (
-                        <>
-                            <h3 className="mt-2 text-lg font-bold font-headline">{displayContent.engagement.donationTitle}</h3>
-                            <p className="max-w-xs text-sm text-muted-foreground">
-                                {displayContent.engagement.donationDescription}
-                            </p>
-                            <Button asChild variant="secondary" className="mt-4">
-                                <Link href="/donations">Contribuer</Link>
-                            </Button>
-                        </>
-                    )}
-                </div>
-            </div>
+          <div className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <div className="grid w-full max-w-sm gap-2 rounded-lg border bg-card p-6 text-center transition-colors hover:bg-card/90">
+                  <Users className="mx-auto h-10 w-10 text-primary" />
+                  {loading ? (
+                     <>
+                      <Skeleton className="h-6 w-3/4 mx-auto mt-2" />
+                      <Skeleton className="h-4 w-full mx-auto mt-1" />
+                      <Skeleton className="h-4 w-5/6 mx-auto mt-1" />
+                      <Skeleton className="h-10 w-24 mx-auto mt-4" />
+                     </>
+                  ) : (
+                      <>
+                      <h3 className="mt-2 text-lg font-bold font-headline">{displayContent.engagement.volunteerTitle}</h3>
+                      <p className="max-w-xs text-sm text-muted-foreground">
+                          {displayContent.engagement.volunteerDescription}
+                      </p>
+                      <Button asChild className="mt-4">
+                          <Link href="/register">S'inscrire</Link>
+                      </Button>
+                      </>
+                  )}
+              </div>
+              <div className="grid w-full max-w-sm gap-2 rounded-lg border bg-card p-6 text-center transition-colors hover:bg-card/90">
+                  <HeartHandshake className="mx-auto h-10 w-10 text-primary" />
+                   {loading ? (
+                     <>
+                      <Skeleton className="h-6 w-3/4 mx-auto mt-2" />
+                      <Skeleton className="h-4 w-full mx-auto mt-1" />
+                      <Skeleton className="h-4 w-5/6 mx-auto mt-1" />
+                      <Skeleton className="h-10 w-24 mx-auto mt-4" />
+                     </>
+                  ) : (
+                      <>
+                          <h3 className="mt-2 text-lg font-bold font-headline">{displayContent.engagement.donationTitle}</h3>
+                          <p className="max-w-xs text-sm text-muted-foreground">
+                              {displayContent.engagement.donationDescription}
+                          </p>
+                          <Button asChild variant="secondary" className="mt-4">
+                              <Link href="/donations">Contribuer</Link>
+                          </Button>
+                      </>
+                  )}
+              </div>
           </div>
-        </section>
-      </main>
-    </PublicLayout>
+        </div>
+      </section>
+    </main>
   )
 }
-
-    

@@ -8,7 +8,8 @@ export interface Volunteer {
   birthPlace?: string;
   sex?: 'masculin' | 'féminin';
   maritalStatus?: 'célibataire' | 'marié(e)' | 'divorcé(e)' | 'veuf(ve)';
-  idCardNumber?: string;
+  idType?: string;
+  idNumber?: string;
   phone: string;
   email: string;
   address: string;

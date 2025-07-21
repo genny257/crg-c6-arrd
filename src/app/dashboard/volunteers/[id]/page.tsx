@@ -140,7 +140,7 @@ export default function VolunteerProfilePage() {
                             </div>
                              <div className="flex items-center gap-2">
                                 <Calendar className="h-4 w-4 text-muted-foreground"/>
-                                <strong>Né(e) le :</strong> {new Date(volunteer.birthDate).toLocaleDateString('fr-FR')}
+                                <strong>Né(e) le :</strong> {volunteer.birthDate ? new Date(volunteer.birthDate).toLocaleDateString('fr-FR') : 'N/A'}
                             </div>
                              <div className="flex items-center gap-2">
                                 <MapPin className="h-4 w-4 text-muted-foreground"/>
@@ -148,7 +148,7 @@ export default function VolunteerProfilePage() {
                             </div>
                              <div className="flex items-center gap-2">
                                 <FileText className="h-4 w-4 text-muted-foreground"/>
-                                <strong>N° CNI :</strong> {volunteer.idCardNumber || 'N/A'}
+                                <strong>Pièce :</strong> {volunteer.idType || 'N/A'} - {volunteer.idNumber || 'N/A'}
                             </div>
                         </CardContent>
                     </Card>

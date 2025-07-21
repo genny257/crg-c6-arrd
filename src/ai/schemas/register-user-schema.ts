@@ -23,7 +23,8 @@ export const RegisterUserInputSchema = z.object({
   birthPlace: z.string().min(1, "Le lieu de naissance est requis."),
   sex: z.enum(["masculin", "féminin"]),
   maritalStatus: z.enum(["célibataire", "marié(e)", "divorcé(e)", "veuf(ve)"]),
-  idCardNumber: z.string().min(1, "Le numéro de carte d'identité est requis."),
+  idType: z.string().optional(),
+  idNumber: z.string().optional(),
   phone: z.string().min(1, "Le numéro de téléphone est requis."),
   email: z.string().email("L'adresse e-mail n'est pas valide."),
   address: z.string().min(1, "L'adresse est requise."),
@@ -41,6 +42,14 @@ export const RegisterUserInputSchema = z.object({
   termsAccepted: z.literal(true, {
     errorMap: () => ({ message: "Vous devez accepter les termes et conditions." }),
   }),
+}).superRefine((data, ctx) => {
+    if (data.idType && !data.idNumber) {
+        ctx.addIssue({
+            code: "custom",
+            path: ["idNumber"],
+            message: "Le numéro de pièce est requis si un type de pièce est sélectionné.",
+        });
+    }
 });
 
 export type RegisterUserInput = z.infer<typeof RegisterUserInputSchema>;

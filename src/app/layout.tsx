@@ -2,7 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { Belleza, Alegreya } from 'next/font/google'
-import { AuthProvider } from '@/hooks/use-auth';
+import AuthProvider from '@/components/auth-provider';
 import { Chatbot } from '@/components/chatbot';
 
 const belleza = Belleza({

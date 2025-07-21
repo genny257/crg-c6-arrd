@@ -14,6 +14,7 @@ import {
 import { ChevronDown, Menu, X, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import Image from "next/image";
+import AuthProvider from "./auth-provider";
 
 const publicNavLinks = [
   { href: "/#actions", label: "Nos Actions" },
