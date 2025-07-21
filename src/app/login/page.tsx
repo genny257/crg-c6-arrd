@@ -44,7 +44,7 @@ export default function LoginPage() {
         <CardHeader>
           <div className="flex flex-col items-center justify-center mb-4 pt-8">
             <Link href="/" className="flex items-center justify-center">
-              <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={48} height={48} />
+              <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={64} height={64} />
             </Link>
             <span className="mt-2 font-bold text-center">Croix-Rouge Gabonaise</span>
           </div>

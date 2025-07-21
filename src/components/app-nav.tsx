@@ -76,7 +76,7 @@ export function AppNav() {
     <>
       <SidebarHeader>
         <Link href="/" className="flex items-center gap-2 p-2">
-            <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={32} height={32} />
+            <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={40} height={40} />
             <span className="font-headline text-lg group-data-[collapsible=icon]:hidden">
                 CRG-6-Arrond.
             </span>
