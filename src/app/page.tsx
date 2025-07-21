@@ -22,7 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { PublicLayout } from "@/components/public-layout"
 
 const initialContent: HomePageContent = {
-    heroTitle: "Comité-6-Arrondissement",
+    heroTitle: "Comité du 6ème Arrondissement",
     heroSubtitle: "Croix-Rouge Gabonaise",
     heroDescription: "Ensemble, pour un avenir plus sûr. Rejoignez-nous pour gérer les missions, coordonner les volontaires et amplifier notre impact.",
     actions: [
@@ -260,3 +260,5 @@ export default function Home() {
     </PublicLayout>
   )
 }
+
+    
