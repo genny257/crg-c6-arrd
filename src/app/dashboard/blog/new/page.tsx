@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { addDoc, collection } from "firebase/firestore";
+import Link from "next/link";
+import { ArrowLeft, Sparkles, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,9 +19,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/firebase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import { Switch } from "@/components/ui/switch";
+import { generateBlogPost } from "@/ai/flows/generate-blog-post-flow";
 
 const blogPostSchema = z.object({
   title: z.string().min(1, "Le titre est requis."),
@@ -38,6 +39,8 @@ export default function NewBlogPostPage() {
   const { toast } = useToast();
   const { user, loading } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isGenerating, setIsGenerating] = React.useState(false);
+  const [generationTopic, setGenerationTopic] = React.useState("");
 
   const form = useForm<BlogPostFormValues>({
     resolver: zodResolver(blogPostSchema),
@@ -51,6 +54,27 @@ export default function NewBlogPostPage() {
       visible: true,
     },
   });
+
+  const handleGenerateContent = async () => {
+    if (!generationTopic) {
+      toast({ title: "Sujet manquant", description: "Veuillez entrer un sujet pour la génération.", variant: "destructive" });
+      return;
+    }
+    setIsGenerating(true);
+    try {
+      const result = await generateBlogPost(generationTopic);
+      form.setValue("title", result.title);
+      form.setValue("slug", result.slug);
+      form.setValue("excerpt", result.excerpt);
+      form.setValue("content", result.content);
+      toast({ title: "Contenu généré !", description: "Les champs ont été remplis avec la suggestion de l'IA." });
+    } catch (error) {
+      console.error("Error generating blog post:", error);
+      toast({ title: "Erreur de génération", description: "Impossible de générer le contenu.", variant: "destructive" });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const onSubmit = async (data: BlogPostFormValues) => {
     setIsSubmitting(true);
@@ -99,9 +123,25 @@ export default function NewBlogPostPage() {
         <Card>
             <CardHeader>
                 <CardTitle>Rédiger un nouvel article</CardTitle>
-                <CardDescription>Remplissez les champs ci-dessous pour publier un nouvel article.</CardDescription>
+                <CardDescription>Remplissez le sujet et laissez l'IA vous aider, ou remplissez les champs manuellement.</CardDescription>
             </CardHeader>
             <CardContent>
+              <div className="space-y-2 mb-6 p-4 border bg-muted/50 rounded-lg">
+                <Label htmlFor="generation-topic">Idée ou sujet de l'article</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="generation-topic"
+                    placeholder="Ex: L'importance du secourisme en milieu scolaire"
+                    value={generationTopic}
+                    onChange={(e) => setGenerationTopic(e.target.value)}
+                    disabled={isGenerating}
+                  />
+                  <Button onClick={handleGenerateContent} disabled={isGenerating}>
+                    {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                    Générer
+                  </Button>
+                </div>
+              </div>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
@@ -203,7 +243,7 @@ export default function NewBlogPostPage() {
                   )}
                 />
 
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting || isGenerating}>
                     {isSubmitting ? "Publication..." : "Publier l'article"}
                 </Button>
                 </form>

@@ -8,7 +8,7 @@ import { z } from "zod";
 import { useRouter, useParams } from "next/navigation";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +21,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { BlogPost } from "@/types/blog";
+import { generateBlogPost } from "@/ai/flows/generate-blog-post-flow";
+import { Label } from "@/components/ui/label";
 
 const blogPostSchema = z.object({
   title: z.string().min(1, "Le titre est requis."),
@@ -42,6 +44,8 @@ export default function EditBlogPostPage() {
   const { user, loading: authLoading } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [pageLoading, setPageLoading] = React.useState(true);
+  const [isGenerating, setIsGenerating] = React.useState(false);
+  const [generationTopic, setGenerationTopic] = React.useState("");
 
   const form = useForm<BlogPostFormValues>({
     resolver: zodResolver(blogPostSchema),
@@ -56,6 +60,7 @@ export default function EditBlogPostPage() {
         if (postSnap.exists()) {
             const postData = postSnap.data() as BlogPost;
             form.reset(postData);
+            setGenerationTopic(postData.title);
         } else {
             toast({ title: "Erreur", description: "Article non trouvé.", variant: "destructive" });
             router.push('/blog');
@@ -64,6 +69,28 @@ export default function EditBlogPostPage() {
     };
     fetchPost();
   }, [id, form, router, toast]);
+  
+  const handleGenerateContent = async () => {
+    if (!generationTopic) {
+      toast({ title: "Sujet manquant", description: "Veuillez entrer un sujet pour la génération.", variant: "destructive" });
+      return;
+    }
+    setIsGenerating(true);
+    try {
+      const result = await generateBlogPost(generationTopic);
+      form.setValue("title", result.title);
+      form.setValue("slug", result.slug);
+      form.setValue("excerpt", result.excerpt);
+      form.setValue("content", result.content);
+      toast({ title: "Contenu généré !", description: "Les champs ont été remplis avec la suggestion de l'IA." });
+    } catch (error) {
+      console.error("Error generating blog post:", error);
+      toast({ title: "Erreur de génération", description: "Impossible de générer le contenu.", variant: "destructive" });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
 
   const onSubmit = async (data: BlogPostFormValues) => {
     if(typeof id !== 'string') return;
@@ -131,9 +158,26 @@ export default function EditBlogPostPage() {
         <Card>
             <CardHeader>
                 <CardTitle>Détails de l'article</CardTitle>
-                <CardDescription>Mettez à jour les informations de l'article ci-dessous.</CardDescription>
+                <CardDescription>Mettez à jour les informations de l'article ci-dessous. Vous pouvez utiliser l'IA pour vous aider.</CardDescription>
             </CardHeader>
             <CardContent>
+             <div className="space-y-2 mb-6 p-4 border bg-muted/50 rounded-lg">
+                <Label htmlFor="generation-topic">Sujet pour l'IA</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="generation-topic"
+                    placeholder="Ex: L'importance du secourisme en milieu scolaire"
+                    value={generationTopic}
+                    onChange={(e) => setGenerationTopic(e.target.value)}
+                    disabled={isGenerating}
+                  />
+                  <Button onClick={handleGenerateContent} disabled={isGenerating}>
+                    {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                    Générer
+                  </Button>
+                </div>
+              </div>
+
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
@@ -235,7 +279,7 @@ export default function EditBlogPostPage() {
                   )}
                 />
 
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting || isGenerating}>
                     {isSubmitting ? "Enregistrement..." : "Enregistrer les modifications"}
                 </Button>
                 </form>
