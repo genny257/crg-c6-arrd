@@ -121,9 +121,11 @@ export default function EventsPage() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      <span>Modifier</span>
+                    <DropdownMenuItem asChild>
+                        <Link href={`/dashboard/events/${event.id}/edit`}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            <span>Modifier</span>
+                        </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => toggleStatus(event.id, event.status)}>
                       {event.status !== 'Annulé' ? (
@@ -171,6 +173,7 @@ export default function EventsPage() {
               <CardFooter className="p-6 pt-0 flex justify-between items-center">
                 <Button disabled={event.status === 'Annulé'}>S'inscrire</Button>
                 {event.status === 'Annulé' && <span className="text-xs font-semibold text-destructive">Annulé</span>}
+                {event.status === 'Terminé' && <span className="text-xs font-semibold text-gray-500">Terminé</span>}
               </CardFooter>
             </Card>
           ))

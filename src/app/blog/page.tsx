@@ -118,9 +118,11 @@ export default function BlogPage() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      <span>Modifier</span>
+                    <DropdownMenuItem asChild>
+                      <Link href={`/dashboard/blog/${post.id}/edit`}>
+                        <Pencil className="mr-2 h-4 w-4" />
+                        <span>Modifier</span>
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => toggleVisibility(post.id, post.visible)}>
                       <Eye className="mr-2 h-4 w-4" />
@@ -164,5 +166,3 @@ export default function BlogPage() {
     </div>
   );
 }
-
-    
