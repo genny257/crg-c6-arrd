@@ -1,24 +1,62 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 import missionRoutes from './routes/mission.routes';
 
+// Charger les variables d'environnement
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Middlewares
-app.use(cors()); // Enable CORS for all routes
+// --- Configuration de Swagger ---
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'API de gestion de missions',
+      version: '1.0.0',
+      description: 'Documentation de l\'API pour la gestion des missions, des volontaires, etc.',
+    },
+    servers: [
+      {
+        url: `http://localhost:${port}/api`,
+        description: 'Serveur de développement',
+      },
+    ],
+  },
+  // Chemin vers les fichiers contenant les annotations Swagger
+  apis: ['./src/routes/*.ts'],
+};
+
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+// --- Fin de la configuration de Swagger ---
+
+
+// --- Middlewares ---
+// Activer CORS pour autoriser les requêtes cross-origin
+app.use(cors());
+// Parser les corps de requête JSON
 app.use(express.json());
 
-// Routes
+
+// --- Routes ---
+// Route pour la documentation de l'API
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+// Routes de l'API pour les missions
 app.use('/api', missionRoutes);
 
+// Route de base pour vérifier que le serveur fonctionne
 app.get('/', (req, res) => {
-  res.send('API Server is running!');
+  res.send('Le serveur API est en cours d\'exécution !');
 });
 
+
+// Démarrage du serveur
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Le serveur fonctionne sur http://localhost:${port}`);
+  console.log(`La documentation API est disponible sur http://localhost:${port}/api-docs`);
 });

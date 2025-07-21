@@ -4,13 +4,13 @@ Bienvenue sur la plateforme de gestion développée avec Firebase Studio. Cette 
 
 ## Stack Technique
 
-- **Framework**: [Next.js](https://nextjs.org/) (avec App Router)
+- **Framework Frontend**: [Next.js](https://nextjs.org/) (avec App Router)
 - **Langage**: TypeScript
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **Composants UI**: [ShadCN/UI](https://ui.shadcn.com/)
-- **Base de données**: [Firestore](https://firebase.google.com/docs/firestore)
+- **Backend**: Serveur Node.js avec Express, Prisma et PostgreSQL.
 - **IA & Logique Métier**: [Genkit (Firebase GenAI)](https://firebase.google.com/docs/genkit)
-- **Authentification**: Gestion simple par contexte React (simulée)
+- **Authentification**: Gestion simple par contexte React (simulée).
 
 ---
 
@@ -18,21 +18,30 @@ Bienvenue sur la plateforme de gestion développée avec Firebase Studio. Cette 
 
 Voici les étapes clés restantes pour rendre la plateforme entièrement fonctionnelle et prête pour le déploiement.
 
-### 1. Connecter la Base de Données (Firestore)
-- [x] **Volontaires**: Lier les actions (Approuver, Rejeter) pour mettre à jour les statuts dans Firestore.
-- [ ] **Missions, Dons, Blog, Rapports, Événements**: Remplacer les données statiques par des appels à Firestore pour lire et écrire les informations.
+### 1. Intégration complète de l'API Backend
+- **Objectif**: Remplacer toutes les données statiques et la logique côté client par des appels à votre API backend.
+- **Actions**:
+  - **Missions, Dons, Blog, Rapports, Événements**: Connecter les pages du frontend aux endpoints de l'API pour lire, créer, modifier et supprimer des données.
+  - **Volontaires**: Lier les actions (Approuver, Rejeter) aux endpoints de l'API pour mettre à jour les statuts.
 
-### 2. Implémenter le CRUD Complet
-- [ ] **Formulaires de Création/Modification**: Créer les interfaces pour ajouter et éditer des missions, articles, événements, etc., et les connecter à Firestore.
-- [ ] **Gestion des Fichiers**: Implémenter l'upload de fichiers (images, rapports PDF) vers Firebase Storage.
+### 2. Finaliser le Portail de Dons
+- **Objectif**: Permettre des dons réels et automatisés.
+- **Actions**:
+  - **Intégration Paiement**: Connecter le formulaire de dons à une passerelle de paiement (côté backend).
+  - **Génération de Reçus**: Créer un endpoint backend pour générer et envoyer des reçus de dons.
 
 ### 3. Intégrer les Fonctionnalités d'IA (Genkit)
-- [ ] **Assignation Automatisée**: Créer un flux Genkit pour suggérer des volontaires pour une mission en fonction de leurs compétences et disponibilités.
-- [ ] **Aide à la Rédaction**: Utiliser l'IA pour aider à la création de contenu (articles, descriptions d'événements).
+- **Objectif**: Utiliser l'intelligence artificielle pour optimiser la gestion.
+- **Actions**:
+  - **Assignation Automatisée**: Créer un flux Genkit qui interroge votre API pour obtenir la liste des volontaires et suggère les meilleurs profils pour une mission.
+  - **Aide à la Rédaction**: Utiliser Genkit pour aider à la création de contenu (articles, descriptions d'événements).
 
-### 4. Finaliser le Portail de Dons
-- [ ] **Intégration Paiement**: Connecter le formulaire de dons à une passerelle de paiement.
-- [ ] **Génération de Reçus**: Créer un flux pour générer et envoyer des reçus de dons.
+### 4. Carte Interactive
+- **Objectif**: Offrir une visualisation géographique des opérations.
+- **Actions**:
+  - Remplacer l'image statique sur la page des missions par une carte dynamique (avec Leaflet ou OpenStreetMap) qui affiche les localisations des missions récupérées depuis votre API.
 
-### 5. Carte Interactive
-- [ ] **Remplacer l'image statique** sur la page des missions par une carte dynamique affichant les emplacements des missions depuis Firestore.
+### 5. Finaliser l'Authentification
+- **Objectif**: Sécuriser l'application avec un système d'authentification robuste.
+- **Actions**:
+  - Remplacer l'authentification simulée par un vrai système (par exemple, avec JWT) géré par votre backend.
