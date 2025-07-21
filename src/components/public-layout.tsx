@@ -25,6 +25,8 @@ const mediaNavLinks = [
     { href: "/blog", label: "Blog" },
     { href: "/reports", label: "Rapports" },
     { href: "/events", label: "Évènements" },
+    { href: "/principes", label: "Principes CRG" },
+    { href: "/hymne", label: "Hymne CRG" },
 ]
 
 export function PublicLayout({ children }: { children: ReactNode }) {
@@ -44,7 +46,7 @@ export function PublicLayout({ children }: { children: ReactNode }) {
             ))}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="text-sm font-medium hover:underline underline-offset-4 px-0">
+                <Button variant="ghost" className="text-sm font-medium hover:underline underline-offset-4 px-0 flex items-center gap-1">
                   Média <ChevronDown className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
