@@ -9,3 +9,4 @@ export interface Event {
   imageHint?: string;
   status: 'À venir' | 'Terminé' | 'Annulé';
 }
+
