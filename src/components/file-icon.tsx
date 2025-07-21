@@ -1,4 +1,3 @@
-
 import { File, Folder, Image as ImageIcon, Video, FileText, Music, FileArchive, FileSpreadsheet, FileType2 } from "lucide-react";
 import type { ArchiveItemType } from "@/types/archive";
 

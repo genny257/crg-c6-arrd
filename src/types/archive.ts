@@ -1,4 +1,3 @@
-
 export type ArchiveItemType = "folder" | "document" | "spreadsheet" | "image" | "video" | "audio" | "pdf" | "archive" | "text" | "unknown";
 
 export interface ArchiveItem {

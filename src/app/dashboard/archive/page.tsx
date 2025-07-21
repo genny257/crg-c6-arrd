@@ -8,7 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
 import {
   FilePlus2,
@@ -39,10 +38,12 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
+
 
 export default function ArchivePage() {
   const [items, setItems] = React.useState<ArchiveItem[]>([]);
@@ -54,6 +55,8 @@ export default function ArchivePage() {
   const [isCreateFolderDialogOpen, setIsCreateFolderDialogOpen] = React.useState(false);
   
   const { toast } = useToast();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
 
   const fetchItems = React.useCallback(async (folderId: string | null) => {
     setLoading(true);
@@ -113,6 +116,12 @@ export default function ArchivePage() {
     setCurrentFolderId(crumb.id);
     setBreadcrumbs(breadcrumbs.slice(0, crumbIndex + 1));
   };
+
+  if (authLoading) return <div>Chargement...</div>;
+  if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
+     router.push('/login');
+     return null;
+  }
   
   const visibleItems = items;
 
@@ -150,12 +159,10 @@ export default function ArchivePage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                 <AlertDialogTrigger asChild>
-                    <DropdownMenuItem>
-                        <FolderPlus className="mr-2 h-4 w-4" />
-                        <span>Nouveau dossier</span>
-                    </DropdownMenuItem>
-                 </AlertDialogTrigger>
+                 <DropdownMenuItem onSelect={() => setIsCreateFolderDialogOpen(true)}>
+                    <FolderPlus className="mr-2 h-4 w-4" />
+                    <span>Nouveau dossier</span>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <FileIcon type="document" className="mr-2 h-4 w-4" />
@@ -282,17 +289,14 @@ const ItemMenu = () => (
         <DropdownMenuItem>
           <Copy className="mr-2 h-4 w-4" />
           <span>Copier</span>
-          <DropdownMenuShortcut>⌘C</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <Scissors className="mr-2 h-4 w-4" />
           <span>Couper</span>
-           <DropdownMenuShortcut>⌘X</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <Clipboard className="mr-2 h-4 w-4" />
           <span>Coller</span>
-           <DropdownMenuShortcut>⌘V</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-destructive">
