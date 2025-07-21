@@ -43,10 +43,12 @@ export default function LoginPage() {
         </Link>
         <CardHeader>
           <div className="flex flex-col items-center justify-center mb-4 pt-8">
-            <Link href="/" className="flex items-center justify-center">
-              <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={64} height={64} />
+            <Link href="/" className="flex items-center justify-center gap-2">
+              <div className="relative h-12 w-12">
+                <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" fill style={{objectFit: 'contain'}} />
+              </div>
+              <span className="mt-2 font-bold text-center">Croix-Rouge Gabonaise</span>
             </Link>
-            <span className="mt-2 font-bold text-center">Croix-Rouge Gabonaise</span>
           </div>
           <CardTitle className="text-2xl font-headline text-center">Connexion</CardTitle>
           <CardDescription className="text-center">

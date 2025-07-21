@@ -36,8 +36,10 @@ export function PublicLayout({ children }: { children: ReactNode }) {
   return (
     <div className="bg-background min-h-screen flex flex-col">
       <header className="px-4 lg:px-6 h-14 flex items-center bg-card shadow-sm z-20 sticky top-0">
-        <Link href="/" className="flex items-center justify-center gap-2" prefetch={false}>
-          <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={40} height={40} />
+        <Link href="/" className="flex items-center justify-start gap-2 w-1/10" prefetch={false}>
+          <div className="relative h-10 w-10">
+            <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" fill style={{ objectFit: 'contain' }} />
+          </div>
           <span className="font-semibold hidden sm:inline-block">Croix-Rouge Gabonaise</span>
         </Link>
         <nav className="ml-auto hidden md:flex gap-4 sm:gap-6 items-center">
