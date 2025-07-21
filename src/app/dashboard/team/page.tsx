@@ -18,7 +18,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Icon } from "lucide-react";
-import { professionsList, skillsList as allSkillsGroups } from "@/lib/locations";
 
 type Member = {
     name: string;
@@ -314,7 +313,7 @@ export default function TeamPage() {
                         <div className="relative lg:col-span-4">
                             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input 
-                                placeholder="Rechercher par nom, prénom, email..." 
+                                placeholder="Rechercher par nom..." 
                                 className="pl-8 w-full"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -397,3 +396,5 @@ export default function TeamPage() {
         </div>
     );
 }
+
+    
