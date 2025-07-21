@@ -9,6 +9,6 @@ export interface Mission {
   endDate: string;   // ISO 8601 format
   status: 'Planifiée' | 'En cours' | 'Terminée' | 'Annulée';
   requiredSkills: string[];
-  participants?: string[]; // Array of volunteer IDs
+  participants?: string[]; // Array of volunteer IDs (Firestore document IDs)
   maxParticipants?: number;
 }

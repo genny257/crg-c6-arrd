@@ -103,9 +103,11 @@ export default function MissionDetailPage() {
                             Modifier
                         </Link>
                     </Button>
-                    <Button variant="outline">
-                        <Share2 className="mr-2 h-4 w-4" />
-                        Partager la liste
+                    <Button variant="outline" asChild>
+                        <Link href={`/missions/${mission.id}`} target="_blank">
+                           <Share2 className="mr-2 h-4 w-4" />
+                           Partager
+                        </Link>
                     </Button>
                 </div>
             </div>
@@ -165,9 +167,11 @@ export default function MissionDetailPage() {
                                     Participants
                                     {mission.maxParticipants && <span className="text-base font-medium text-muted-foreground">({participantCount} / {mission.maxParticipants})</span>}
                                 </CardTitle>
-                                 <Button size="sm">
-                                    <PlusCircle className="mr-2 h-4 w-4" />
-                                    Créer un formulaire
+                                 <Button size="sm" asChild>
+                                    <Link href={`/missions/${mission.id}`} target="_blank">
+                                        <PlusCircle className="mr-2 h-4 w-4" />
+                                        Ouvrir le formulaire
+                                    </Link>
                                 </Button>
                             </div>
                              <CardDescription>Liste des volontaires ayant confirmé leur participation.</CardDescription>
@@ -199,7 +203,7 @@ export default function MissionDetailPage() {
                                     <Users className="mx-auto h-12 w-12 text-muted-foreground" />
                                     <h3 className="mt-4 text-lg font-semibold">Aucun participant pour le moment</h3>
                                     <p className="mt-1 text-sm text-muted-foreground">
-                                        Créez et partagez un formulaire pour inviter les volontaires à participer.
+                                        Partagez le formulaire public pour inviter les volontaires à participer.
                                     </p>
                                 </div>
                            )}
