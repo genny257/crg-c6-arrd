@@ -28,7 +28,7 @@ type ReportFormValues = z.infer<typeof reportSchema>;
 export default function NewReportPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const { user, loading } = useAuth();
+  const { user, loading, token } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<ReportFormValues>({
@@ -41,15 +41,25 @@ export default function NewReportPage() {
   });
 
   const onSubmit = async (data: ReportFormValues) => {
+    if (!token) return;
     setIsSubmitting(true);
     try {
-      // TODO: Replace with API call to POST /api/reports
-      console.log("Creating report with data:", data);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error("La création a échoué.");
+      
       toast({
         title: "Rapport créé",
-        description: "Le nouveau rapport a été ajouté avec succès (simulation).",
+        description: "Le nouveau rapport a été ajouté avec succès.",
       });
       router.push("/dashboard/reports");
+      router.refresh();
     } catch (error) {
       console.error("Error creating report: ", error);
       toast({

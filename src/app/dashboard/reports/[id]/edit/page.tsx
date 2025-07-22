@@ -27,14 +27,12 @@ const reportSchema = z.object({
 
 type ReportFormValues = z.infer<typeof reportSchema>;
 
-const mockReport: Report = { id: '1', title: 'Rapport Annuel 2023', date: '2024-01-15T10:00:00Z', fileUrl: 'https://example.com/report.pdf', visible: true };
-
 export default function EditReportPage() {
   const router = useRouter();
   const params = useParams();
   const { id } = params;
   const { toast } = useToast();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, token } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [pageLoading, setPageLoading] = React.useState(true);
 
@@ -43,32 +41,46 @@ export default function EditReportPage() {
   });
 
   React.useEffect(() => {
-    if (typeof id !== 'string') return;
+    if (typeof id !== 'string' || !token) return;
     const fetchReport = async () => {
         setPageLoading(true);
-        // TODO: Replace with API call to /api/reports/{id}
-        if (mockReport) {
-            form.reset(mockReport);
-        } else {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error("Rapport non trouvé.");
+            const reportData: Report = await response.json();
+            form.reset(reportData);
+        } catch (error) {
             toast({ title: "Erreur", description: "Rapport non trouvé.", variant: "destructive" });
             router.push('/dashboard/reports');
+        } finally {
+            setPageLoading(false);
         }
-        setPageLoading(false);
     };
     fetchReport();
-  }, [id, form, router, toast]);
+  }, [id, form, router, toast, token]);
 
   const onSubmit = async (data: ReportFormValues) => {
-    if(typeof id !== 'string') return;
+    if(typeof id !== 'string' || !token) return;
     setIsSubmitting(true);
     try {
-      // TODO: Replace with API call to PUT /api/reports/{id}
-      console.log("Updating report with data:", data);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports/${id}`, {
+            method: 'PUT',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error("La mise à jour a échoué.");
+
       toast({
         title: "Rapport modifié",
-        description: "Le rapport a été mis à jour avec succès (simulation).",
+        description: "Le rapport a été mis à jour avec succès.",
       });
       router.push('/dashboard/reports');
+      router.refresh();
     } catch (error) {
       console.error("Error updating report: ", error);
       toast({

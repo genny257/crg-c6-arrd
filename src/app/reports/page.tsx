@@ -16,7 +16,7 @@ import { fr } from "date-fns/locale";
 
 export default function ReportsPage() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin' || user?.role === 'ADMIN' || user?.role === 'SUPERADMIN';
   const [reports, setReports] = React.useState<Report[]>([]);
   const [loading, setLoading] = React.useState(true);
   const { toast } = useToast();
@@ -30,9 +30,8 @@ export default function ReportsPage() {
       }
       let reportsData: Report[] = await response.json();
       
-      if (!isAdmin) {
-        reportsData = reportsData.filter(r => r.visible);
-      }
+      // On public page, only show visible reports
+      reportsData = reportsData.filter(r => r.visible);
         
       setReports(reportsData);
     } catch (error) {
@@ -45,7 +44,7 @@ export default function ReportsPage() {
     } finally {
       setLoading(false);
     }
-  }, [isAdmin, toast]);
+  }, [toast]);
 
   React.useEffect(() => {
     fetchReports();
@@ -74,8 +73,7 @@ export default function ReportsPage() {
                         <TableRow>
                             <TableHead>Titre du rapport</TableHead>
                             <TableHead className="hidden md:table-cell w-[200px] text-right">Date de publication</TableHead>
-                            {isAdmin && <TableHead className="w-[120px] text-center">Statut</TableHead>}
-                            <TableHead className="w-[120px] text-right">Action</TableHead>
+                            <TableHead className="w-[150px] text-right">Action</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -84,25 +82,17 @@ export default function ReportsPage() {
                                 <TableRow key={i}>
                                     <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
                                     <TableCell className="hidden md:table-cell text-right"><Skeleton className="h-5 w-24 ml-auto" /></TableCell>
-                                    {isAdmin && <TableCell className="text-center"><Skeleton className="h-6 w-16 mx-auto rounded-full" /></TableCell>}
-                                    <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+                                    <TableCell className="text-right"><Skeleton className="h-10 w-32 ml-auto" /></TableCell>
                                 </TableRow>
                             ))
                         ) : (
                             reports.map((report) => (
-                                <TableRow key={report.id} className={isAdmin && !report.visible ? 'bg-muted/50' : ''}>
+                                <TableRow key={report.id}>
                                     <TableCell className="font-medium flex items-center gap-2">
                                         <FileText className="h-4 w-4 text-muted-foreground" />
                                         {report.title}
                                     </TableCell>
                                     <TableCell className="hidden md:table-cell text-right">{format(new Date(report.date), "d MMMM yyyy", { locale: fr })}</TableCell>
-                                     {isAdmin && (
-                                        <TableCell className="text-center">
-                                            <span className={`text-xs font-semibold ${report.visible ? 'text-green-600' : 'text-amber-600'}`}>
-                                                {report.visible ? 'Visible' : 'Masqué'}
-                                            </span>
-                                        </TableCell>
-                                    )}
                                     <TableCell className="text-right">
                                         <Button variant="outline" size="sm" asChild>
                                           <a href={report.fileUrl} download target="_blank" rel="noopener noreferrer">
@@ -116,7 +106,7 @@ export default function ReportsPage() {
                         )}
                          {!loading && reports.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={isAdmin ? 4 : 3} className="text-center py-8 text-muted-foreground">
+                                <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
                                     Aucun rapport à afficher pour le moment.
                                 </TableCell>
                             </TableRow>

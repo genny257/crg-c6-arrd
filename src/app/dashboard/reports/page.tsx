@@ -15,25 +15,22 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
-// Mock data
-const mockReports: Report[] = [
-    { id: '1', title: 'Rapport Annuel 2023', date: '2024-01-15T10:00:00Z', fileUrl: 'https://example.com/report1.pdf', visible: true },
-    { id: '2', title: 'Rapport Financier T1 2024', date: '2024-04-10T10:00:00Z', fileUrl: 'https://example.com/report2.pdf', visible: true },
-    { id: '3', title: 'Brouillon Rapport T2 2024', date: '2024-07-05T10:00:00Z', fileUrl: 'https://example.com/report3.pdf', visible: false },
-];
-
 export default function ReportsPage() {
-  const { user, loading: authLoading } = useAuth();
-  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+  const { user, loading: authLoading, token } = useAuth();
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin' || user?.role === 'ADMIN' || user?.role === 'SUPERADMIN';
   const [reports, setReports] = React.useState<Report[]>([]);
   const [loading, setLoading] = React.useState(true);
   const { toast } = useToast();
 
   const fetchReports = React.useCallback(async () => {
+    if (!token) return;
     setLoading(true);
     try {
-      // TODO: Replace with API call to /api/reports
-      const reportsData = mockReports;
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!response.ok) throw new Error("Failed to fetch reports");
+      const reportsData: Report[] = await response.json();
       setReports(reportsData);
     } catch (error) {
       console.error("Error fetching reports: ", error);
@@ -45,27 +42,56 @@ export default function ReportsPage() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, token]);
 
   React.useEffect(() => {
-    fetchReports();
-  }, [fetchReports]);
+    if (token) {
+        fetchReports();
+    }
+  }, [fetchReports, token]);
 
   const handleDelete = async (id: string) => {
-    if (!id) return;
-    // TODO: Replace with API call to DELETE /api/reports/{id}
+    if (!id || !token) return;
+    const originalReports = [...reports];
     setReports(reports.filter(r => r.id !== id));
-    toast({ title: "Succès", description: "Le rapport a été supprimé." });
+    
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error("La suppression a échoué.");
+        toast({ title: "Succès", description: "Le rapport a été supprimé." });
+    } catch (error) {
+        setReports(originalReports);
+        toast({ title: "Erreur", description: "La suppression a échoué.", variant: "destructive" });
+    }
   };
 
   const toggleVisibility = async (id: string, currentVisibility: boolean) => {
-     if (!id) return;
-    // TODO: Replace with API call to PATCH /api/reports/{id}
+    if (!id || !token) return;
+    const originalReports = [...reports];
     setReports(reports.map(r => r.id === id ? { ...r, visible: !r.visible } : r));
-    toast({ title: "Succès", description: `Le rapport est maintenant ${!currentVisibility ? 'visible' : 'masqué'}.` });
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports/${id}`, {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ visible: !currentVisibility })
+      });
+      if (!response.ok) throw new Error("La mise à jour a échoué.");
+      toast({ title: "Succès", description: `Le rapport est maintenant ${!currentVisibility ? 'visible' : 'masqué'}.` });
+    } catch (error) {
+        setReports(originalReports);
+        toast({ title: "Erreur", description: "La mise à jour de la visibilité a échoué.", variant: "destructive" });
+    }
   };
   
   if (authLoading) return <div>Chargement...</div>;
+  if (!user || !isAdmin) return null;
 
   return (
     <div className="flex flex-col gap-8">
