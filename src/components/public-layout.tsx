@@ -27,7 +27,6 @@ const mediaNavLinks = [
     { href: "/events", label: "Évènements" },
     { href: "/principes", label: "Principes CRG" },
     { href: "/hymne", label: "Hymne CRG" },
-    { href: "/mecenat", label: "Mécénat" },
 ]
 
 export function PublicLayout({ children }: { children: ReactNode }) {
@@ -118,7 +117,7 @@ export function PublicLayout({ children }: { children: ReactNode }) {
         <p className="text-xs text-muted-foreground">&copy; 2024 Croix-Rouge Gabonaise. Tous droits réservés.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link href="/mecenat" className="text-xs hover:underline underline-offset-4" prefetch={false}>
-            Mécénat d'Entreprise
+            Mécénat
           </Link>
           <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
             Politique de confidentialité
