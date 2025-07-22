@@ -36,7 +36,7 @@ export const getVolunteerById = async (req: Request, res: Response) => {
 };
 
 const statusUpdateSchema = z.object({
-  status: z.enum(['Actif', 'Inactif', 'Rejeté', 'En attente']),
+  status: z.enum(['Actif', 'Inactif', 'Rejeté', 'En_attente']),
 });
 
 export const updateVolunteerStatus = async (req: Request, res: Response) => {

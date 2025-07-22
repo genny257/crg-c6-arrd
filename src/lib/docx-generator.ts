@@ -30,7 +30,7 @@ const createStyledParagraph = (text: string, options: { bold?: boolean; size?: n
     });
 };
 
-const createLabelAndValue = (label: string, value?: string) => {
+const createLabelAndValue = (label: string, value?: string | null) => {
     return new Paragraph({
         children: [
             new TextRun({ text: `${label} : `, bold: true, font: "Calibri", size: 22 }),
@@ -107,8 +107,7 @@ export const generateDocx = async (volunteer: Volunteer) => {
                                             createLabelAndValue("Prénom(s)", volunteer.firstName),
                                             createLabelAndValue("Né(e) le", volunteer.birthDate ? new Date(volunteer.birthDate).toLocaleDateString('fr-FR') : 'N/A'),
                                             createLabelAndValue("À", volunteer.birthPlace),
-                                            createLabelAndValue("Type de pièce", volunteer.idType),
-                                            createLabelAndValue("N° de pièce", volunteer.idNumber),
+                                            createLabelAndValue("Pièce d'identité", `${volunteer.idCardType || 'N/A'} - ${volunteer.idCardNumber || 'N/A'}`),
                                         ],
                                         verticalAlign: VerticalAlign.TOP,
                                         borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },

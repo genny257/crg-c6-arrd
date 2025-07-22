@@ -1,6 +1,7 @@
 // src/services/volunteer.service.ts
 import { PrismaClient, Volunteer, VolunteerStatus } from '@prisma/client';
-import prisma from '@/lib/prisma'; // Assuming prisma client is instantiated here
+
+const prisma = new PrismaClient();
 
 export const getAllVolunteers = async (): Promise<Volunteer[]> => {
     return await prisma.volunteer.findMany({

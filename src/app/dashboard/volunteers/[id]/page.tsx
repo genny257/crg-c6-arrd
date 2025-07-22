@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { generateDocx } from "@/lib/docx-generator";
+import { useAuth } from "@/hooks/use-auth";
 
 const getStatusBadgeVariant = (status?: string) => {
     switch (status) {
@@ -28,18 +29,21 @@ export default function VolunteerProfilePage() {
     const { id } = useParams();
     const router = useRouter();
     const { toast } = useToast();
+    const { token } = useAuth();
     const [volunteer, setVolunteer] = React.useState<Volunteer | null>(null);
     const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
         const fetchVolunteer = async () => {
-            if (typeof id !== 'string') {
-                router.push('/dashboard/volunteers');
+            if (typeof id !== 'string' || !token) {
+                setLoading(false);
                 return;
             }
             setLoading(true);
             try {
-                const response = await fetch(`http://localhost:3001/api/volunteers/${id}`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/volunteers/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 if (!response.ok) {
                     throw new Error('Volunteer not found');
                 }
@@ -60,8 +64,10 @@ export default function VolunteerProfilePage() {
             }
         };
 
-        fetchVolunteer();
-    }, [id, router, toast]);
+        if (token) {
+            fetchVolunteer();
+        }
+    }, [id, router, toast, token]);
     
     const handleExport = () => {
         if (volunteer) {
@@ -150,7 +156,7 @@ export default function VolunteerProfilePage() {
                             </div>
                              <div className="flex items-center gap-2">
                                 <FileText className="h-4 w-4 text-muted-foreground"/>
-                                <strong>Pièce :</strong> {volunteer.idType || 'N/A'} - {volunteer.idNumber || 'N/A'}
+                                <strong>Pièce :</strong> {volunteer.idCardNumber || 'N/A'}
                             </div>
                         </CardContent>
                     </Card>

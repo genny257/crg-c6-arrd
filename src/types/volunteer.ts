@@ -8,8 +8,8 @@ export interface Volunteer {
   birthPlace?: string;
   sex?: 'masculin' | 'féminin';
   maritalStatus?: 'célibataire' | 'marié(e)' | 'divorcé(e)' | 'veuf(ve)';
-  idType?: string;
-  idNumber?: string;
+  idCardType?: string;
+  idCardNumber?: string;
   phone: string;
   email: string;
   address: string;
@@ -20,7 +20,7 @@ export interface Volunteer {
   availability?: string[];
   causes?: string[];
   assignedCell?: string;
-  residence: {
+  residence?: {
     province?: string;
     departement?: string;
     communeCanton?: string;
