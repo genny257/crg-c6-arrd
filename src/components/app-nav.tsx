@@ -21,6 +21,7 @@ import {
   CalendarDays,
   Archive,
   FileText,
+  Building,
 } from "lucide-react"
 
 import {
@@ -52,6 +53,7 @@ const mainNavItems = [
 
 const reportsNavItems = [
     { href: "/dashboard/donations", icon: HeartHandshake, label: "Dons" },
+    { href: "/dashboard/sponsorships", icon: Building, label: "Mécénat", adminOnly: true },
     { href: "/dashboard/analytics", icon: LineChart, label: "Statistiques" },
 ]
 
@@ -71,6 +73,12 @@ export function AppNav() {
     if (!item.adminOnly) return true;
     return isAdmin;
   });
+
+  const filteredReportsNav = reportsNavItems.filter(item => {
+    if (!item.adminOnly) return true;
+    return isAdmin;
+  });
+
 
   return (
     <>
@@ -132,9 +140,9 @@ export function AppNav() {
         <SidebarSeparator />
          <SidebarMenu>
             <SidebarMenuItem>
-                <span className="px-2 text-xs font-medium text-muted-foreground group-data-[collapsible=icon]:hidden">Rapports</span>
+                <span className="px-2 text-xs font-medium text-muted-foreground group-data-[collapsible=icon]:hidden">Rapports & Finances</span>
             </SidebarMenuItem>
-          {reportsNavItems.map((item) => (
+          {filteredReportsNav.map((item) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild

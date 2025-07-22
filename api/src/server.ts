@@ -14,12 +14,20 @@ import genericRoutes from './routes/generic.routes';
 import donationRoutes from './routes/donation.routes';
 import userRoutes from './routes/user.routes';
 import sponsorshipRoutes from './routes/sponsorship.routes';
+import adminRoutes from './routes/admin.routes';
+import { loggingMiddleware } from './middleware/logging';
 
 // Charger les variables d'environnement
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001;
+
+// Trust proxy to get the real IP address of the request
+app.set('trust proxy', true);
+
+// --- Middlewares de Journalisation ---
+app.use(loggingMiddleware);
 
 // --- Configuration de Swagger ---
 const swaggerOptions = {
@@ -77,6 +85,7 @@ app.use('/api', genericRoutes);
 app.use('/api', donationRoutes);
 app.use('/api', userRoutes);
 app.use('/api', sponsorshipRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Route de base pour vérifier que le serveur fonctionne
 app.get('/', (req, res) => {

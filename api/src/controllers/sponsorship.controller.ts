@@ -23,3 +23,12 @@ export const createSponsorship = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Erreur lors de la création de la demande de mécénat', error });
     }
 };
+
+export const getSponsorships = async (req: Request, res: Response) => {
+    try {
+        const sponsorships = await sponsorshipService.getAllSponsorships();
+        res.status(200).json(sponsorships);
+    } catch (error) {
+        res.status(500).json({ message: 'Erreur lors de la récupération des demandes de mécénat', error });
+    }
+};

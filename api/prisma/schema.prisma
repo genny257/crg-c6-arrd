@@ -197,6 +197,24 @@ enum SponsorshipStatus {
   CLOSED_LOST
 }
 
+model RequestLog {
+  id         String   @id @default(cuid())
+  ip         String
+  method     String
+  path       String
+  statusCode Int
+  userAgent  String?
+  isThreat   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+model BlockedIP {
+  id        String   @id @default(cuid())
+  ip        String   @unique
+  reason    String?
+  createdAt DateTime @default(now())
+}
+
 // Reusable entities for dropdowns / relations
 model Skill {
   id    String @id @default(cuid())
