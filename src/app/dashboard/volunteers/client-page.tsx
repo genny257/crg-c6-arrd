@@ -26,6 +26,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { useAuth } from "@/hooks/use-auth";
 
 const getStatusBadgeVariant = (status?: Volunteer['status']) => {
     switch (status) {
@@ -42,6 +43,7 @@ interface VolunteersClientPageProps {
 }
 
 export function VolunteersClientPage({ initialVolunteers }: VolunteersClientPageProps) {
+    const { token } = useAuth();
     const { toast } = useToast();
     const [volunteers, setVolunteers] = React.useState<Volunteer[]>(initialVolunteers);
     const [searchTerm, setSearchTerm] = React.useState("");
@@ -54,11 +56,14 @@ export function VolunteersClientPage({ initialVolunteers }: VolunteersClientPage
 
 
     const updateVolunteerStatus = async (id: string, status: 'Actif' | 'Rejeté') => {
-        if (!id) return;
+        if (!id || !token) return;
         try {
-            const response = await fetch(`http://localhost:3001/api/volunteers/${id}/status`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/volunteers/${id}/status`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
                 body: JSON.stringify({ status })
             });
 

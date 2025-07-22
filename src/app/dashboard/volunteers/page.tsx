@@ -5,20 +5,17 @@ import { VolunteersClientPage } from "./client-page";
 
 async function getVolunteers(): Promise<Volunteer[]> {
     try {
-        // In a real app, you'd fetch from your API
-        // For now, let's assume this is your API endpoint
-        const res = await fetch('http://localhost:3001/api/volunteers', { cache: 'no-store' });
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/volunteers`, { cache: 'no-store' });
 
         if (!res.ok) {
-            // This will activate the closest `error.js` Error Boundary
-            throw new Error('Failed to fetch volunteers');
+            console.error('Failed to fetch volunteers, status:', res.status);
+            return [];
         }
 
         const volunteers = await res.json();
         return volunteers;
     } catch (error) {
         console.error("Could not fetch volunteers:", error);
-        // In case of error, return an empty array to prevent the page from crashing.
         return [];
     }
 }
