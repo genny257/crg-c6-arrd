@@ -13,9 +13,9 @@ import { useToast } from "@/hooks/use-toast";
 import type { BlogPost } from "@/types/blog";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function BlogPage() {
+export default function DashboardBlogPage() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin' || user?.role === 'ADMIN' || user?.role === 'SUPERADMIN';
   const [blogPosts, setBlogPosts] = React.useState<BlogPost[]>([]);
   const [loading, setLoading] = React.useState(true);
   const { toast } = useToast();
@@ -23,7 +23,7 @@ export default function BlogPage() {
   const fetchPosts = React.useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/blog');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog`);
       if (!response.ok) throw new Error("Failed to fetch posts");
       let postsData = await response.json();
       
@@ -49,28 +49,32 @@ export default function BlogPage() {
 
   const handleDelete = async (id: string) => {
     if (!id) return;
+    const originalPosts = [...blogPosts];
+    setBlogPosts(blogPosts.filter(p => p.id !== id));
     try {
-        const response = await fetch(`http://localhost:3001/api/blog/${id}`, { method: 'DELETE' });
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${id}`, { method: 'DELETE' });
         if (!response.ok) throw new Error("Failed to delete post");
-        setBlogPosts(blogPosts.filter(p => p.id !== id));
         toast({ title: "Succès", description: "L'article a été supprimé." });
     } catch(error) {
+        setBlogPosts(originalPosts);
         toast({ title: "Erreur", description: "La suppression a échoué.", variant: "destructive" });
     }
   };
 
   const toggleVisibility = async (id: string, currentVisibility: boolean) => {
      if (!id) return;
+     const originalPosts = [...blogPosts];
+     setBlogPosts(blogPosts.map(p => p.id === id ? { ...p, visible: !p.visible } : p));
     try {
-        const response = await fetch(`http://localhost:3001/api/blog/${id}`, { 
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${id}`, { 
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ visible: !currentVisibility })
         });
         if (!response.ok) throw new Error("Failed to update visibility");
-        setBlogPosts(blogPosts.map(p => p.id === id ? { ...p, visible: !p.visible } : p));
         toast({ title: "Succès", description: `L'article est maintenant ${!currentVisibility ? 'visible' : 'masqué'}.` });
     } catch (error) {
+         setBlogPosts(originalPosts);
          toast({ title: "Erreur", description: "La mise à jour a échoué.", variant: "destructive" });
     }
   };
@@ -79,8 +83,8 @@ export default function BlogPage() {
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-headline font-bold">Blog</h2>
-          <p className="text-muted-foreground">Les dernières nouvelles et articles de la Croix-Rouge Gabonaise.</p>
+          <h2 className="text-3xl font-headline font-bold">Gestion du Blog</h2>
+          <p className="text-muted-foreground">Créez, modifiez et gérez les articles de votre site.</p>
         </div>
         {isAdmin && (
           <Button asChild>
@@ -138,7 +142,7 @@ export default function BlogPage() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
-              <Link href={`/blog/${post.slug}`} className="contents">
+              <Link href={`/blog/${post.slug}`} className="contents" target="_blank">
                 <CardHeader className="p-0">
                   <Image
                     src={post.image || "https://placehold.co/600x400.png"}
@@ -150,14 +154,14 @@ export default function BlogPage() {
                   />
                 </CardHeader>
                 <CardContent className="p-6 flex-1">
-                  <p className="text-sm text-muted-foreground mb-1">{new Date(post.date).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                  <p className="text-sm text-muted-foreground mb-1">{new Date(post.createdAt).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                   <CardTitle className="font-headline text-xl mb-2 group-hover:underline">{post.title}</CardTitle>
                   <CardDescription>{post.excerpt}</CardDescription>
                 </CardContent>
               </Link>
               <CardFooter className="p-6 pt-0 flex justify-between items-center">
                 <Button asChild variant="secondary">
-                  <Link href={`/blog/${post.slug}`}>Lire la suite</Link>
+                  <Link href={`/dashboard/blog/${post.id}/edit`}>Éditer</Link>
                 </Button>
                 {!post.visible && isAdmin && <span className="text-xs font-semibold text-amber-600">Masqué</span>}
               </CardFooter>

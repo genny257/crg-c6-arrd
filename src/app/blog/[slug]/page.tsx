@@ -24,7 +24,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       if (!params.slug) return notFound();
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:3001/api/blog/slug/${params.slug}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/slug/${params.slug}`);
         if (!response.ok) throw new Error("Post not found");
         const foundPost = await response.json();
 
@@ -84,8 +84,8 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
         </h1>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Calendar className="h-4 w-4" />
-          <time dateTime={post.date}>
-            {new Date(post.date).toLocaleDateString("fr-FR", {
+          <time dateTime={post.createdAt}>
+            {new Date(post.createdAt).toLocaleDateString("fr-FR", {
               year: "numeric",
               month: "long",
               day: "numeric",

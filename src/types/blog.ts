@@ -2,7 +2,8 @@
 export interface BlogPost {
   id: string;
   title: string;
-  date: string; // ISO 8601 format
+  createdAt: string; // ISO 8601 format
+  updatedAt: string; // ISO 8601 format
   excerpt: string;
   image?: string;
   imageHint?: string;

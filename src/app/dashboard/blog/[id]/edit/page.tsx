@@ -55,14 +55,14 @@ export default function EditBlogPostPage() {
     const fetchPost = async () => {
         setPageLoading(true);
         try {
-            const response = await fetch(`http://localhost:3001/api/blog/${id}`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${id}`);
             if (!response.ok) throw new Error("Failed to fetch post");
             const postData = await response.json();
             form.reset(postData);
             setGenerationTopic(postData.title);
         } catch(error) {
             toast({ title: "Erreur", description: "Article non trouvé.", variant: "destructive" });
-            router.push('/blog');
+            router.push('/dashboard/blog');
         } finally {
             setPageLoading(false);
         }
@@ -96,7 +96,7 @@ export default function EditBlogPostPage() {
     if(typeof id !== 'string') return;
     setIsSubmitting(true);
     try {
-        const response = await fetch(`http://localhost:3001/api/blog/${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -107,7 +107,8 @@ export default function EditBlogPostPage() {
         title: "Article modifié",
         description: "L'article a été mis à jour avec succès.",
       });
-      router.push(`/blog`);
+      router.push(`/dashboard/blog`);
+      router.refresh();
     } catch (error) {
       console.error("Error updating blog post: ", error);
       toast({
@@ -153,7 +154,7 @@ export default function EditBlogPostPage() {
     <div className="flex flex-col gap-8">
         <div className="flex items-center gap-4">
              <Button asChild variant="outline" size="icon">
-                <Link href="/blog">
+                <Link href="/dashboard/blog">
                     <ArrowLeft className="h-4 w-4" />
                 </Link>
             </Button>
