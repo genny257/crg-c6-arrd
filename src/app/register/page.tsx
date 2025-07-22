@@ -61,27 +61,17 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
-import {
-  locations,
-  cells,
-  skillsList,
-  professionsList,
-  educationLevels,
-} from "@/lib/locations";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { RegisterUserInputSchema } from "@/ai/schemas/register-user-schema";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { countries } from "@/lib/countries";
 
 const totalSteps = 5;
 
-const allEducationLevels = educationLevels.flatMap((group) => group.levels);
-const allProfessions = professionsList.flatMap((group) => group.professions);
-
 type FormValues = z.infer<typeof RegisterUserInputSchema>;
+
 
 const allIdTypes = [
     "CNI",
@@ -198,87 +188,24 @@ const LocationSelector = ({
   form,
   title,
   fieldPrefix,
+  provinces,
+  departements,
+  communesCantons,
+  arrondissements,
+  quartiersVillages,
 }: {
   form: any;
   title: string;
   fieldPrefix: string;
+  provinces: string[];
+  departements: string[];
+  communesCantons: string[];
+  arrondissements: string[];
+  quartiersVillages: string[];
 }) => {
   const selectedProvince = form.watch(`${fieldPrefix}.province`);
   const selectedDepartement = form.watch(`${fieldPrefix}.departement`);
   const selectedCommuneCanton = form.watch(`${fieldPrefix}.communeCanton`);
-  const selectedArrondissement = form.watch(`${fieldPrefix}.arrondissement`);
-
-  const departements = selectedProvince
-    ? Object.keys(locations[selectedProvince as keyof typeof locations] || {})
-    : [];
-
-  const communes =
-    selectedProvince && selectedDepartement && (locations[selectedProvince as keyof typeof locations] as any)?.[selectedDepartement]
-      ? Object.keys(
-          (locations[selectedProvince as keyof typeof locations] as any)[
-            selectedDepartement
-          ]?.communes || {}
-        )
-      : [];
-
-  const cantons =
-    selectedProvince && selectedDepartement && (locations[selectedProvince as keyof typeof locations] as any)?.[selectedDepartement]
-      ? Object.keys(
-          (locations[selectedProvince as keyof typeof locations] as any)[
-            selectedDepartement
-          ]?.cantons || {}
-        )
-      : [];
-
-  const communesEtCantons = [...communes, ...cantons];
-
-  const arrondissements =
-    selectedProvince &&
-    selectedDepartement &&
-    selectedCommuneCanton &&
-    communes.includes(selectedCommuneCanton) &&
-    (locations[selectedProvince as keyof typeof locations] as any)?.[selectedDepartement]?.communes?.[selectedCommuneCanton]
-      ? Object.keys(
-          (locations[selectedProvince as keyof typeof locations] as any)[
-            selectedDepartement
-          ].communes[selectedCommuneCanton]?.arrondissements || {}
-        )
-      : [];
-
-  const quartiers =
-    selectedProvince &&
-    selectedDepartement &&
-    selectedCommuneCanton &&
-    arrondissements.length > 0 &&
-    selectedArrondissement &&
-    (locations[selectedProvince as keyof typeof locations] as any)?.[selectedDepartement]?.communes?.[selectedCommuneCanton]?.arrondissements?.[selectedArrondissement]
-      ? (locations[selectedProvince as keyof typeof locations] as any)[
-          selectedDepartement
-        ].communes[selectedCommuneCanton].arrondissements[
-          selectedArrondissement
-        ] || []
-      : selectedProvince &&
-        selectedDepartement &&
-        selectedCommuneCanton &&
-        communes.includes(selectedCommuneCanton) &&
-        (locations[selectedProvince as keyof typeof locations] as any)?.[selectedDepartement]?.communes?.[selectedCommuneCanton]
-      ? (locations[selectedProvince as keyof typeof locations] as any)[
-          selectedDepartement
-        ].communes[selectedCommuneCanton].quartiers || []
-      : [];
-
-  const villages =
-    selectedProvince &&
-    selectedDepartement &&
-    selectedCommuneCanton &&
-    cantons.includes(selectedCommuneCanton) &&
-    (locations[selectedProvince as keyof typeof locations] as any)?.[selectedDepartement]?.cantons?.[selectedCommuneCanton]
-      ? (locations[selectedProvince as keyof typeof locations] as any)[
-          selectedDepartement
-        ].cantons[selectedCommuneCanton] || []
-      : [];
-
-  const localitesFinales = [...quartiers, ...villages];
 
   return (
     <div className="grid gap-2 p-4 border rounded-lg">
@@ -289,7 +216,7 @@ const LocationSelector = ({
           fieldName={`${fieldPrefix}.province`}
           label="Province"
           placeholder="Sélectionner une province"
-          options={Object.keys(locations)}
+          options={provinces}
           onValueChange={(value) => {
             form.setValue(`${fieldPrefix}.province`, value);
             form.setValue(`${fieldPrefix}.departement`, "");
@@ -317,7 +244,7 @@ const LocationSelector = ({
           fieldName={`${fieldPrefix}.communeCanton`}
           label="Commune ou Canton"
           placeholder="Sélectionner une commune/canton"
-          options={communesEtCantons}
+          options={communesCantons}
           disabled={!selectedDepartement}
           onValueChange={(value) => {
             form.setValue(`${fieldPrefix}.communeCanton`, value);
@@ -331,7 +258,7 @@ const LocationSelector = ({
           label="Arrondissement"
           placeholder="Sélectionner un arrondissement"
           options={arrondissements}
-          disabled={!selectedCommuneCanton || !communes.includes(selectedCommuneCanton)}
+          disabled={!selectedCommuneCanton}
           onValueChange={(value) => {
             form.setValue(`${fieldPrefix}.arrondissement`, value);
             form.setValue(`${fieldPrefix}.quartierVillage`, "");
@@ -343,7 +270,7 @@ const LocationSelector = ({
             fieldName={`${fieldPrefix}.quartierVillage`}
             label="Quartier ou Village"
             placeholder="Sélectionner un quartier/village"
-            options={localitesFinales}
+            options={quartiersVillages}
             disabled={!selectedCommuneCanton}
             onValueChange={(value) => {
                 form.setValue(`${fieldPrefix}.quartierVillage`, value);
@@ -357,6 +284,8 @@ const LocationSelector = ({
 
 type UploadableField = "photo" | "idCardFront" | "idCardBack";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+
 export default function RegisterPage() {
   const [step, setStep] = React.useState(1);
   const { toast } = useToast();
@@ -368,6 +297,67 @@ export default function RegisterPage() {
   const [uploadProgress, setUploadProgress] = React.useState<
     Partial<Record<UploadableField, number>>
   >({});
+  
+  // State for dynamic lists
+  const [nationalities, setNationalities] = React.useState<string[]>([]);
+  const [educationLevels, setEducationLevels] = React.useState<string[]>([]);
+  const [professions, setProfessions] = React.useState<string[]>([]);
+  const [skills, setSkills] = React.useState<string[]>([]);
+  const [provinces, setProvinces] = React.useState<string[]>([]);
+  const [departements, setDepartements] = React.useState<string[]>([]);
+  const [communesCantons, setCommunesCantons] = React.useState<string[]>([]);
+  const [arrondissements, setArrondissements] = React.useState<string[]>([]);
+  const [quartiersVillages, setQuartiersVillages] = React.useState<string[]>([]);
+  const [cells, setCells] = React.useState<string[]>([]);
+
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [
+          nationalitiesRes,
+          educationLevelsRes,
+          professionsRes,
+          skillsRes,
+          provincesRes,
+          departementsRes,
+          communesCantonsRes,
+          arrondissementsRes,
+          quartiersVillagesRes,
+        ] = await Promise.all([
+          fetch(`${API_BASE_URL}/nationalitys`),
+          fetch(`${API_BASE_URL}/educationLevels`),
+          fetch(`${API_BASE_URL}/professions`),
+          fetch(`${API_BASE_URL}/skills`),
+          fetch(`${API_BASE_URL}/provinces`),
+          fetch(`${API_BASE_URL}/departements`),
+          fetch(`${API_BASE_URL}/communeCantons`),
+          fetch(`${API_BASE_URL}/arrondissements`),
+          fetch(`${API_BASE_URL}/quartierVillages`),
+        ]);
+        
+        setNationalities(await nationalitiesRes.json());
+        setEducationLevels(await educationLevelsRes.json());
+        setProfessions(await professionsRes.json());
+        setSkills(await skillsRes.json());
+        setProvinces(await provincesRes.json());
+        setDepartements(await departementsRes.json());
+        setCommunesCantons(await communesCantonsRes.json());
+        setArrondissements(await arrondissementsRes.json());
+        setQuartiersVillages(await quartiersVillagesRes.json());
+
+      } catch (error) {
+        console.error("Failed to fetch dynamic lists", error);
+        toast({
+          title: "Erreur de chargement",
+          description: "Impossible de charger les listes de sélection.",
+          variant: "destructive",
+        });
+      }
+    };
+    fetchData();
+  }, [toast]);
+
 
   const form = useForm<FormValues>({
     resolver: zodResolver(RegisterUserInputSchema),
@@ -473,47 +463,27 @@ export default function RegisterPage() {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     
-    // Handle "Autre" cause
     const finalCauses = data.causes?.filter(c => c !== 'Autre');
     if (otherCauseChecked && otherCause) {
         finalCauses?.push(otherCause);
     }
     const finalData = { ...data, causes: finalCauses };
 
-
     try {
-      // 1. Create the user account
-      const userResponse = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          firstName: finalData.firstName,
-          lastName: finalData.lastName,
-          email: finalData.email,
-          password: finalData.password,
-        }),
-      });
-
-      if (!userResponse.ok) {
-        const errorData = await userResponse.text();
-        throw new Error(errorData || "La création du compte a échoué.");
-      }
-
-      // 2. Create the volunteer profile
-      const volunteerResponse = await fetch('/api/volunteers', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(finalData),
       });
 
-      if (!volunteerResponse.ok) {
-        const errorData = await volunteerResponse.text();
-        throw new Error(errorData || "L'enregistrement des informations du bénévole a échoué.");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "L'inscription a échoué.");
       }
       
       toast({
-        title: "Candidature Soumise",
-        description: "Votre inscription a été envoyée avec succès.",
+        title: "Inscription Réussie",
+        description: "Votre compte a été créé. Vous pouvez maintenant vous connecter.",
       });
       
       const signInResult = await signIn('credentials', {
@@ -535,10 +505,8 @@ export default function RegisterPage() {
 
     } catch (error: any) {
       toast({
-        title: "Erreur",
-        description:
-          error.message ||
-          "Une erreur est survenue lors de la soumission. Veuillez réessayer.",
+        title: "Erreur d'inscription",
+        description: error.message || "Une erreur est survenue. Veuillez réessayer.",
         variant: "destructive",
       });
     } finally {
@@ -709,7 +677,7 @@ export default function RegisterPage() {
                                                     </CommandItem>
                                                 </CommandEmpty>
                                                 <CommandGroup>
-                                                    {countries.map((country) => (
+                                                    {nationalities.map((country) => (
                                                         <CommandItem
                                                             value={country}
                                                             key={country}
@@ -973,6 +941,11 @@ export default function RegisterPage() {
                     form={form}
                     title="Lieu de résidence actuel"
                     fieldPrefix="residence"
+                    provinces={provinces}
+                    departements={departements}
+                    communesCantons={communesCantons}
+                    arrondissements={arrondissements}
+                    quartiersVillages={quartiersVillages}
                   />
                 </div>
               )}
@@ -1000,11 +973,7 @@ export default function RegisterPage() {
                                   role="combobox"
                                   className="w-full justify-between"
                                 >
-                                  {field.value
-                                    ? allEducationLevels.find(
-                                        (level) => level === field.value
-                                      ) || field.value
-                                    : "Sélectionner ou saisir un niveau..."}
+                                  {field.value || "Sélectionner ou saisir un niveau..."}
                                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
                               </FormControl>
@@ -1024,18 +993,15 @@ export default function RegisterPage() {
                                           "educationLevel",
                                           educationInputValue
                                         );
+                                        setEducationLevels(prev => [...prev, educationInputValue]);
                                         setEducationPopoverOpen(false);
                                       }}
                                     >
                                       Ajouter "{educationInputValue}"
                                     </CommandItem>
                                   </CommandEmpty>
-                                  {educationLevels.map((group) => (
-                                    <CommandGroup
-                                      key={group.group}
-                                      heading={group.group}
-                                    >
-                                      {group.levels.map((level) => (
+                                  <CommandGroup>
+                                      {educationLevels.map((level) => (
                                         <CommandItem
                                           key={level}
                                           value={level}
@@ -1059,7 +1025,6 @@ export default function RegisterPage() {
                                         </CommandItem>
                                       ))}
                                     </CommandGroup>
-                                  ))}
                                 </CommandList>
                               </Command>
                             </PopoverContent>
@@ -1085,11 +1050,7 @@ export default function RegisterPage() {
                                   role="combobox"
                                   className="w-full justify-between"
                                 >
-                                  {field.value
-                                    ? allProfessions.find(
-                                        (prof) => prof === field.value
-                                      ) || field.value
-                                    : "Sélectionner ou saisir une profession..."}
+                                  {field.value || "Sélectionner ou saisir une profession..."}
                                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
                               </FormControl>
@@ -1109,18 +1070,15 @@ export default function RegisterPage() {
                                           "profession",
                                           professionInputValue
                                         );
+                                        setProfessions(prev => [...prev, professionInputValue]);
                                         setProfessionPopoverOpen(false);
                                       }}
                                     >
                                       Ajouter "{professionInputValue}"
                                     </CommandItem>
                                   </CommandEmpty>
-                                  {professionsList.map((group) => (
-                                    <CommandGroup
-                                      key={group.group}
-                                      heading={group.group}
-                                    >
-                                      {group.professions.map((profession) => (
+                                  <CommandGroup>
+                                      {professions.map((profession) => (
                                         <CommandItem
                                           key={profession}
                                           value={profession}
@@ -1144,7 +1102,6 @@ export default function RegisterPage() {
                                         </CommandItem>
                                       ))}
                                     </CommandGroup>
-                                  ))}
                                 </CommandList>
                               </Command>
                             </PopoverContent>
@@ -1221,19 +1178,16 @@ export default function RegisterPage() {
                                 <CommandList>
                                   <CommandEmpty>
                                     <CommandItem
-                                      onSelect={() =>
-                                        handleSelectSkill(skillsInputValue)
-                                      }
+                                      onSelect={() => {
+                                        handleSelectSkill(skillsInputValue);
+                                        setSkills(prev => [...prev, skillsInputValue]);
+                                      }}
                                     >
                                       Ajouter "{skillsInputValue}"
                                     </CommandItem>
                                   </CommandEmpty>
-                                  {skillsList.map((group) => (
-                                    <CommandGroup
-                                      key={group.group}
-                                      heading={group.group}
-                                    >
-                                      {group.skills.map((skill) => (
+                                  <CommandGroup>
+                                      {skills.map((skill) => (
                                         <CommandItem
                                           key={skill}
                                           value={skill}
@@ -1253,7 +1207,6 @@ export default function RegisterPage() {
                                         </CommandItem>
                                       ))}
                                     </CommandGroup>
-                                  ))}
                                 </CommandList>
                               </Command>
                             </PopoverContent>

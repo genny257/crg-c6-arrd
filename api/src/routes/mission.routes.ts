@@ -179,4 +179,7 @@ router.route('/missions/:id')
   .put(missionController.updateMission)
   .delete(missionController.deleteMission);
 
+router.post('/missions/:id/suggest-volunteers', missionController.suggestVolunteersForMission);
+
+
 export default router;

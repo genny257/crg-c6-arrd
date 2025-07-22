@@ -1,6 +1,11 @@
 // src/controllers/mission.controller.ts
 import { Request, Response } from 'express';
 import * as missionService from '../services/mission.service';
+import { runFlow } from '@genkit-ai/flow';
+import { missionAssignmentFlow } from '../../src/ai/flows/mission-assignment-flow';
+import { configureGenkit } from '../../src/ai/flows/chatbot-flow';
+
+configureGenkit();
 
 /**
  * Récupère toutes les missions.
@@ -65,3 +70,15 @@ export const deleteMission = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Erreur lors de la suppression de la mission.', error });
   }
 };
+
+/**
+ * Suggerer des volontaires pour une mission.
+ */
+export const suggestVolunteersForMission = async (req: Request, res: Response) => {
+    try {
+        const suggestions = await runFlow(missionAssignmentFlow, { missionId: req.params.id });
+        res.status(200).json(suggestions);
+    } catch (error) {
+        res.status(500).json({ message: 'Erreur lors de la suggestion de volontaires.', error: (error as Error).message });
+    }
+}

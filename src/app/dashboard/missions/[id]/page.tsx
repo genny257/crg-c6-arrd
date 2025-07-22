@@ -9,7 +9,7 @@ import type { Volunteer } from "@/types/volunteer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Users, Calendar, MapPin, ClipboardList, Share2, PlusCircle, CheckCircle, Edit } from "lucide-react";
+import { ArrowLeft, Users, Calendar, MapPin, ClipboardList, Share2, PlusCircle, CheckCircle, Edit, Sparkles, Wand2, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { format } from "date-fns";
@@ -205,11 +205,82 @@ export default function MissionDetailPage() {
                            )}
                         </CardContent>
                     </Card>
+                    <VolunteerSuggestions missionId={mission.id} />
                 </div>
             </div>
         </div>
     );
 }
+
+const VolunteerSuggestions = ({ missionId }: { missionId: string }) => {
+    const [suggestions, setSuggestions] = React.useState<any[]>([]);
+    const [loading, setLoading] = React.useState(false);
+    const { toast } = useToast();
+
+    const handleSuggest = async () => {
+        setLoading(true);
+        setSuggestions([]);
+        try {
+            const response = await fetch(`/api/missions/${missionId}/suggest-volunteers`, {
+                method: 'POST',
+            });
+            if (!response.ok) {
+                throw new Error('Failed to get suggestions');
+            }
+            const data = await response.json();
+            setSuggestions(data.recommendations);
+        } catch (error) {
+            toast({ title: "Erreur", description: "Impossible de générer les suggestions.", variant: "destructive" });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <Card>
+            <CardHeader>
+                <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-headline flex items-center gap-2">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        Suggestions IA
+                    </CardTitle>
+                    <Button onClick={handleSuggest} disabled={loading} size="sm">
+                        {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+                        Suggérer des volontaires
+                    </Button>
+                </div>
+                <CardDescription>Laissez l'IA vous proposer les meilleurs profils pour cette mission.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                {loading && (
+                    <div className="space-y-4">
+                        {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}
+                    </div>
+                )}
+                {suggestions.length > 0 && (
+                     <div className="space-y-4">
+                        {suggestions.map((s, i) => (
+                             <div key={i} className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
+                                <div className="flex-1">
+                                    <p className="font-bold">{s.volunteerName}</p>
+                                    <p className="text-sm text-muted-foreground italic">"{s.justification}"</p>
+                                </div>
+                                <div className="text-right">
+                                     <p className="text-sm font-semibold">Score</p>
+                                     <Badge>{(s.matchScore * 100).toFixed(0)}%</Badge>
+                                </div>
+                                <Button size="sm" variant="outline">Contacter</Button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+                 {!loading && suggestions.length === 0 && (
+                    <p className="text-sm text-center text-muted-foreground py-4">Cliquez sur le bouton pour générer des suggestions.</p>
+                 )}
+            </CardContent>
+        </Card>
+    );
+};
 
 const MissionDetailSkeleton = () => (
     <div className="space-y-6">

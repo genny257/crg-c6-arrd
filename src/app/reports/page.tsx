@@ -14,14 +14,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
-// Mock Data
-const mockReports: Report[] = [
-    { id: '1', title: 'Rapport Annuel 2023', date: '2024-01-15T10:00:00Z', fileUrl: 'https://example.com/report1.pdf', visible: true },
-    { id: '2', title: 'Rapport Financier T1 2024', date: '2024-04-10T10:00:00Z', fileUrl: 'https://example.com/report2.pdf', visible: true },
-    { id: '3', title: 'Brouillon Rapport T2 2024', date: '2024-07-05T10:00:00Z', fileUrl: 'https://example.com/report3.pdf', visible: false },
-];
-
-
 export default function ReportsPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
@@ -32,8 +24,15 @@ export default function ReportsPage() {
   const fetchReports = React.useCallback(async () => {
     setLoading(true);
     try {
-      // TODO: Replace with API call to /api/reports
-      const reportsData = isAdmin ? mockReports : mockReports.filter(r => r.visible);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      let reportsData: Report[] = await response.json();
+      
+      if (!isAdmin) {
+        reportsData = reportsData.filter(r => r.visible);
+      }
         
       setReports(reportsData);
     } catch (error) {
