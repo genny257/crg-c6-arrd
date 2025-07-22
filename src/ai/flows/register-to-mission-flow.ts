@@ -1,6 +1,6 @@
 'use server';
 
-import { ai } from '@/ai/genkit';
+import { ai } from '../genkit';
 import prisma from '@/lib/prisma';
 import {
   RegisterToMissionInputSchema,
