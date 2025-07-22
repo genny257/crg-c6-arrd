@@ -27,6 +27,7 @@ const mediaNavLinks = [
     { href: "/events", label: "Évènements" },
     { href: "/principes", label: "Principes CRG" },
     { href: "/hymne", label: "Hymne CRG" },
+    { href: "/mecenat", label: "Mécénat" },
 ]
 
 export function PublicLayout({ children }: { children: ReactNode }) {
