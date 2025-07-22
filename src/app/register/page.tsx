@@ -92,6 +92,8 @@ const allIdTypes = [
     "RECEPICE PASSPORT",
     "CARTE DE SÉJOURS",
     "RECEPICE CARTE DE SEJOURS",
+    "CNAMGS",
+    "CARTE D'IDENTITÉ SCOLAIRE",
 ];
 
 const foreignIdTypes = allIdTypes.filter(type => type.includes("PASSPORT") || type.includes("CARTE DE SÉJOURS"));
@@ -375,6 +377,7 @@ export default function RegisterPage() {
       phone: "",
       email: "",
       password: "",
+      confirmPassword: "",
       address: "",
       educationLevel: "",
       profession: "",
@@ -550,6 +553,11 @@ export default function RegisterPage() {
 
   const capitalizeFirstLetter = (string: string) => {
     if (!string) return string;
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+  
+  const capitalizeFirstLetterLowercaseRest = (string: string) => {
+    if (!string) return string;
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
 
@@ -623,7 +631,7 @@ export default function RegisterPage() {
                               <Input
                                 placeholder="Votre prénom"
                                 {...field}
-                                onChange={e => field.onChange(capitalizeFirstLetter(e.target.value))}
+                                onChange={e => field.onChange(capitalizeFirstLetterLowercaseRest(e.target.value))}
                               />
                             </FormControl>
                             <FormMessage />
@@ -715,7 +723,7 @@ export default function RegisterPage() {
                               <Input
                                 placeholder="Lieu de naissance"
                                 {...field}
-                                onChange={e => field.onChange(capitalizeFirstLetter(e.target.value))}
+                                onChange={e => field.onChange(capitalizeFirstLetterLowercaseRest(e.target.value))}
                               />
                             </FormControl>
                             <FormMessage />
@@ -837,24 +845,43 @@ export default function RegisterPage() {
                   <h3 className="text-lg font-semibold">
                     Coordonnées & Résidence
                   </h3>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Téléphone</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="tel"
+                              placeholder="Numéro de téléphone"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Adresse e-mail</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="nom@exemple.com"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Adresse e-mail</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="email"
-                                placeholder="nom@exemple.com"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
                       <FormField
                         control={form.control}
                         name="password"
@@ -872,8 +899,25 @@ export default function RegisterPage() {
                           </FormItem>
                         )}
                       />
+                      <FormField
+                        control={form.control}
+                        name="confirmPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Confirmer le mot de passe</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="password"
+                                placeholder="********"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
                   <FormField
                     control={form.control}
                     name="address"
@@ -886,7 +930,7 @@ export default function RegisterPage() {
                           <Textarea
                             placeholder="Ex: BP 123, Rue de la Paix, Immeuble B"
                             {...field}
-                            className="capitalize"
+                            onChange={e => field.onChange(capitalizeFirstLetter(e.target.value))}
                           />
                         </FormControl>
                         <FormMessage />
@@ -898,7 +942,6 @@ export default function RegisterPage() {
                     title="Lieu de résidence actuel"
                     fieldPrefix="residence"
                   />
-                </div>
                 </div>
               )}
 
@@ -1209,6 +1252,7 @@ export default function RegisterPage() {
                           <Textarea
                             placeholder="Si oui, précisez dans quel domaine et en quelle année..."
                             {...field}
+                            onChange={(e) => field.onChange(capitalizeFirstLetter(e.target.value))}
                           />
                         </FormControl>
                         <FormMessage />

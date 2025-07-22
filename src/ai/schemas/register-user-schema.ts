@@ -25,6 +25,7 @@ export const RegisterUserInputSchema = z.object({
   phone: z.string().min(1, "Le numéro de téléphone est requis."),
   email: z.string().email("L'adresse e-mail est invalide."),
   password: z.string().min(8, "Le mot de passe doit contenir au moins 8 caractères."),
+  confirmPassword: z.string().min(8, "La confirmation est requise."),
   address: z.string().min(5, "L'adresse complète est requise."),
   residence: LocationSchema,
 
@@ -46,4 +47,7 @@ export const RegisterUserInputSchema = z.object({
   termsAccepted: z.boolean().refine((val) => val === true, {
     message: "Vous devez accepter les termes et conditions.",
   }),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Les mots de passe ne correspondent pas.",
+  path: ["confirmPassword"], // path of error
 });
