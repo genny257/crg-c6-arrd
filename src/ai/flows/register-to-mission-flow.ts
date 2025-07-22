@@ -4,31 +4,12 @@
  * @fileOverview Flow to handle volunteer registration for a mission.
  *
  * - registerToMission - Handles the business logic for registering a volunteer.
- * - RegisterToMissionInput - The input type for the flow.
- * - RegisterToMissionOutput - The return type for the flow.
  */
 import { ai } from '@/ai/genkit';
-import { z } from 'zod';
 import prisma from '@/lib/prisma';
+import type { RegisterToMissionInput, RegisterToMissionOutput } from '@/ai/schemas/register-to-mission-schema';
+import { RegisterToMissionInputSchema, RegisterToMissionOutputSchema } from '@/ai/schemas/register-to-mission-schema';
 
-export const RegisterToMissionInputSchema = z.object({
-  missionId: z.string().describe('The ID of the mission.'),
-  matricule: z
-    .string()
-    .min(1, 'Le matricule est requis.')
-    .describe('The matricule of the volunteer.'),
-});
-export type RegisterToMissionInput = z.infer<
-  typeof RegisterToMissionInputSchema
->;
-
-export const RegisterToMissionOutputSchema = z.object({
-  success: z.boolean(),
-  message: z.string(),
-});
-export type RegisterToMissionOutput = z.infer<
-  typeof RegisterToMissionOutputSchema
->;
 
 // Exported wrapper function that calls the flow.
 export async function registerToMission(
