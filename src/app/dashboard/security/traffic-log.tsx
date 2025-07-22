@@ -8,8 +8,11 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { fr } from "date-fns/locale";
+import * as XLSX from 'xlsx';
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
 
+// This would be in a types file, e.g., src/types/security.ts
 type RequestLog = {
     id: string;
     ip: string;
@@ -24,7 +27,7 @@ const columns: ColumnDef<RequestLog>[] = [
     {
         accessorKey: "createdAt",
         header: "Date",
-        cell: ({ row }) => format(new Date(row.getValue("createdAt")), "dd/MM/yyyy HH:mm:ss", { locale: fr }),
+        cell: ({ row }) => format(new Date(row.getValue("createdAt")), "dd/MM/yyyy HH:mm:ss"),
     },
     {
         accessorKey: "ip",
@@ -32,24 +35,24 @@ const columns: ColumnDef<RequestLog>[] = [
     },
     {
         accessorKey: "method",
-        header: "Méthode",
+        header: "Method",
         cell: ({ row }) => {
             const method = row.getValue("method") as string;
-            const color = method === "GET" ? "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300" :
-                          method === "POST" ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300" :
-                          method === "PUT" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300" :
-                          method === "DELETE" ? "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300" :
-                          "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+            const color = method === "GET" ? "bg-blue-100 text-blue-800" :
+                          method === "POST" ? "bg-green-100 text-green-800" :
+                          method === "PUT" ? "bg-yellow-100 text-yellow-800" :
+                          method === "DELETE" ? "bg-red-100 text-red-800" :
+                          "bg-gray-100 text-gray-800";
             return <Badge variant="outline" className={color}>{method}</Badge>
         }
     },
     {
         accessorKey: "path",
-        header: "Chemin",
+        header: "Path",
     },
     {
         accessorKey: "statusCode",
-        header: "Statut",
+        header: "Status",
          cell: ({ row }) => {
             const status = row.getValue("statusCode") as number;
             const color = status >= 500 ? "bg-red-500" :
@@ -61,8 +64,8 @@ const columns: ColumnDef<RequestLog>[] = [
     },
     {
         accessorKey: "isThreat",
-        header: "Menace",
-        cell: ({ row }) => (row.getValue("isThreat") ? <Badge variant="destructive">Oui</Badge> : "Non"),
+        header: "Threat",
+        cell: ({ row }) => (row.getValue("isThreat") ? <Badge variant="destructive">Yes</Badge> : "No"),
     },
 ];
 
@@ -72,13 +75,42 @@ export function TrafficLogTab() {
     const [data, setData] = React.useState<RequestLog[]>([]);
     const [pageCount, setPageCount] = React.useState(0);
     const [pageIndex, setPageIndex] = React.useState(0);
-    const [loading, setLoading] = React.useState(true);
-    const pageSize = 15;
+    const pageSize = 15; // Or make this configurable
+
+    const handleExport = async () => {
+        if (!token) return;
+        toast({ title: "Exporting...", description: "Fetching all logs for export." });
+        try {
+            // Fetch all data without pagination for export
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/traffic?limit=99999`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error("Failed to fetch all traffic logs");
+            const result = await response.json();
+            
+            const dataToExport = result.data.map((log: RequestLog) => ({
+                Date: format(new Date(log.createdAt), "dd/MM/yyyy HH:mm:ss"),
+                IP: log.ip,
+                Method: log.method,
+                Path: log.path,
+                Status: log.statusCode,
+                Threat: log.isThreat ? "Yes" : "No",
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Traffic Logs");
+            XLSX.writeFile(workbook, "traffic_logs.xlsx");
+
+            toast({ title: "Export Successful", description: "Traffic logs have been downloaded." });
+        } catch (error) {
+            toast({ title: "Export Error", description: "Could not export traffic logs.", variant: "destructive" });
+        }
+    };
 
     React.useEffect(() => {
         const fetchData = async () => {
             if (!token) return;
-            setLoading(true);
             try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/traffic?page=${pageIndex + 1}&limit=${pageSize}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -89,22 +121,27 @@ export function TrafficLogTab() {
                 setPageCount(Math.ceil(result.total / pageSize));
             } catch (error) {
                 toast({ title: "Error", description: "Could not fetch traffic logs.", variant: "destructive" });
-            } finally {
-                setLoading(false);
             }
         };
         fetchData();
     }, [token, pageIndex, toast]);
 
     return (
-        <DataTable
-            columns={columns}
-            data={data}
-            pageCount={pageCount}
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            onPageChange={setPageIndex}
-            loading={loading}
-        />
+        <>
+            <DataTable
+                columns={columns}
+                data={data}
+                pageCount={pageCount}
+                pageIndex={pageIndex}
+                pageSize={pageSize}
+                onPageChange={setPageIndex}
+            />
+            <div className="flex justify-end mt-4">
+                <Button onClick={handleExport}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Export to Excel
+                </Button>
+            </div>
+        </>
     );
 }

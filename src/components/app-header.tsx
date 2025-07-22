@@ -1,3 +1,4 @@
+
 "use client"
 import Link from "next/link"
 import { CircleUser, Search } from "lucide-react"
@@ -17,6 +18,7 @@ import { useAuth } from "@/hooks/use-auth"
 
 export function AppHeader() {
   const { user, logout } = useAuth();
+  const roleDisplay = user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase() : 'Mon Compte';
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
@@ -43,7 +45,7 @@ export function AppHeader() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>
-              {user ? `Connecté en tant que ${user.role}` : 'Mon Compte'}
+              {user ? `Connecté (${roleDisplay})` : 'Mon Compte'}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
