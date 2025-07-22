@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { ElementType } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 type Member = {
     name: string;
@@ -133,7 +134,8 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => (
 
 
 export default function TeamPage() {
-    const { user, loading: authLoading } = useAuth();
+    const { user, loading: authLoading, token } = useAuth();
+    const { toast } = useToast();
     const router = useRouter();
     const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
     const [loading, setLoading] = useState(true);
@@ -153,39 +155,41 @@ export default function TeamPage() {
     }, [user, authLoading, router]);
 
     useEffect(() => {
+        if (!token) return;
+        const fetchFilters = async () => {
+            try {
+                const [skillsRes, professionsRes] = await Promise.all([
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills`),
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/professions`),
+                ]);
+                setAllSkills(await skillsRes.json());
+                setAllProfessions(await professionsRes.json());
+            } catch (error) {
+                console.error("Failed to fetch filters", error);
+                toast({ title: "Erreur", description: "Impossible de charger les filtres.", variant: "destructive" });
+            }
+        };
+
         const fetchVolunteers = async () => {
             setLoading(true);
             try {
-                // TODO: Replace with your actual API call:
-                // const response = await fetch('/api/volunteers?status=Actif');
-                // const volunteersData = await response.json();
-                
-                // Using mock data for now
-                const volunteersData: Volunteer[] = [
-                    { id: '1', firstName: 'Alice', lastName: 'Dubois', email: 'alice.d@example.com', status: 'Actif', createdAt: '2024-07-20T10:00:00Z', termsAccepted: true, address: '', phone: '', birthDate: '', assignedCell: 'Nzeng-Ayong Lac', skills: ['Secourisme'], profession: 'Infirmier(e)', photo: 'https://placehold.co/100x100.png' },
-                    { id: '2', firstName: 'Bob', lastName: 'Martin', email: 'bob.m@example.com', status: 'Actif', createdAt: '2024-07-19T11:00:00Z', termsAccepted: true, address: '', phone: '', birthDate: '', assignedCell: 'PK6-PK9', skills: ['Logistique'], profession: 'Chauffeur', photo: 'https://placehold.co/100x100.png' },
-                ];
-                
-                setVolunteers(volunteersData);
-
-                const skills = new Set<string>();
-                const professions = new Set<string>();
-                volunteersData.forEach(v => {
-                    v.skills?.forEach(skill => skills.add(skill));
-                    if (v.profession) professions.add(v.profession);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/volunteers`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
-                setAllSkills(Array.from(skills).sort());
-                setAllProfessions(Array.from(professions).sort());
-
+                if (!response.ok) throw new Error("Failed to fetch volunteers");
+                const volunteersData = await response.json();
+                setVolunteers(volunteersData.filter((v: Volunteer) => v.status === 'Actif'));
             } catch (error) {
                 console.error("Error fetching active volunteers: ", error);
+                toast({ title: "Erreur", description: "Impossible de charger les volontaires.", variant: "destructive" });
             } finally {
                 setLoading(false);
             }
         };
 
+        fetchFilters();
         fetchVolunteers();
-    }, []);
+    }, [token, toast]);
     
     const filteredAndSortedVolunteers = useMemo(() => {
         let sortedVolunteers = [...volunteers];
