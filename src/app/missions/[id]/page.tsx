@@ -42,8 +42,7 @@ export default function PublicMissionPage() {
             if (typeof id !== 'string') return;
             setLoading(true);
             try {
-                // TODO: Replace with API call to /api/missions/{id}
-                const response = await fetch(`http://localhost:3001/api/missions/${id}`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions/${id}`);
                  if (!response.ok) {
                     throw new Error('Mission not found');
                 }
@@ -79,6 +78,10 @@ export default function PublicMissionPage() {
             setRegistrationResult(result);
             if (result.success) {
                 setMatricule("");
+                // Refresh mission data to update participant count
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions/${id}`);
+                const updatedMission = await response.json();
+                setMission(updatedMission);
             }
         } catch (error) {
             console.error("Registration error:", error);

@@ -1,5 +1,7 @@
 
 
+import type { Volunteer } from './volunteer';
+
 export interface Mission {
   id: string;
   title: string;
@@ -9,6 +11,6 @@ export interface Mission {
   endDate: string;   // ISO 8601 format
   status: 'Planifiée' | 'En cours' | 'Terminée' | 'Annulée';
   requiredSkills: string[];
-  participants?: string[]; // Array of volunteer IDs (Firestore document IDs)
+  participants?: Volunteer[]; // Now an array of Volunteer objects
   maxParticipants?: number;
 }

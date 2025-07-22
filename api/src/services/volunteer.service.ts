@@ -26,6 +26,13 @@ export const getVolunteerById = async (id: string): Promise<Volunteer | null> =>
     });
 };
 
+export const getVolunteerByMatricule = async (matricule: string): Promise<Volunteer | null> => {
+    return await prisma.volunteer.findUnique({
+        where: { matricule },
+    });
+};
+
+
 export const updateVolunteerStatus = async (id: string, status: VolunteerStatus): Promise<Volunteer> => {
     return await prisma.volunteer.update({
         where: { id },
