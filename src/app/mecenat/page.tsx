@@ -1,14 +1,72 @@
 
 "use client"
 
+import * as React from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useToast } from "@/hooks/use-toast";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Building, HandHeart, CheckCircle2 } from "lucide-react";
+import { Building, HandHeart, CheckCircle2, Loader2 } from "lucide-react";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
+const sponsorshipSchema = z.object({
+  companyName: z.string().min(1, "Le nom de l'entreprise est requis"),
+  contactName: z.string().min(1, "Le nom du contact est requis"),
+  email: z.string().email("L'adresse e-mail est invalide"),
+  phone: z.string().optional(),
+  message: z.string().min(1, "Le message ne peut pas être vide"),
+});
+
+type SponsorshipFormValues = z.infer<typeof sponsorshipSchema>;
 
 export default function MecenatPage() {
+  const [isSubmitted, setIsSubmitted] = React.useState(false);
+  const { toast } = useToast();
+
+  const form = useForm<SponsorshipFormValues>({
+    resolver: zodResolver(sponsorshipSchema),
+    defaultValues: {
+      companyName: "",
+      contactName: "",
+      email: "",
+      phone: "",
+      message: "",
+    },
+  });
+
+  const onSubmit: SubmitHandler<SponsorshipFormValues> = async (data) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/sponsorships`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("La soumission a échoué.");
+      }
+      
+      setIsSubmitted(true);
+      form.reset();
+
+    } catch (error) {
+        console.error("Sponsorship form error:", error);
+        toast({
+            title: "Erreur",
+            description: "Une erreur est survenue. Veuillez réessayer.",
+            variant: "destructive",
+        });
+    }
+  };
+
+
   return (
     <div className="space-y-16">
       <section className="text-center">
@@ -68,39 +126,48 @@ export default function MecenatPage() {
                 </li>
             </ul>
         </div>
-        <Card>
-            <CardHeader>
-                <CardTitle className="font-headline text-2xl">Contactez notre équipe Partenariats</CardTitle>
-                <CardDescription>Discutons ensemble d'un partenariat sur mesure. Laissez-nous vos coordonnées et nous vous recontacterons rapidement.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                 <form className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="contact-name">Nom du contact</Label>
-                            <Input id="contact-name" placeholder="Prénom et Nom" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="company-name">Nom de l'entreprise</Label>
-                            <Input id="company-name" placeholder="Votre entreprise" />
-                        </div>
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="email">Adresse e-mail professionnelle</Label>
-                        <Input id="email" type="email" placeholder="contact@entreprise.com" />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="phone">Numéro de téléphone</Label>
-                        <Input id="phone" type="tel" placeholder="Votre numéro" />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="message">Votre message</Label>
-                        <Textarea id="message" placeholder="Comment aimeriez-vous nous soutenir ?" rows={4} />
-                    </div>
-                    <Button type="submit" className="w-full">Envoyer la demande</Button>
-                </form>
-            </CardContent>
-        </Card>
+         {isSubmitted ? (
+            <Card className="flex flex-col items-center justify-center text-center p-8">
+                <CheckCircle2 className="h-16 w-16 text-green-500 mb-4" />
+                <CardTitle className="font-headline text-2xl">Demande envoyée !</CardTitle>
+                <CardDescription className="mt-2">Merci pour votre intérêt. Notre équipe vous recontactera dans les plus brefs délais.</CardDescription>
+                <Button onClick={() => setIsSubmitted(false)} className="mt-6">Faire une autre demande</Button>
+            </Card>
+        ) : (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline text-2xl">Contactez notre équipe Partenariats</CardTitle>
+                    <CardDescription>Discutons ensemble d'un partenariat sur mesure. Laissez-nous vos coordonnées et nous vous recontacterons rapidement.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <FormField control={form.control} name="contactName" render={({ field }) => (
+                                    <FormItem><FormLabel>Nom du contact</FormLabel><FormControl><Input placeholder="Prénom et Nom" {...field} /></FormControl><FormMessage /></FormItem>
+                                )} />
+                                <FormField control={form.control} name="companyName" render={({ field }) => (
+                                    <FormItem><FormLabel>Nom de l'entreprise</FormLabel><FormControl><Input placeholder="Votre entreprise" {...field} /></FormControl><FormMessage /></FormItem>
+                                )} />
+                            </div>
+                            <FormField control={form.control} name="email" render={({ field }) => (
+                                <FormItem><FormLabel>Adresse e-mail professionnelle</FormLabel><FormControl><Input type="email" placeholder="contact@entreprise.com" {...field} /></FormControl><FormMessage /></FormItem>
+                            )} />
+                             <FormField control={form.control} name="phone" render={({ field }) => (
+                                <FormItem><FormLabel>Numéro de téléphone</FormLabel><FormControl><Input type="tel" placeholder="Votre numéro (optionnel)" {...field} /></FormControl><FormMessage /></FormItem>
+                            )} />
+                            <FormField control={form.control} name="message" render={({ field }) => (
+                                <FormItem><FormLabel>Votre message</FormLabel><FormControl><Textarea placeholder="Comment aimeriez-vous nous soutenir ?" rows={4} {...field} /></FormControl><FormMessage /></FormItem>
+                            )} />
+                            <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                                {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Envoyer la demande
+                            </Button>
+                        </form>
+                    </Form>
+                </CardContent>
+            </Card>
+        )}
       </section>
     </div>
   );

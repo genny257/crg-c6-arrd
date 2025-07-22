@@ -13,6 +13,7 @@ import reportRoutes from './routes/report.routes';
 import genericRoutes from './routes/generic.routes';
 import donationRoutes from './routes/donation.routes';
 import userRoutes from './routes/user.routes';
+import sponsorshipRoutes from './routes/sponsorship.routes';
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -75,6 +76,7 @@ app.use('/api', reportRoutes);
 app.use('/api', genericRoutes);
 app.use('/api', donationRoutes);
 app.use('/api', userRoutes);
+app.use('/api', sponsorshipRoutes);
 
 // Route de base pour vérifier que le serveur fonctionne
 app.get('/', (req, res) => {

@@ -10,245 +10,256 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ENUMS
-
-enum MissionStatus {
-  Planifiee
-  En_cours
-  Terminee
-  Annulee
-}
-
-enum DonationType {
-  Ponctuel
-  Mensuel
-}
-
-enum DonationMethod {
-  Mobile_Money
-  Carte_Bancaire
-}
-
-enum DonationStatus {
-  Confirme
-  En_attente
-  Echoue
-}
-
-enum EventStatus {
-  A_venir
-  Termine
-  Annule
-}
-
-enum VolunteerStatus {
-  En_attente
-  Actif
-  Inactif
-  Rejete
-}
-
-enum Sex {
-  masculin
-  feminin
-}
-
-enum MaritalStatus {
-  celibataire
-  marie
-  divorce
-  veuf
-}
-
-enum ArchiveItemType {
-  folder
-  document
-  spreadsheet
-  image
-  video
-  audio
-  pdf
-  archive
-  text
-  unknown
-}
-
-// MODELS
-
+// User Model: Represents both administrators and volunteers
 model User {
-  id                String         @id @default(cuid())
-  firstName         String
-  lastName          String
-  email             String         @unique
-  phone             String?
-  password          String
-  role              UserRole       @default(USER)
+  id                      String    @id @default(cuid())
+  email                   String    @unique
+  password                String
+  firstName               String
+  lastName                String
+  role                    UserRole  @default(VOLUNTEER)
+  status                  UserStatus @default(PENDING)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  // Volunteer-specific profile information
+  matricule               String?   @unique
+  birthDate               DateTime?
+  birthPlace              String?
+  sex                     String?
+  maritalStatus           String?
+  idType                  String?
+  idNumber                String?
+  phone                   String?
+  address                 String?
   
-  // Volunteer Profile Fields
-  matricule         String?        @unique
-  nationality       Nationality?   @relation(fields: [nationalityId], references: [id])
-  nationalityId     String?
-  birthDate         DateTime?
-  birthPlace        String?
-  sex               Sex?
-  maritalStatus     MaritalStatus?
-  idType            String?
-  idNumber          String?
-  address           String?
-  educationLevel    EducationLevel? @relation(fields: [educationLevelId], references: [id])
-  educationLevelId  String?
-  profession        Profession?    @relation(fields: [professionId], references: [id])
-  professionId      String?
-  skills            Skill[]        @relation("UserSkills")
-  volunteerExperience String?
-  availability      String[]
-  causes            String[]
-  assignedCell      String?
-  residenceProvince String?
-  residenceDepartement String?
-  residenceCommuneCanton String?
-  residenceArrondissement String?
-  residenceQuartierVillage String?
-  photo             String?
-  idCardFront       String?
-  idCardBack        String?
-  termsAccepted     Boolean?       @default(false)
-  status            VolunteerStatus? @default(En_attente)
+  residenceProvince         String?
+  residenceDepartement      String?
+  residenceCommuneCanton    String?
+  residenceArrondissement   String?
+  residenceQuartierVillage  String?
+
+  professionId            String?
+  profession              Profession? @relation(fields: [professionId], references: [id])
   
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  missions          Mission[]      @relation("MissionParticipants")
+  educationLevelId        String?
+  educationLevel          EducationLevel? @relation(fields: [educationLevelId], references: [id])
+  
+  nationalityId           String?
+  nationality             Nationality? @relation(fields: [nationalityId], references: [id])
+
+  skills                  Skill[]   @relation("UserSkills")
+  
+  volunteerExperience     String?
+  availability            String[]
+  causes                  String[]
+  assignedCell            String?
+
+  photo                   String?
+  idCardFront             String?
+  idCardBack              String?
+
+  termsAccepted           Boolean?
+
+  // Relationships
+  missions                Mission[] @relation("MissionParticipants")
+  posts                   Post[]    // If users can author blog posts
 }
 
 enum UserRole {
-  USER
-  ADMIN
   SUPERADMIN
+  ADMIN
+  VOLUNTEER
 }
 
-model Skill {
-  id          String      @id @default(cuid())
-  name        String      @unique
-  volunteers  User[]      @relation("UserSkills")
+enum UserStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+  REJECTED
 }
 
-
-model Profession {
-  id          String      @id @default(cuid())
-  name        String      @unique
-  volunteers  User[]
-}
-
-model EducationLevel {
-  id          String      @id @default(cuid())
-  name        String      @unique
-  volunteers  User[]
-}
-
-model Nationality {
-  id          String      @id @default(cuid())
-  name        String      @unique
-  volunteers  User[]
-}
-
-model Province {
-  id          String      @id @default(cuid())
-  name        String      @unique
-}
-
-
-model Departement {
-  id          String      @id @default(cuid())
-  name        String      @unique
-}
-
-model CommuneCanton {
-  id          String      @id @default(cuid())
-  name        String      @unique
-}
-
-model Arrondissement {
-  id          String      @id @default(cuid())
-  name        String      @unique
-}
-
-model QuartierVillage {
-  id          String      @id @default(cuid())
-  name        String      @unique
-}
 
 model Mission {
-  id              String        @id @default(cuid())
+  id              String   @id @default(cuid())
   title           String
   description     String
   location        String
   startDate       DateTime
   endDate         DateTime
-  status          MissionStatus @default(Planifiee)
+  status          MissionStatus @default(PLANNED)
   requiredSkills  String[]
   maxParticipants Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
   participants    User[]   @relation("MissionParticipants")
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
 }
 
-model BlogPost {
-  id        String   @id @default(cuid())
-  title     String
-  date      DateTime
-  excerpt   String
-  image     String?
-  imageHint String?
-  slug      String   @unique
-  visible   Boolean  @default(false)
-  content   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum MissionStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
 }
+
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?
+  content     String
+  image       String?
+  imageHint   String?
+  visible     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  author      User     @relation(fields: [authorId], references: [id])
+  authorId    String
+}
+
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  date        DateTime
+  location    String
+  image       String?
+  imageHint   String?
+  status      EventStatus @default(UPCOMING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum EventStatus {
+  UPCOMING
+  COMPLETED
+  CANCELLED
+}
+
 
 model Report {
   id        String   @id @default(cuid())
   title     String
-  date      DateTime
   fileUrl   String
   visible   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Event {
-  id          String      @id @default(cuid())
-  title       String
-  date        DateTime
-  location    String
-  description String
-  image       String?
-  imageHint   String?
-  status      EventStatus @default(A_venir)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-}
-
 model Donation {
-  id        String         @id @default(cuid())
+  id        String   @id @default(cuid())
+  amount    Float
   name      String
   email     String
-  amount    Float
   type      DonationType
   method    DonationMethod
-  date      DateTime
-  status    DonationStatus @default(En_attente)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  status    DonationStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model ArchiveItem {
-  id        String          @id @default(cuid())
-  name      String
-  type      ArchiveItemType
-  parentId  String?
-  parent    ArchiveItem?    @relation("FolderChildren", fields: [parentId], references: [id])
-  children  ArchiveItem[]   @relation("FolderChildren")
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+enum DonationType {
+  ONE_TIME
+  MONTHLY
+}
+
+enum DonationMethod {
+  CREDIT_CARD
+  MOBILE_MONEY
+}
+
+enum DonationStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+model CorporateSponsorship {
+  id          String   @id @default(cuid())
+  companyName String
+  contactName String
+  email       String
+  phone       String?
+  message     String
+  status      SponsorshipStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum SponsorshipStatus {
+  PENDING
+  CONTACTED
+  IN_PROGRESS
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+// Reusable entities for dropdowns / relations
+model Skill {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[] @relation("UserSkills")
+}
+
+model Profession {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[]
+}
+
+model EducationLevel {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[]
+}
+
+model Nationality {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[]
+}
+
+// Location models
+model Province {
+  id           String         @id @default(cuid())
+  name         String         @unique
+  departements Departement[]
+}
+
+model Departement {
+  id              String            @id @default(cuid())
+  name            String
+  province        Province          @relation(fields: [provinceId], references: [id])
+  provinceId      String
+  communesCantons CommuneCanton[]
+  @@unique([name, provinceId])
+}
+
+model CommuneCanton {
+  id              String            @id @default(cuid())
+  name            String
+  departement     Departement       @relation(fields: [departementId], references: [id])
+  departementId   String
+  arrondissements Arrondissement[]
+  @@unique([name, departementId])
+}
+
+model Arrondissement {
+  id                String            @id @default(cuid())
+  name              String
+  communeCanton     CommuneCanton     @relation(fields: [communeCantonId], references: [id])
+  communeCantonId   String
+  quartiersVillages QuartierVillage[]
+  @@unique([name, communeCantonId])
+}
+
+model QuartierVillage {
+  id                String         @id @default(cuid())
+  name              String
+  arrondissement    Arrondissement? @relation(fields: [arrondissementId], references: [id])
+  arrondissementId  String?
+  @@unique([name, arrondissementId])
 }
