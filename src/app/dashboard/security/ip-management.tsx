@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react";
@@ -10,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Ban, Trash2, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 type BlockedIP = {
     id: string;
@@ -31,7 +33,7 @@ export function IpManagementTab() {
         if (!token) return;
         setLoading(true);
         try {
-            const response = await fetch('/api/admin/blocked-ips', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/blocked-ips`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!response.ok) throw new Error("Failed to fetch blocked IPs");
@@ -52,7 +54,7 @@ export function IpManagementTab() {
         e.preventDefault();
         setActionLoading(true);
         try {
-            const response = await fetch('/api/admin/blocked-ips', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/blocked-ips`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ip: newIp, reason }),
@@ -74,7 +76,7 @@ export function IpManagementTab() {
 
     const handleUnblockIp = async (id: string) => {
         try {
-            const response = await fetch(`/api/admin/blocked-ips/${id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/blocked-ips/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` },
             });
@@ -91,27 +93,27 @@ export function IpManagementTab() {
             <div className="md:col-span-2">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Currently Blocked IPs</CardTitle>
-                        <CardDescription>List of all IP addresses that are currently blocked from accessing the API.</CardDescription>
+                        <CardTitle>IP Bloquées Actuellement</CardTitle>
+                        <CardDescription>Liste de toutes les adresses IP actuellement bloquées de l'API.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>IP Address</TableHead>
-                                    <TableHead>Reason</TableHead>
-                                    <TableHead>Date Blocked</TableHead>
+                                    <TableHead>Adresse IP</TableHead>
+                                    <TableHead>Raison</TableHead>
+                                    <TableHead>Date de Blocage</TableHead>
                                     <TableHead className="text-right">Action</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {loading ? (
-                                    <TableRow><TableCell colSpan={4} className="text-center h-24">Loading...</TableCell></TableRow>
+                                    <TableRow><TableCell colSpan={4} className="text-center h-24">Chargement...</TableCell></TableRow>
                                 ) : blockedIps.map(ip => (
                                     <TableRow key={ip.id}>
                                         <TableCell className="font-mono">{ip.ip}</TableCell>
                                         <TableCell>{ip.reason || "N/A"}</TableCell>
-                                        <TableCell>{format(new Date(ip.createdAt), "dd/MM/yyyy")}</TableCell>
+                                        <TableCell>{format(new Date(ip.createdAt), "dd MMMM yyyy", { locale: fr })}</TableCell>
                                         <TableCell className="text-right">
                                             <Button variant="ghost" size="icon" onClick={() => handleUnblockIp(ip.id)}>
                                                 <Trash2 className="h-4 w-4 text-destructive" />
@@ -127,33 +129,33 @@ export function IpManagementTab() {
             <div>
                 <Card>
                     <CardHeader>
-                        <CardTitle>Block a New IP</CardTitle>
-                        <CardDescription>Manually add an IP address to the blocklist.</CardDescription>
+                        <CardTitle>Bloquer une nouvelle IP</CardTitle>
+                        <CardDescription>Ajoutez manuellement une adresse IP à la liste de blocage.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleBlockIp} className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="ip-address">IP Address</Label>
+                                <Label htmlFor="ip-address">Adresse IP</Label>
                                 <Input 
                                     id="ip-address" 
-                                    placeholder="e.g., 192.168.1.1" 
+                                    placeholder="Ex: 192.168.1.1" 
                                     value={newIp}
                                     onChange={(e) => setNewIp(e.target.value)}
                                     required
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="reason">Reason (Optional)</Label>
+                                <Label htmlFor="reason">Raison (Optionnel)</Label>
                                 <Input 
                                     id="reason" 
-                                    placeholder="e.g., Spamming"
+                                    placeholder="Ex: Spam"
                                     value={reason}
                                     onChange={(e) => setReason(e.target.value)}
                                 />
                             </div>
                             <Button type="submit" className="w-full" disabled={actionLoading}>
                                 {actionLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                <Ban className="mr-2 h-4 w-4" /> Block IP
+                                <Ban className="mr-2 h-4 w-4" /> Bloquer l'IP
                             </Button>
                         </form>
                     </CardContent>

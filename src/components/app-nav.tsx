@@ -22,6 +22,7 @@ import {
   Archive,
   FileText,
   Building,
+  Shield,
 } from "lucide-react"
 
 import {
@@ -61,6 +62,7 @@ export function AppNav() {
   const pathname = usePathname()
   const { user, logout } = useAuth();
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+  const isSuperAdmin = user?.role === 'SUPERADMIN';
   const [isMediaOpen, setIsMediaOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -123,13 +125,13 @@ export function AppNav() {
                     </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pl-8 py-1 space-y-1">
-                    <Link href="/blog" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/blog') || pathname.includes('/dashboard/blog')) && 'bg-sidebar-accent')}>
+                    <Link href="/dashboard/blog" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/blog') || pathname.includes('/dashboard/blog')) && 'bg-sidebar-accent')}>
                         Blog
                     </Link>
                     <Link href="/dashboard/reports" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/reports') || pathname.includes('/dashboard/reports')) && 'bg-sidebar-accent')}>
                         Rapports
                     </Link>
-                    <Link href="/events" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/events') || pathname.includes('/dashboard/events')) && 'bg-sidebar-accent')}>
+                    <Link href="/dashboard/events" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/events') || pathname.includes('/dashboard/events')) && 'bg-sidebar-accent')}>
                         Évènements
                     </Link>
                 </CollapsibleContent>
@@ -160,6 +162,16 @@ export function AppNav() {
       </SidebarContent>
       <SidebarFooter className="p-2">
         <SidebarMenu>
+             {isSuperAdmin && (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/security')} tooltip="Sécurité">
+                  <Link href="/dashboard/security">
+                    <Shield className="h-4 w-4" />
+                    <span>Sécurité</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
             <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/profile')} tooltip="Profil">
                     <Link href="/dashboard/profile">

@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -18,6 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "./skeleton"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -26,6 +28,7 @@ interface DataTableProps<TData, TValue> {
   pageIndex: number
   pageSize: number
   onPageChange: (pageIndex: number) => void
+  loading?: boolean
 }
 
 export function DataTable<TData, TValue>({
@@ -35,6 +38,7 @@ export function DataTable<TData, TValue>({
   pageIndex,
   pageSize,
   onPageChange,
+  loading = false,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -73,7 +77,15 @@ export function DataTable<TData, TValue>({
             ))}
             </TableHeader>
             <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {loading ? (
+                Array.from({ length: pageSize }).map((_, i) => (
+                    <TableRow key={i}>
+                        {columns.map((column, j) => (
+                             <TableCell key={j}><Skeleton className="h-5 w-full" /></TableCell>
+                        ))}
+                    </TableRow>
+                ))
+            ) : table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                 <TableRow
                     key={row.id}
@@ -89,7 +101,7 @@ export function DataTable<TData, TValue>({
             ) : (
                 <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                    No results.
+                    Aucun résultat.
                 </TableCell>
                 </TableRow>
             )}
@@ -101,20 +113,20 @@ export function DataTable<TData, TValue>({
             variant="outline"
             size="sm"
             onClick={() => onPageChange(pageIndex - 1)}
-            disabled={pageIndex === 0}
+            disabled={pageIndex === 0 || loading}
             >
-            Previous
+            Précédent
             </Button>
             <span className="text-sm">
-                Page {pageIndex + 1} of {pageCount}
+                Page {pageCount > 0 ? pageIndex + 1 : 0} sur {pageCount}
             </span>
             <Button
             variant="outline"
             size="sm"
             onClick={() => onPageChange(pageIndex + 1)}
-            disabled={pageIndex + 1 >= pageCount}
+            disabled={pageIndex + 1 >= pageCount || loading}
             >
-            Next
+            Suivant
             </Button>
       </div>
     </div>

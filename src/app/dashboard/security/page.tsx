@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -8,8 +9,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TrafficLogTab } from "./traffic-log";
+import { ThreatsLogTab } from "./threats-log";
+import { IpManagementTab } from "./ip-management";
 
-// This would be in a types file, e.g., src/types/security.ts
 interface SecurityStats {
     totalRequests: number;
     totalThreats: number;
@@ -18,7 +21,7 @@ interface SecurityStats {
 }
 
 export default function SecurityPage() {
-    const { user, token } = useAuth();
+    const { user, token, loading: authLoading } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
     
@@ -26,8 +29,7 @@ export default function SecurityPage() {
     const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
-        // Redirect if user is not a superadmin
-        if (user && user.role !== 'SUPERADMIN') {
+        if (!authLoading && (!user || user.role !== 'SUPERADMIN')) {
             toast({ title: "Accès non autorisé", description: "Vous n'avez pas les droits pour voir cette page.", variant: "destructive" });
             router.push('/dashboard');
             return;
@@ -37,7 +39,7 @@ export default function SecurityPage() {
             if (!token) return;
             setLoading(true);
             try {
-                const response = await fetch('/api/admin/stats', {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/stats`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response.ok) throw new Error("Failed to fetch stats");
@@ -54,10 +56,10 @@ export default function SecurityPage() {
         if (user && token) {
             fetchStats();
         }
-    }, [user, token, router, toast]);
+    }, [user, token, router, toast, authLoading]);
 
-    if (!user || user.role !== 'SUPERADMIN') {
-        return <div className="flex items-center justify-center h-full"><p>Redirection...</p></div>;
+    if (authLoading || (!user || user.role !== 'SUPERADMIN')) {
+        return <div className="flex items-center justify-center h-full"><p>Chargement...</p></div>;
     }
     
     if (loading) {
@@ -127,14 +129,14 @@ export default function SecurityPage() {
                     </div>
                 </TabsContent>
 
-                <TabsContent value="traffic">
-                    <p>Tableau des logs du trafic à venir.</p>
+                <TabsContent value="traffic" className="mt-4">
+                    <TrafficLogTab />
                 </TabsContent>
-                <TabsContent value="threats">
-                     <p>Tableau des menaces à venir.</p>
+                <TabsContent value="threats" className="mt-4">
+                     <ThreatsLogTab />
                 </TabsContent>
-                <TabsContent value="ip-management">
-                     <p>Interface de gestion des IP à venir.</p>
+                <TabsContent value="ip-management" className="mt-4">
+                     <IpManagementTab />
                 </TabsContent>
             </Tabs>
         </div>

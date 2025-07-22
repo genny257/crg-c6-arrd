@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react";
@@ -7,8 +8,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
-// This would be in a types file, e.g., src/types/security.ts
 type RequestLog = {
     id: string;
     ip: string;
@@ -23,7 +24,7 @@ const columns: ColumnDef<RequestLog>[] = [
     {
         accessorKey: "createdAt",
         header: "Date",
-        cell: ({ row }) => format(new Date(row.getValue("createdAt")), "dd/MM/yyyy HH:mm:ss"),
+        cell: ({ row }) => format(new Date(row.getValue("createdAt")), "dd/MM/yyyy HH:mm:ss", { locale: fr }),
     },
     {
         accessorKey: "ip",
@@ -31,24 +32,24 @@ const columns: ColumnDef<RequestLog>[] = [
     },
     {
         accessorKey: "method",
-        header: "Method",
+        header: "Méthode",
         cell: ({ row }) => {
             const method = row.getValue("method") as string;
-            const color = method === "GET" ? "bg-blue-100 text-blue-800" :
-                          method === "POST" ? "bg-green-100 text-green-800" :
-                          method === "PUT" ? "bg-yellow-100 text-yellow-800" :
-                          method === "DELETE" ? "bg-red-100 text-red-800" :
-                          "bg-gray-100 text-gray-800";
+            const color = method === "GET" ? "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300" :
+                          method === "POST" ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300" :
+                          method === "PUT" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300" :
+                          method === "DELETE" ? "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300" :
+                          "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
             return <Badge variant="outline" className={color}>{method}</Badge>
         }
     },
     {
         accessorKey: "path",
-        header: "Path",
+        header: "Chemin",
     },
     {
         accessorKey: "statusCode",
-        header: "Status",
+        header: "Statut",
          cell: ({ row }) => {
             const status = row.getValue("statusCode") as number;
             const color = status >= 500 ? "bg-red-500" :
@@ -60,8 +61,8 @@ const columns: ColumnDef<RequestLog>[] = [
     },
     {
         accessorKey: "isThreat",
-        header: "Threat",
-        cell: ({ row }) => (row.getValue("isThreat") ? <Badge variant="destructive">Yes</Badge> : "No"),
+        header: "Menace",
+        cell: ({ row }) => (row.getValue("isThreat") ? <Badge variant="destructive">Oui</Badge> : "Non"),
     },
 ];
 
@@ -71,13 +72,15 @@ export function TrafficLogTab() {
     const [data, setData] = React.useState<RequestLog[]>([]);
     const [pageCount, setPageCount] = React.useState(0);
     const [pageIndex, setPageIndex] = React.useState(0);
-    const pageSize = 15; // Or make this configurable
+    const [loading, setLoading] = React.useState(true);
+    const pageSize = 15;
 
     React.useEffect(() => {
         const fetchData = async () => {
             if (!token) return;
+            setLoading(true);
             try {
-                const response = await fetch(`/api/admin/traffic?page=${pageIndex + 1}&limit=${pageSize}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/traffic?page=${pageIndex + 1}&limit=${pageSize}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response.ok) throw new Error("Failed to fetch traffic logs");
@@ -86,6 +89,8 @@ export function TrafficLogTab() {
                 setPageCount(Math.ceil(result.total / pageSize));
             } catch (error) {
                 toast({ title: "Error", description: "Could not fetch traffic logs.", variant: "destructive" });
+            } finally {
+                setLoading(false);
             }
         };
         fetchData();
@@ -99,6 +104,7 @@ export function TrafficLogTab() {
             pageIndex={pageIndex}
             pageSize={pageSize}
             onPageChange={setPageIndex}
+            loading={loading}
         />
     );
 }
