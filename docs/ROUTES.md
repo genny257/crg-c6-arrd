@@ -56,38 +56,44 @@ Ces routes sont protégées et nécessitent une authentification.
 
 ## 2. Endpoints de l'API Backend (Express)
 
-Ces endpoints sont appelés par le frontend pour interagir avec la base de données. Ils sont définis dans `/api/src/routes`.
+Ces endpoints sont appelés par le frontend pour interagir avec la base de données. Ils sont définis dans `/api/src/routes`. Le préfixe de base pour toutes les routes de l'API est `/api`.
 
-### Missions (`/api/missions`)
--   `GET /api/missions` : Récupère la liste de toutes les missions.
--   `POST /api/missions` : Crée une nouvelle mission.
--   `GET /api/missions/:id` : Récupère une mission par son ID.
--   `PUT /api/missions/:id` : Met à jour une mission.
--   `DELETE /api/missions/:id` : Supprime une mission.
-
-### Volontaires (`/api/volunteers`)
--   `GET /api/volunteers` : Récupère la liste de tous les volontaires.
--   `POST /api/volunteers` : Crée un nouveau profil de volontaire.
--   `GET /api/volunteers/:id` : Récupère un volontaire par son ID.
--   `PUT /api/volunteers/:id` : Met à jour un volontaire.
--   `PATCH /api/volunteers/:id/status` : Met à jour le statut d'un volontaire.
--   `DELETE /api/volunteers/:id` : Supprime un volontaire.
-
-### Blog (`/api/blog`)
--   `GET /api/blog` : Récupère tous les articles.
--   `GET /api/blog/slug/:slug` : Récupère un article par son slug.
--   `POST /api/blog` : Crée un nouvel article.
--   `GET /api/blog/:id` : Récupère un article par son ID.
--   `PUT /api/blog/:id` : Met à jour un article.
--   `DELETE /api/blog/:id` : Supprime un article.
-
-### Événements (`/api/events`)
--   `GET /api/events` : Récupère tous les événements.
--   `POST /api/events` : Crée un nouvel événement.
--   `GET /api/events/:id` : Récupère un événement par son ID.
--   `PUT /api/events/:id` : Met à jour un événement.
--   `DELETE /api/events/:id` : Supprime un événement.
-
-### Authentification & Inscription
+### Authentification (gérée par Next.js)
 -   `POST /api/register` : Crée un nouvel utilisateur (compte de connexion).
 -   `POST /api/auth/signin` : Connecte un utilisateur (géré par NextAuth).
+
+### Missions (`/missions`)
+-   `GET /missions` : Récupère la liste de toutes les missions.
+-   `POST /missions` : Crée une nouvelle mission.
+-   `GET /missions/:id` : Récupère une mission par son ID.
+-   `PUT /missions/:id` : Met à jour une mission.
+-   `DELETE /missions/:id` : Supprime une mission.
+
+### Volontaires (`/volunteers`)
+-   `GET /volunteers` : Récupère la liste de tous les volontaires.
+-   `POST /volunteers` : Crée un nouveau profil de volontaire (après l'inscription).
+-   `GET /volunteers/:id` : Récupère un volontaire par son ID.
+-   `PUT /volunteers/:id` : Met à jour les informations d'un volontaire.
+-   `DELETE /volunteers/:id` : Supprime un volontaire.
+
+### Blog (`/blog`)
+-   `GET /blog` : Récupère tous les articles.
+-   `POST /blog` : Crée un nouvel article.
+-   `GET /blog/slug/:slug` : Récupère un article par son slug.
+-   `GET /blog/:id` : Récupère un article par son ID.
+-   `PUT /blog/:id` : Met à jour un article.
+-   `DELETE /blog/:id` : Supprime un article.
+
+### Événements (`/events`)
+-   `GET /events` : Récupère tous les événements.
+-   `POST /events` : Crée un nouvel événement.
+-   `GET /events/:id` : Récupère un événement par son ID.
+-   `PUT /events/:id` : Met à jour un événement.
+-   `DELETE /events/:id` : Supprime un événement.
+
+### Rapports (`/reports`)
+-   `GET /reports` : Récupère tous les rapports.
+-   `POST /reports` : Crée un nouveau rapport.
+-   `GET /reports/:id` : Récupère un rapport par son ID.
+-   `PUT /reports/:id` : Met à jour un rapport.
+-   `DELETE /reports/:id` : Supprime un rapport.

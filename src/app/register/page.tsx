@@ -419,6 +419,10 @@ export default function RegisterPage() {
   const [professionInputValue, setProfessionInputValue] = React.useState("");
   
   const [nationalityPopoverOpen, setNationalityPopoverOpen] = React.useState(false);
+  
+  const [otherCause, setOtherCause] = React.useState("");
+  const causes = form.watch('causes');
+  const otherCauseChecked = causes?.includes('Autre') ?? false;
 
   const handleNext = () => setStep((prev) => Math.min(prev + 1, totalSteps));
   const handlePrevious = () => setStep((prev) => Math.max(prev - 1, 1));
@@ -467,16 +471,25 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
+    
+    // Handle "Autre" cause
+    const finalCauses = data.causes?.filter(c => c !== 'Autre');
+    if (otherCauseChecked && otherCause) {
+        finalCauses?.push(otherCause);
+    }
+    const finalData = { ...data, causes: finalCauses };
+
+
     try {
       // 1. Create the user account
       const userResponse = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          password: data.password,
+          firstName: finalData.firstName,
+          lastName: finalData.lastName,
+          email: finalData.email,
+          password: finalData.password,
         }),
       });
 
@@ -489,7 +502,7 @@ export default function RegisterPage() {
       const volunteerResponse = await fetch('/api/volunteers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(finalData),
       });
 
       if (!volunteerResponse.ok) {
@@ -504,8 +517,8 @@ export default function RegisterPage() {
       
       const signInResult = await signIn('credentials', {
         redirect: false,
-        email: data.email,
-        password: data.password,
+        email: finalData.email,
+        password: finalData.password,
       });
 
       if (signInResult?.error) {
@@ -1274,58 +1287,44 @@ export default function RegisterPage() {
                       </FormItem>
                     )}
                   />
-                  <FormField
+                 <FormField
                     control={form.control}
                     name="causes"
                     render={() => (
                       <FormItem>
-                        <FormLabel>
-                          Dans quel(s) domaine(s) souhaiterez-vous servir ?
-                        </FormLabel>
+                        <FormLabel>Dans quel(s) domaine(s) souhaiterez-vous servir ?</FormLabel>
                         <div className="grid grid-cols-2 gap-4">
-                          {[
-                            "Secourisme",
-                            "Santé",
-                            "Education",
-                            "Assainissement",
-                            "Etude et projet",
-                          ].map((item) => (
+                          {["Secourisme", "Santé", "Education", "Assainissement", "Etude et projet", "Autre"].map((item) => (
                             <FormField
                               key={item}
                               control={form.control}
                               name="causes"
-                              render={({ field }) => {
-                                return (
-                                  <FormItem
-                                    key={item}
-                                    className="flex flex-row items-start space-x-3 space-y-0"
-                                  >
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value?.includes(item)}
-                                        onCheckedChange={(checked) => {
-                                          return checked
-                                            ? field.onChange([
-                                                ...(field.value || []),
-                                                item,
-                                              ])
-                                            : field.onChange(
-                                                field.value?.filter(
-                                                  (value) => value !== item
-                                                )
-                                              );
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="font-normal">
-                                      {item}
-                                    </FormLabel>
-                                  </FormItem>
-                                );
-                              }}
+                              render={({ field }) => (
+                                <FormItem key={item} className="flex flex-row items-start space-x-3 space-y-0">
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value?.includes(item)}
+                                      onCheckedChange={(checked) => {
+                                        return checked
+                                          ? field.onChange([...(field.value || []), item])
+                                          : field.onChange(field.value?.filter((value) => value !== item));
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">{item}</FormLabel>
+                                </FormItem>
+                              )}
                             />
                           ))}
                         </div>
+                        {otherCauseChecked && (
+                          <Input
+                            placeholder="Veuillez préciser"
+                            className="mt-2"
+                            value={otherCause}
+                            onChange={(e) => setOtherCause(e.target.value)}
+                          />
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}
