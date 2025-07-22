@@ -98,6 +98,102 @@ const allIdTypes = [
 
 const foreignIdTypes = allIdTypes.filter(type => type.includes("PASSPORT") || type.includes("CARTE DE SÉJOURS") || type.includes("RECEPICE CARTE DE SEJOURS"));
 
+const ComboboxSelector = ({
+  form,
+  fieldName,
+  label,
+  placeholder,
+  options,
+  onValueChange,
+  disabled = false,
+}: {
+  form: any;
+  fieldName: string;
+  label: string;
+  placeholder: string;
+  options: string[];
+  onValueChange: (value: string) => void;
+  disabled?: boolean;
+}) => {
+  const [popoverOpen, setPopoverOpen] = React.useState(false);
+  const [inputValue, setInputValue] = React.useState("");
+
+  return (
+    <FormField
+      control={form.control}
+      name={fieldName}
+      render={({ field }) => (
+        <FormItem className="flex flex-col">
+          <FormLabel>{label}</FormLabel>
+          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+            <PopoverTrigger asChild>
+              <FormControl>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  disabled={disabled}
+                  className={cn(
+                    "w-full justify-between",
+                    !field.value && "text-muted-foreground"
+                  )}
+                >
+                  {field.value || placeholder}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </FormControl>
+            </PopoverTrigger>
+            <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
+              <Command>
+                <CommandInput
+                  placeholder={`Rechercher ${label.toLowerCase()}...`}
+                  value={inputValue}
+                  onValueChange={setInputValue}
+                />
+                <CommandList>
+                  <CommandEmpty>
+                    <CommandItem
+                        onSelect={() => {
+                            onValueChange(inputValue);
+                            setPopoverOpen(false);
+                        }}
+                        >
+                        Ajouter "{inputValue}"
+                    </CommandItem>
+                  </CommandEmpty>
+                  <CommandGroup>
+                    {options.map((option) => (
+                      <CommandItem
+                        value={option}
+                        key={option}
+                        onSelect={() => {
+                          onValueChange(option);
+                          setPopoverOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            option === field.value
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                        {option}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+
+
 const LocationSelector = ({
   form,
   title,
@@ -117,7 +213,7 @@ const LocationSelector = ({
     : [];
 
   const communes =
-    selectedProvince && selectedDepartement
+    selectedProvince && selectedDepartement && (locations[selectedProvince as keyof typeof locations] as any)?.[selectedDepartement]
       ? Object.keys(
           (locations[selectedProvince as keyof typeof locations] as any)[
             selectedDepartement
@@ -126,7 +222,7 @@ const LocationSelector = ({
       : [];
 
   const cantons =
-    selectedProvince && selectedDepartement
+    selectedProvince && selectedDepartement && (locations[selectedProvince as keyof typeof locations] as any)?.[selectedDepartement]
       ? Object.keys(
           (locations[selectedProvince as keyof typeof locations] as any)[
             selectedDepartement
@@ -140,7 +236,8 @@ const LocationSelector = ({
     selectedProvince &&
     selectedDepartement &&
     selectedCommuneCanton &&
-    communes.includes(selectedCommuneCanton)
+    communes.includes(selectedCommuneCanton) &&
+    (locations[selectedProvince as keyof typeof locations] as any)?.[selectedDepartement]?.communes?.[selectedCommuneCanton]
       ? Object.keys(
           (locations[selectedProvince as keyof typeof locations] as any)[
             selectedDepartement
@@ -153,7 +250,8 @@ const LocationSelector = ({
     selectedDepartement &&
     selectedCommuneCanton &&
     arrondissements.length > 0 &&
-    selectedArrondissement
+    selectedArrondissement &&
+    (locations[selectedProvince as keyof typeof locations] as any)?.[selectedDepartement]?.communes?.[selectedCommuneCanton]?.arrondissements?.[selectedArrondissement]
       ? (locations[selectedProvince as keyof typeof locations] as any)[
           selectedDepartement
         ].communes[selectedCommuneCanton].arrondissements[
@@ -162,7 +260,8 @@ const LocationSelector = ({
       : selectedProvince &&
         selectedDepartement &&
         selectedCommuneCanton &&
-        communes.includes(selectedCommuneCanton)
+        communes.includes(selectedCommuneCanton) &&
+        (locations[selectedProvince as keyof typeof locations] as any)?.[selectedDepartement]?.communes?.[selectedCommuneCanton]
       ? (locations[selectedProvince as keyof typeof locations] as any)[
           selectedDepartement
         ].communes[selectedCommuneCanton].quartiers || []
@@ -172,7 +271,8 @@ const LocationSelector = ({
     selectedProvince &&
     selectedDepartement &&
     selectedCommuneCanton &&
-    cantons.includes(selectedCommuneCanton)
+    cantons.includes(selectedCommuneCanton) &&
+    (locations[selectedProvince as keyof typeof locations] as any)?.[selectedDepartement]?.cantons?.[selectedCommuneCanton]
       ? (locations[selectedProvince as keyof typeof locations] as any)[
           selectedDepartement
         ].cantons[selectedCommuneCanton] || []
@@ -184,165 +284,72 @@ const LocationSelector = ({
     <div className="grid gap-2 p-4 border rounded-lg">
       <h4 className="font-semibold">{title}</h4>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField
-          control={form.control}
-          name={`${fieldPrefix}.province`}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Province</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  form.setValue(`${fieldPrefix}.departement`, "");
-                  form.setValue(`${fieldPrefix}.communeCanton`, "");
-                  form.setValue(`${fieldPrefix}.arrondissement`, "");
-                  form.setValue(`${fieldPrefix}.quartierVillage`, "");
-                }}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner une province" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {Object.keys(locations).map((province) => (
-                    <SelectItem key={province} value={province}>
-                      {province}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+        <ComboboxSelector
+          form={form}
+          fieldName={`${fieldPrefix}.province`}
+          label="Province"
+          placeholder="Sélectionner une province"
+          options={Object.keys(locations)}
+          onValueChange={(value) => {
+            form.setValue(`${fieldPrefix}.province`, value);
+            form.setValue(`${fieldPrefix}.departement`, "");
+            form.setValue(`${fieldPrefix}.communeCanton`, "");
+            form.setValue(`${fieldPrefix}.arrondissement`, "");
+            form.setValue(`${fieldPrefix}.quartierVillage`, "");
+          }}
         />
-        <FormField
-          control={form.control}
-          name={`${fieldPrefix}.departement`}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Département</FormLabel>
-              <Select
-                disabled={!selectedProvince}
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  form.setValue(`${fieldPrefix}.communeCanton`, "");
-                  form.setValue(`${fieldPrefix}.arrondissement`, "");
-                  form.setValue(`${fieldPrefix}.quartierVillage`, "");
-                }}
-                value={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un département" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {departements.map((dep) => (
-                    <SelectItem key={dep} value={dep}>
-                      {dep}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+        <ComboboxSelector
+          form={form}
+          fieldName={`${fieldPrefix}.departement`}
+          label="Département"
+          placeholder="Sélectionner un département"
+          options={departements}
+          disabled={!selectedProvince}
+          onValueChange={(value) => {
+            form.setValue(`${fieldPrefix}.departement`, value);
+            form.setValue(`${fieldPrefix}.communeCanton`, "");
+            form.setValue(`${fieldPrefix}.arrondissement`, "");
+            form.setValue(`${fieldPrefix}.quartierVillage`, "");
+          }}
         />
-        <FormField
-          control={form.control}
-          name={`${fieldPrefix}.communeCanton`}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Commune ou Canton</FormLabel>
-              <Select
-                disabled={!selectedDepartement}
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  form.setValue(`${fieldPrefix}.arrondissement`, "");
-                  form.setValue(`${fieldPrefix}.quartierVillage`, "");
-                }}
-                value={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner une commune/canton" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {communesEtCantons.map((item) => (
-                    <SelectItem key={item} value={item}>
-                      {item}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+        <ComboboxSelector
+          form={form}
+          fieldName={`${fieldPrefix}.communeCanton`}
+          label="Commune ou Canton"
+          placeholder="Sélectionner une commune/canton"
+          options={communesEtCantons}
+          disabled={!selectedDepartement}
+          onValueChange={(value) => {
+            form.setValue(`${fieldPrefix}.communeCanton`, value);
+            form.setValue(`${fieldPrefix}.arrondissement`, "");
+            form.setValue(`${fieldPrefix}.quartierVillage`, "");
+          }}
         />
-        <FormField
-          control={form.control}
-          name={`${fieldPrefix}.arrondissement`}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Arrondissement</FormLabel>
-              <Select
-                disabled={
-                  !selectedCommuneCanton || !communes.includes(selectedCommuneCanton)
-                }
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  form.setValue(`${fieldPrefix}.quartierVillage`, "");
-                }}
-                value={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un arrondissement" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {arrondissements.map((arr) => (
-                    <SelectItem key={arr} value={arr}>
-                      {arr}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+        <ComboboxSelector
+          form={form}
+          fieldName={`${fieldPrefix}.arrondissement`}
+          label="Arrondissement"
+          placeholder="Sélectionner un arrondissement"
+          options={arrondissements}
+          disabled={!selectedCommuneCanton || !communes.includes(selectedCommuneCanton)}
+          onValueChange={(value) => {
+            form.setValue(`${fieldPrefix}.arrondissement`, value);
+            form.setValue(`${fieldPrefix}.quartierVillage`, "");
+          }}
         />
-        <FormField
-          control={form.control}
-          name={`${fieldPrefix}.quartierVillage`}
-          render={({ field }) => (
-            <FormItem className="md:col-span-2">
-              <FormLabel>Quartier ou Village</FormLabel>
-              <Select
-                disabled={!selectedCommuneCanton}
-                onValueChange={field.onChange}
-                value={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un quartier/village" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {localitesFinales.map((loc) => (
-                    <SelectItem key={loc} value={loc}>
-                      {loc}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="md:col-span-2">
+            <ComboboxSelector
+            form={form}
+            fieldName={`${fieldPrefix}.quartierVillage`}
+            label="Quartier ou Village"
+            placeholder="Sélectionner un quartier/village"
+            options={localitesFinales}
+            disabled={!selectedCommuneCanton}
+            onValueChange={(value) => {
+                form.setValue(`${fieldPrefix}.quartierVillage`, value);
+            }}
+            />
+        </div>
       </div>
     </div>
   );
@@ -675,7 +682,15 @@ export default function RegisterPage() {
                                         <Command>
                                             <CommandInput placeholder="Rechercher un pays..." />
                                             <CommandList>
-                                                <CommandEmpty>Aucun pays trouvé. Vous pouvez l'ajouter manuellement.</CommandEmpty>
+                                                <CommandEmpty>
+                                                    <CommandItem onSelect={() => {
+                                                        const currentInput = (document.querySelector('[cmdk-input]') as HTMLInputElement)?.value;
+                                                        form.setValue("nationality", currentInput);
+                                                        setNationalityPopoverOpen(false);
+                                                    }}>
+                                                        Ajouter "{ (document.querySelector('[cmdk-input]') as HTMLInputElement)?.value }"
+                                                    </CommandItem>
+                                                </CommandEmpty>
                                                 <CommandGroup>
                                                     {countries.map((country) => (
                                                         <CommandItem
@@ -971,7 +986,7 @@ export default function RegisterPage() {
                                   {field.value
                                     ? allEducationLevels.find(
                                         (level) => level === field.value
-                                      )
+                                      ) || field.value
                                     : "Sélectionner ou saisir un niveau..."}
                                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
@@ -1056,7 +1071,7 @@ export default function RegisterPage() {
                                   {field.value
                                     ? allProfessions.find(
                                         (prof) => prof === field.value
-                                      )
+                                      ) || field.value
                                     : "Sélectionner ou saisir une profession..."}
                                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
