@@ -8,5 +8,5 @@ export interface Event {
   image?: string;
   imageHint?: string;
   status: 'À venir' | 'Terminé' | 'Annulé';
+  href?: string;
 }
-

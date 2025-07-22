@@ -4,6 +4,8 @@ import * as eventController from '../controllers/event.controller';
 
 const router = Router();
 
+router.get('/events/featured', eventController.getFeaturedEvents);
+
 router.route('/events')
     .get(eventController.getEvents)
     .post(eventController.createEvent);

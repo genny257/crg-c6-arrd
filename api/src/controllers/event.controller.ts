@@ -11,6 +11,15 @@ export const getEvents = async (req: Request, res: Response) => {
     }
 };
 
+export const getFeaturedEvents = async (req: Request, res: Response) => {
+    try {
+        const events = await eventService.getFeaturedEvents();
+        res.json(events);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching featured events', error });
+    }
+};
+
 export const createEvent = async (req: Request, res: Response) => {
     try {
         const event = await eventService.createEvent(req.body);

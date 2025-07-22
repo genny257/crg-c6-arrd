@@ -17,6 +17,9 @@ import {
 import type { HomePageContent } from "@/types/homepage"
 import { Skeleton } from "@/components/ui/skeleton"
 import { PublicLayout } from "@/components/public-layout"
+import type { Event } from "@/types/event"
+import Autoplay from "embla-carousel-autoplay"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 
 const initialContent: HomePageContent = {
     heroTitle: "Comité du 6ème Arrondissement",
@@ -50,19 +53,25 @@ const actionIcons: { [key: string]: React.ElementType } = {
 
 export default function Home() {
   const [content, setContent] = React.useState<HomePageContent | null>(null);
+  const [featuredEvents, setFeaturedEvents] = React.useState<Event[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchContent = async () => {
       setLoading(true);
       try {
-        // Here you would fetch from your API:
-        // const response = await fetch('http://localhost:3001/api/content/home');
-        // const data = await response.json();
-        // setContent(data);
+        const [contentRes, eventsRes] = await Promise.all([
+           Promise.resolve(initialContent), // Mocking content fetch
+           fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/featured`)
+        ]);
+
+        setContent(contentRes);
         
-        // For now, we continue using initial static content
-        setContent(initialContent);
+        if(eventsRes.ok){
+            const eventsData = await eventsRes.json();
+            setFeaturedEvents(eventsData);
+        }
+
       } catch (error) {
         console.error("Error fetching home page content: ", error);
         setContent(initialContent); // Fallback to initial content on error
@@ -72,6 +81,18 @@ export default function Home() {
     };
     fetchContent();
   }, []);
+  
+  const carouselEvents = featuredEvents.length > 0 ? featuredEvents : [{
+        id: 'placeholder-1',
+        title: "Rejoignez nos actions",
+        image: "https://placehold.co/1200x800.png",
+        imageHint: "red cross volunteers",
+        href: "/events",
+        date: new Date().toISOString(),
+        location: "",
+        description: "",
+        status: "À venir"
+    }];
 
   const displayContent = content || initialContent;
 
@@ -79,22 +100,41 @@ export default function Home() {
     <PublicLayout>
       <main className="flex-1">
         <section className="w-full h-[60vh] md:h-[70vh] relative">
-            <Image
-                src="https://placehold.co/1200x800.png"
-                alt="Volontaires de la Croix-Rouge"
-                data-ai-hint="red cross volunteers"
-                fill
-                className="object-cover"
-                priority
-            />
-            <div className="absolute inset-0 bg-black/50" />
-            <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4">
+             <Carousel 
+                className="w-full h-full" 
+                plugins={[Autoplay({ delay: 5000 })]}
+                opts={{ loop: true }}
+            >
+                <CarouselContent className="h-full">
+                    {carouselEvents.map((event, index) => (
+                        <CarouselItem key={index} className="h-full">
+                            <Link href={event.href || `/events`}>
+                                <Image
+                                    src={event.image || "https://placehold.co/1200x800.png"}
+                                    alt={event.title}
+                                    data-ai-hint={event.imageHint}
+                                    fill
+                                    className="object-cover"
+                                    priority={index === 0}
+                                />
+                                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-8 text-white">
+                                    <h2 className="text-2xl md:text-4xl font-headline font-bold drop-shadow-lg">{event.title}</h2>
+                                </div>
+                            </Link>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+                <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2" />
+                <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2" />
+             </Carousel>
+            <div className="absolute inset-0 bg-black/50 pointer-events-none" />
+            <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4 pointer-events-none">
                 {loading ? (
                     <>
-                        <Skeleton className="h-16 w-3/4 mb-4" />
-                        <Skeleton className="h-8 w-1/2 mb-6" />
-                        <Skeleton className="h-5 w-full max-w-2xl mb-2" />
-                        <Skeleton className="h-5 w-2/3 max-w-2xl mb-8" />
+                        <Skeleton className="h-16 w-3/4 mb-4 bg-white/20" />
+                        <Skeleton className="h-8 w-1/2 mb-6 bg-white/20" />
+                        <Skeleton className="h-5 w-full max-w-2xl mb-2 bg-white/20" />
+                        <Skeleton className="h-5 w-2/3 max-w-2xl mb-8 bg-white/20" />
                     </>
                 ) : (
                     <>
@@ -109,7 +149,7 @@ export default function Home() {
                         </p>
                     </>
                 )}
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col sm:flex-row gap-4 pointer-events-auto">
                     <Button asChild size="lg">
                         <Link href="/register">Devenir Volontaire</Link>
                     </Button>

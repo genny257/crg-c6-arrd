@@ -6,6 +6,21 @@ export const getAllEvents = async () => {
     return await prisma.event.findMany({ orderBy: { date: 'desc' } });
 };
 
+export const getFeaturedEvents = async () => {
+    return await prisma.event.findMany({
+        where: {
+            image: {
+                not: null,
+            },
+            status: 'À venir',
+        },
+        orderBy: {
+            date: 'asc',
+        },
+        take: 3,
+    });
+};
+
 export const createEvent = async (data: any) => {
     return await prisma.event.create({ data });
 };
