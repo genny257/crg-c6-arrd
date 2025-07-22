@@ -1,4 +1,3 @@
-
 "use client"
 import * as React from "react";
 import { Button } from "@/components/ui/button";
@@ -18,33 +17,34 @@ import type { Donation } from "@/types/donation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { useAuth } from "@/hooks/use-auth";
 
 const getStatusBadgeVariant = (status: string) => {
     switch (status) {
         case 'Confirmé': return 'default';
-        case 'En attente': return 'secondary';
+        case 'En_attente': return 'secondary';
         case 'Échoué': return 'destructive';
         default: return 'outline';
     }
 };
 
-// Mock data
-const mockDonations: Donation[] = [
-    { id: '1', name: 'Jean Dupont', amount: 5000, type: 'Ponctuel', method: 'Mobile Money', date: '2024-07-15T10:00:00Z', status: 'Confirmé', email: 'jean.dupont@example.com' },
-    { id: '2', name: 'Marie Claire', amount: 10000, type: 'Mensuel', method: 'Carte Bancaire', date: '2024-07-14T11:00:00Z', status: 'En attente', email: 'marie.claire@example.com' },
-    { id: '3', name: 'Paul Martin', amount: 2000, type: 'Ponctuel', method: 'Mobile Money', date: '2024-07-13T12:00:00Z', status: 'Échoué', email: 'paul.martin@example.com' },
-];
 
 export default function DonationPage() {
+    const { token } = useAuth();
     const [donations, setDonations] = React.useState<Donation[]>([]);
     const [loading, setLoading] = React.useState(true);
     const { toast } = useToast();
 
     const fetchDonations = React.useCallback(async () => {
+        if (!token) return;
         setLoading(true);
         try {
-            // TODO: Replace with API call to /api/donations
-            setDonations(mockDonations);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error("Failed to fetch donations");
+
+            setDonations(await response.json());
         } catch (error) {
             console.error("Error fetching donations: ", error);
             toast({
@@ -55,7 +55,7 @@ export default function DonationPage() {
         } finally {
             setLoading(false);
         }
-    }, [toast]);
+    }, [toast, token]);
 
     React.useEffect(() => {
         fetchDonations();
@@ -104,10 +104,10 @@ export default function DonationPage() {
                                         <TableCell className="font-medium">{donation.name}</TableCell>
                                         <TableCell className="hidden md:table-cell">{donation.amount.toLocaleString('fr-FR')}</TableCell>
                                         <TableCell className="hidden lg:table-cell">
-                                            {format(new Date(donation.date), "d MMM yyyy", { locale: fr })}
+                                            {format(new Date(donation.createdAt), "d MMM yyyy", { locale: fr })}
                                         </TableCell>
                                         <TableCell>
-                                            <Badge variant={getStatusBadgeVariant(donation.status)}>{donation.status}</Badge>
+                                            <Badge variant={getStatusBadgeVariant(donation.status)}>{donation.status.replace('_', ' ')}</Badge>
                                         </TableCell>
                                         <TableCell>
                                         <DropdownMenu>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -11,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/hooks/use-auth";
 
 const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -23,22 +23,27 @@ const getStatusBadgeVariant = (status: string) => {
 
 
 export default function DashboardPage() {
+    const { token } = useAuth();
     const [stats, setStats] = React.useState({ volunteers: 0, missions: 0, donations: 0 });
     const [pendingVolunteers, setPendingVolunteers] = React.useState<Volunteer[]>([]);
     const [upcomingMissions, setUpcomingMissions] = React.useState<Mission[]>([]);
     const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
+        if (!token) return;
+
         const fetchData = async () => {
             setLoading(true);
             try {
-                // In a real app, you'd fetch this from multiple API endpoints
-                // For now, we simulate this with a slight delay
                 const [volunteersRes, missionsRes] = await Promise.all([
-                    fetch('http://localhost:3001/api/volunteers'),
-                    fetch('http://localhost:3001/api/missions')
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/volunteers`, { headers: { 'Authorization': `Bearer ${token}` }}),
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions`, { headers: { 'Authorization': `Bearer ${token}` }})
                 ]);
                 
+                if (!volunteersRes.ok || !missionsRes.ok) {
+                    throw new Error("Failed to fetch initial dashboard data");
+                }
+
                 const volunteersData: Volunteer[] = await volunteersRes.json();
                 const missionsData: Mission[] = await missionsRes.json();
 
@@ -58,7 +63,7 @@ export default function DashboardPage() {
             }
         };
         fetchData();
-    }, []);
+    }, [token]);
 
     return (
         <div className="flex flex-col gap-8">
@@ -91,7 +96,7 @@ export default function DashboardPage() {
                         <HeartHandshake className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                         {loading ? <Skeleton className="h-8 w-1/4" /> : <div className="text-2xl font-bold">{stats.donations}</div>}
+                         {loading ? <Skeleton className="h-8 w-1/4" /> : <div className="text-2xl font-bold">{stats.donations.toLocaleString('fr-FR')} FCFA</div>}
                         <p className="text-xs text-muted-foreground">Contributions enregistrées</p>
                     </CardContent>
                 </Card>
