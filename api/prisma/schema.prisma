@@ -98,17 +98,22 @@ model Volunteer {
   matricule         String?        @unique
   firstName         String
   lastName          String
+  nationality       Nationality?   @relation(fields: [nationalityId], references: [id])
+  nationalityId     String?
   birthDate         DateTime
   birthPlace        String?
   sex               Sex?
   maritalStatus     MaritalStatus?
-  idCardNumber      String?
+  idType            String?
+  idNumber          String?
   phone             String
   email             String         @unique
   address           String
-  educationLevel    String?
-  profession        String?
-  skills            String[]
+  educationLevel    EducationLevel? @relation(fields: [educationLevelId], references: [id])
+  educationLevelId  String?
+  profession        Profession?    @relation(fields: [professionId], references: [id])
+  professionId      String?
+  skills            Skill[]        @relation("VolunteerSkills")
   volunteerExperience String?
   availability      String[]
   causes            String[]
@@ -126,6 +131,55 @@ model Volunteer {
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   missions          Mission[]      @relation("MissionParticipants")
+}
+
+model Skill {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  volunteers  Volunteer[] @relation("VolunteerSkills")
+}
+
+model Profession {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  volunteers  Volunteer[]
+}
+
+model EducationLevel {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  volunteers  Volunteer[]
+}
+
+model Nationality {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  volunteers  Volunteer[]
+}
+
+model Province {
+  id          String      @id @default(cuid())
+  name        String      @unique
+}
+
+model Departement {
+  id          String      @id @default(cuid())
+  name        String      @unique
+}
+
+model CommuneCanton {
+  id          String      @id @default(cuid())
+  name        String      @unique
+}
+
+model Arrondissement {
+  id          String      @id @default(cuid())
+  name        String      @unique
+}
+
+model QuartierVillage {
+  id          String      @id @default(cuid())
+  name        String      @unique
 }
 
 model Mission {

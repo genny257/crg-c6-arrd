@@ -419,6 +419,7 @@ export default function RegisterPage() {
   const [professionInputValue, setProfessionInputValue] = React.useState("");
   
   const [nationalityPopoverOpen, setNationalityPopoverOpen] = React.useState(false);
+  const [nationalityInputValue, setNationalityInputValue] = React.useState("");
   
   const [otherCause, setOtherCause] = React.useState("");
   const causes = form.watch('causes');
@@ -693,15 +694,18 @@ export default function RegisterPage() {
                                     </PopoverTrigger>
                                     <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
                                         <Command>
-                                            <CommandInput placeholder="Rechercher un pays..." />
+                                            <CommandInput
+                                              placeholder="Rechercher un pays..."
+                                              value={nationalityInputValue}
+                                              onValueChange={setNationalityInputValue}
+                                            />
                                             <CommandList>
                                                 <CommandEmpty>
                                                     <CommandItem onSelect={() => {
-                                                        const currentInput = (document.querySelector('[cmdk-input]') as HTMLInputElement)?.value;
-                                                        form.setValue("nationality", currentInput);
+                                                        form.setValue("nationality", nationalityInputValue);
                                                         setNationalityPopoverOpen(false);
                                                     }}>
-                                                        Ajouter "{ (document.querySelector('[cmdk-input]') as HTMLInputElement)?.value }"
+                                                        Ajouter "{nationalityInputValue}"
                                                     </CommandItem>
                                                 </CommandEmpty>
                                                 <CommandGroup>
