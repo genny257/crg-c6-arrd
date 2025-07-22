@@ -33,6 +33,7 @@ const missionSchema = z.object({
   endDate: z.date({ required_error: "La date de fin est requise." }),
   maxParticipants: z.coerce.number().int().positive("Le nombre doit être positif.").optional(),
   status: z.enum(['Planifiée', 'En cours', 'Terminée', 'Annulée']),
+  requiredSkills: z.array(z.string()).default([]),
 });
 
 type MissionFormValues = z.infer<typeof missionSchema>;
@@ -42,7 +43,7 @@ export default function EditMissionPage() {
   const params = useParams();
   const { id } = params;
   const { toast } = useToast();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, token } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [pageLoading, setPageLoading] = React.useState(true);
 
@@ -51,11 +52,13 @@ export default function EditMissionPage() {
   });
 
   React.useEffect(() => {
-    if (typeof id !== 'string') return;
+    if (typeof id !== 'string' || !token) return;
     const fetchMission = async () => {
         setPageLoading(true);
         try {
-            const response = await fetch(`http://localhost:3001/api/missions/${id}`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions/${id}`, {
+                 headers: { 'Authorization': `Bearer ${token}` }
+            });
             if (!response.ok) {
                  throw new Error('Network response was not ok');
             }
@@ -75,15 +78,18 @@ export default function EditMissionPage() {
         }
     };
     fetchMission();
-  }, [id, form, router, toast]);
+  }, [id, form, router, toast, token]);
 
   const onSubmit = async (data: MissionFormValues) => {
-    if(typeof id !== 'string') return;
+    if(typeof id !== 'string' || !token) return;
     setIsSubmitting(true);
     try {
-      const response = await fetch(`http://localhost:3001/api/missions/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions/${id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          },
           body: JSON.stringify(data)
       });
       if (!response.ok) {
@@ -95,6 +101,7 @@ export default function EditMissionPage() {
         description: "La mission a été mise à jour avec succès.",
       });
       router.push(`/dashboard/missions/${id}`);
+      router.refresh();
     } catch (error) {
       console.error("Error updating mission: ", error);
       toast({

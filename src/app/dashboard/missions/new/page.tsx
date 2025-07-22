@@ -14,11 +14,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CalendarIcon } from "lucide-react";
 import Link from "next/link";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -31,7 +30,7 @@ const missionSchema = z.object({
   endDate: z.date({ required_error: "La date de fin est requise." }),
   maxParticipants: z.coerce.number().int().positive("Le nombre doit être positif.").optional(),
   status: z.enum(['Planifiée', 'En cours', 'Terminée', 'Annulée']).default('Planifiée'),
-  requiredSkills: z.array(z.string()).default([]), // Added requiredSkills
+  requiredSkills: z.array(z.string()).default([]),
 });
 
 type MissionFormValues = z.infer<typeof missionSchema>;
@@ -39,7 +38,7 @@ type MissionFormValues = z.infer<typeof missionSchema>;
 export default function NewMissionPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const { user, loading } = useAuth();
+  const { user, loading, token } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<MissionFormValues>({
@@ -56,10 +55,12 @@ export default function NewMissionPage() {
   const onSubmit = async (data: MissionFormValues) => {
     setIsSubmitting(true);
     try {
-      // TODO: Replace with API call to POST /api/missions
-      const response = await fetch('http://localhost:3001/api/missions', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
           body: JSON.stringify(data)
       });
       if (!response.ok) {
@@ -71,6 +72,7 @@ export default function NewMissionPage() {
         description: "La nouvelle mission a été ajoutée avec succès.",
       });
       router.push("/dashboard/missions");
+      router.refresh();
     } catch (error) {
       console.error("Error creating mission: ", error);
       toast({

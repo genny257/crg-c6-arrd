@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/hooks/use-auth";
 
 const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -31,17 +32,18 @@ export default function MissionDetailPage() {
     const { id } = useParams();
     const router = useRouter();
     const { toast } = useToast();
+    const { token } = useAuth();
     const [mission, setMission] = React.useState<Mission | null>(null);
-    const [participants, setParticipants] = React.useState<Volunteer[]>([]);
     const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
         const fetchMissionDetails = async () => {
-            if (typeof id !== 'string') return;
+            if (typeof id !== 'string' || !token) return;
             setLoading(true);
             try {
-                // TODO: Replace with API call to /api/missions/{id} and /api/volunteers?ids=...
-                const missionResponse = await fetch(`http://localhost:3001/api/missions/${id}`);
+                const missionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 if (!missionResponse.ok) {
                     throw new Error('Mission not found');
                 }
@@ -49,17 +51,6 @@ export default function MissionDetailPage() {
                 const missionData: Mission = await missionResponse.json();
                 setMission(missionData);
 
-                // Fetch participants data if any - this part needs a dedicated backend endpoint
-                if (missionData.participants && missionData.participants.length > 0) {
-                     // const participantsResponse = await fetch(`/api/volunteers?ids=${missionData.participants.join(',')}`);
-                    // const participantsData = await participantsResponse.json();
-                    // For now, using mock data
-                     const mockParticipants: Volunteer[] = [
-                        { id: '1', firstName: 'John', lastName: 'Doe', email: 'john@doe.com', photo: 'https://placehold.co/100x100.png', termsAccepted: true, createdAt: new Date().toISOString(), birthDate: new Date().toISOString(), address: '123 street', phone: '123' },
-                        { id: '2', firstName: 'Jane', lastName: 'Smith', email: 'jane@smith.com', photo: 'https://placehold.co/100x100.png', termsAccepted: true, createdAt: new Date().toISOString(), birthDate: new Date().toISOString(), address: '123 street', phone: '123' },
-                    ];
-                    setParticipants(mockParticipants);
-                }
             } catch (error) {
                 console.error("Error fetching mission details: ", error);
                 toast({ title: "Erreur", description: "Impossible de charger les détails de la mission.", variant: "destructive" });
@@ -69,7 +60,7 @@ export default function MissionDetailPage() {
         };
 
         fetchMissionDetails();
-    }, [id, router, toast]);
+    }, [id, router, toast, token]);
 
     if (loading) {
         return <MissionDetailSkeleton />;
@@ -77,7 +68,7 @@ export default function MissionDetailPage() {
 
     if (!mission) return null;
 
-    const participantCount = participants.length;
+    const participantCount = mission.participants?.length || 0;
     const maxParticipants = mission.maxParticipants ?? 0;
     const progressValue = maxParticipants > 0 ? (participantCount / maxParticipants) * 100 : 0;
 
@@ -154,7 +145,7 @@ export default function MissionDetailPage() {
                 </div>
 
                 {/* Right Column - Participants */}
-                <div className="lg:col-span-2">
+                <div className="lg:col-span-2 space-y-6">
                      <Card>
                         <CardHeader>
                             <div className="flex items-center justify-between">
@@ -178,9 +169,9 @@ export default function MissionDetailPage() {
                              )}
                         </CardHeader>
                         <CardContent>
-                           {participants.length > 0 ? (
+                           {(mission.participants && mission.participants.length > 0) ? (
                                 <div className="space-y-4">
-                                    {participants.map(p => (
+                                    {mission.participants.map((p: any) => (
                                          <div key={p.id} className="flex items-center gap-4 p-2 rounded-md hover:bg-muted">
                                             <Avatar>
                                                 <AvatarImage src={p.photo} />
@@ -213,24 +204,28 @@ export default function MissionDetailPage() {
 }
 
 const VolunteerSuggestions = ({ missionId }: { missionId: string }) => {
+    const { token } = useAuth();
     const [suggestions, setSuggestions] = React.useState<any[]>([]);
     const [loading, setLoading] = React.useState(false);
     const { toast } = useToast();
 
     const handleSuggest = async () => {
+        if (!token) return;
         setLoading(true);
         setSuggestions([]);
         try {
-            const response = await fetch(`/api/missions/${missionId}/suggest-volunteers`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions/${missionId}/suggest-volunteers`, {
                 method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!response.ok) {
-                throw new Error('Failed to get suggestions');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to get suggestions');
             }
             const data = await response.json();
             setSuggestions(data.recommendations);
-        } catch (error) {
-            toast({ title: "Erreur", description: "Impossible de générer les suggestions.", variant: "destructive" });
+        } catch (error: any) {
+            toast({ title: "Erreur", description: error.message || "Impossible de générer les suggestions.", variant: "destructive" });
         } finally {
             setLoading(false);
         }
@@ -305,7 +300,7 @@ const MissionDetailSkeleton = () => (
                     </CardContent>
                 </Card>
             </div>
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 space-y-6">
                 <Card>
                     <CardHeader>
                         <div className="flex items-center justify-between">
@@ -319,6 +314,18 @@ const MissionDetailSkeleton = () => (
                          <Skeleton className="h-12 w-12 rounded-full mx-auto" />
                          <Skeleton className="h-6 w-48 mx-auto mt-4" />
                          <Skeleton className="h-4 w-64 mx-auto mt-2" />
+                    </CardContent>
+                </Card>
+                 <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                             <Skeleton className="h-6 w-1/2" />
+                             <Skeleton className="h-9 w-44" />
+                        </div>
+                        <Skeleton className="h-4 w-3/4" />
+                    </CardHeader>
+                    <CardContent className="text-center py-8">
+                         <Skeleton className="h-4 w-3/4 mx-auto" />
                     </CardContent>
                 </Card>
             </div>
