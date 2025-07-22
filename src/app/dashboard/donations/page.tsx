@@ -1,3 +1,4 @@
+
 "use client"
 import * as React from "react";
 import { Button } from "@/components/ui/button";
@@ -44,7 +45,11 @@ export default function DonationPage() {
             });
             if (!response.ok) throw new Error("Failed to fetch donations");
 
-            setDonations(await response.json());
+            const data = await response.json();
+            // Sort donations by date, most recent first
+            data.sort((a: Donation, b: Donation) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+            setDonations(data);
         } catch (error) {
             console.error("Error fetching donations: ", error);
             toast({
@@ -58,8 +63,10 @@ export default function DonationPage() {
     }, [toast, token]);
 
     React.useEffect(() => {
-        fetchDonations();
-    }, [fetchDonations]);
+        if (token) {
+            fetchDonations();
+        }
+    }, [fetchDonations, token]);
 
 
     return (
