@@ -9,14 +9,8 @@
 import { ai } from '@/ai/genkit';
 import prisma from '@/lib/prisma';
 import { z } from 'zod';
-
-// Define the schema for a chat message
-const MessageSchema = z.object({
-  role: z.enum(['user', 'model']),
-  content: z.string(),
-});
-export type Message = z.infer<typeof MessageSchema>;
-
+import type { Message } from '@/ai/schemas/chatbot-schema';
+import { MessageSchema } from '@/ai/schemas/chatbot-schema';
 
 // --- Genkit Tools ---
 

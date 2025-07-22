@@ -11,6 +11,15 @@ export const getBlogPosts = async (req: Request, res: Response) => {
     }
 };
 
+export const getFeaturedBlogPosts = async (req: Request, res: Response) => {
+    try {
+        const posts = await blogService.getFeaturedBlogPosts();
+        res.json(posts);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching featured blog posts', error });
+    }
+};
+
 export const createBlogPost = async (req: Request, res: Response) => {
     try {
         const post = await blogService.createBlogPost(req.body);

@@ -18,6 +18,7 @@ import type { HomePageContent } from "@/types/homepage"
 import { Skeleton } from "@/components/ui/skeleton"
 import { PublicLayout } from "@/components/public-layout"
 import type { Event } from "@/types/event"
+import type { BlogPost } from "@/types/blog"
 import Autoplay from "embla-carousel-autoplay"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 
@@ -51,26 +52,59 @@ const actionIcons: { [key: string]: React.ElementType } = {
 };
 
 
+type CarouselItemData = {
+    id: string;
+    title: string;
+    image: string;
+    imageHint?: string;
+    href: string;
+    date: string;
+};
+
+
 export default function Home() {
   const [content, setContent] = React.useState<HomePageContent | null>(null);
-  const [featuredEvents, setFeaturedEvents] = React.useState<Event[]>([]);
+  const [carouselItems, setCarouselItems] = React.useState<CarouselItemData[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchContent = async () => {
       setLoading(true);
       try {
-        const [contentRes, eventsRes] = await Promise.all([
+        const [contentRes, eventsRes, blogsRes] = await Promise.all([
            Promise.resolve(initialContent), // Mocking content fetch
-           fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/featured`)
+           fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/featured`),
+           fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/featured`)
         ]);
 
         setContent(contentRes);
         
-        if(eventsRes.ok){
-            const eventsData = await eventsRes.json();
-            setFeaturedEvents(eventsData);
-        }
+        const eventsData = eventsRes.ok ? await eventsRes.json() : [];
+        const blogsData = blogsRes.ok ? await blogsRes.json() : [];
+
+        const formattedEvents: CarouselItemData[] = eventsData.map((event: Event) => ({
+            id: `event-${event.id}`,
+            title: event.title,
+            image: event.image || "https://placehold.co/1200x800.png",
+            imageHint: event.imageHint,
+            href: `/events#${event.id}`, // Can be improved later
+            date: event.date
+        }));
+
+        const formattedBlogs: CarouselItemData[] = blogsData.map((post: BlogPost) => ({
+            id: `blog-${post.id}`,
+            title: post.title,
+            image: post.image || "https://placehold.co/1200x800.png",
+            imageHint: post.imageHint,
+            href: `/blog/${post.slug}`,
+            date: post.createdAt
+        }));
+        
+        const combinedItems = [...formattedEvents, ...formattedBlogs]
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+            .slice(0, 3); // Take the 3 most recent items overall
+
+        setCarouselItems(combinedItems);
 
       } catch (error) {
         console.error("Error fetching home page content: ", error);
@@ -82,16 +116,13 @@ export default function Home() {
     fetchContent();
   }, []);
   
-  const carouselEvents = featuredEvents.length > 0 ? featuredEvents : [{
+  const finalCarouselItems = carouselItems.length > 0 ? carouselItems : [{
         id: 'placeholder-1',
         title: "Rejoignez nos actions",
         image: "https://placehold.co/1200x800.png",
         imageHint: "red cross volunteers",
         href: "/events",
-        date: new Date().toISOString(),
-        location: "",
-        description: "",
-        status: "À venir"
+        date: new Date().toISOString()
     }];
 
   const displayContent = content || initialContent;
@@ -106,20 +137,20 @@ export default function Home() {
                 opts={{ loop: true }}
             >
                 <CarouselContent className="h-full">
-                    {carouselEvents.map((event, index) => (
-                        <CarouselItem key={index} className="h-full">
-                            <Link href={event.href || `/events`}>
+                    {finalCarouselItems.map((item, index) => (
+                        <CarouselItem key={item.id} className="h-full">
+                            <Link href={item.href}>
                                 <Image
-                                    src={event.image || "https://placehold.co/1200x800.png"}
-                                    alt={event.title}
-                                    data-ai-hint={event.imageHint}
+                                    src={item.image}
+                                    alt={item.title}
+                                    data-ai-hint={item.imageHint}
                                     fill
                                     className="object-cover"
                                     priority={index === 0}
                                 />
                                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-8 text-white">
-                                    <h2 className="text-2xl md:text-4xl font-headline font-bold drop-shadow-lg">{event.title}</h2>
-                                </div>
+                                    <h2 className="text-2xl md:text-4xl font-headline font-bold drop-shadow-lg">{item.title}</h2>
+                                 </div>
                             </Link>
                         </CarouselItem>
                     ))}

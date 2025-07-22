@@ -4,6 +4,8 @@ import * as blogController from '../controllers/blog.controller';
 
 const router = Router();
 
+router.get('/blog/featured', blogController.getFeaturedBlogPosts);
+
 router.route('/blog')
     .get(blogController.getBlogPosts)
     .post(blogController.createBlogPost);

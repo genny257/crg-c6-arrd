@@ -655,7 +655,7 @@ export default function RegisterPage() {
                                     <PopoverTrigger asChild>
                                         <FormControl>
                                             <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
-                                                {field.value ? countries.find((c) => c === field.value) : "Sélectionner un pays"}
+                                                {field.value || "Sélectionner une nationalité"}
                                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                             </Button>
                                         </FormControl>
@@ -663,7 +663,7 @@ export default function RegisterPage() {
                                     <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
                                         <Command>
                                             <CommandInput
-                                              placeholder="Rechercher un pays..."
+                                              placeholder="Rechercher une nationalité..."
                                               value={nationalityInputValue}
                                               onValueChange={setNationalityInputValue}
                                             />

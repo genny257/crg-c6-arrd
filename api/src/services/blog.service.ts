@@ -6,6 +6,21 @@ export const getAllBlogPosts = async () => {
     return await prisma.post.findMany({ orderBy: { createdAt: 'desc' } });
 };
 
+export const getFeaturedBlogPosts = async () => {
+    return await prisma.post.findMany({
+        where: {
+            image: {
+                not: null,
+            },
+            visible: true,
+        },
+        orderBy: {
+            createdAt: 'desc',
+        },
+        take: 3,
+    });
+};
+
 export const createBlogPost = async (data: any) => {
     return await prisma.post.create({ data });
 };
