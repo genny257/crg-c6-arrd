@@ -96,7 +96,7 @@ const allIdTypes = [
     "CARTE D'IDENTITÉ SCOLAIRE",
 ];
 
-const foreignIdTypes = allIdTypes.filter(type => type.includes("PASSPORT") || type.includes("CARTE DE SÉJOURS"));
+const foreignIdTypes = allIdTypes.filter(type => type.includes("PASSPORT") || type.includes("CARTE DE SÉJOURS") || type.includes("RECEPICE CARTE DE SEJOURS"));
 
 const LocationSelector = ({
   form,
