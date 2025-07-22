@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview Chatbot flow for the Red Cross platform.
@@ -6,24 +5,26 @@
  * fetch real-time data about missions and volunteering, enabling the AI
  * to provide accurate and helpful responses to users.
  */
-import { ai } from '@/ai/genkit';
-import prisma from '@/lib/prisma';
+import { ai } from '../genkit';
 import { z } from 'zod';
-import type { Message } from '@/ai/schemas/chatbot-schema';
-import { MessageSchema } from '@/ai/schemas/chatbot-schema';
+import { Message, MessageSchema } from '@/ai/schemas/chatbot-schema';
+import prisma from '@/lib/prisma';
+
 
 // --- Genkit Tools ---
-
 const getMissionsTool = ai.defineTool(
   {
     name: 'getAvailableMissions',
-    description: 'Get a list of currently available missions that are planned or in progress.',
-    outputSchema: z.array(z.object({
+    description:
+      'Get a list of currently available missions that are planned or in progress.',
+    outputSchema: z.array(
+      z.object({
         id: z.string(),
         title: z.string(),
         location: z.string(),
         startDate: z.string(),
-    })),
+      })
+    ),
   },
   async () => {
     const missions = await prisma.mission.findMany({
@@ -42,35 +43,33 @@ const getMissionsTool = ai.defineTool(
         startDate: 'asc',
       },
     });
-    return missions.map(m => ({...m, startDate: m.startDate.toISOString()}));
+    return missions.map((m) => ({ ...m, startDate: m.startDate.toISOString() }));
   }
 );
 
 const getVolunteerInfoTool = ai.defineTool(
-    {
-        name: 'getVolunteerRegistrationInfo',
-        description: 'Get information about how to become a volunteer.',
-        outputSchema: z.object({
-            registrationUrl: z.string(),
-            requirements: z.array(z.string()),
-        })
-    },
-    async () => {
-        return {
-            registrationUrl: '/register',
-            requirements: [
-                "Être de nationalité gabonaise (ou résident).",
-                "Avoir au moins 18 ans.",
-                "Fournir une pièce d'identité valide.",
-                "Accepter les 7 principes de la Croix-Rouge.",
-            ]
-        }
-    }
+  {
+    name: 'getVolunteerRegistrationInfo',
+    description: 'Get information about how to become a volunteer.',
+    outputSchema: z.object({
+      registrationUrl: z.string(),
+      requirements: z.array(z.string()),
+    }),
+  },
+  async () => {
+    return {
+      registrationUrl: '/register',
+      requirements: [
+        "Être de nationalité gabonaise (ou résident).",
+        "Avoir au moins 18 ans.",
+        "Fournir une pièce d'identité valide.",
+        "Accepter les 7 principes de la Croix-Rouge.",
+      ],
+    };
+  }
 );
 
-
 // --- Main Chatbot Flow ---
-
 const chatbotFlow = ai.defineFlow(
   {
     name: 'chatbotFlow',
@@ -80,15 +79,13 @@ const chatbotFlow = ai.defineFlow(
     outputSchema: z.string(),
   },
   async ({ messages }) => {
-    
-    const model = ai.getModel('googleai/gemini-1.5-flash-latest');
-
-    const history = messages.map(msg => ({
-        role: msg.role,
-        content: [{text: msg.content}]
+    const geminiPro = ai.getModel('googleai/gemini-1.5-flash-latest');
+    const history = messages.map((msg) => ({
+      role: msg.role,
+      content: [{ text: msg.content }],
     }));
 
-    const response = await model.generate({
+    const response = await geminiPro.generate({
       history: history,
       tools: [getMissionsTool, getVolunteerInfoTool],
       prompt: `
@@ -100,18 +97,19 @@ const chatbotFlow = ai.defineFlow(
         - Always respond in French.
         - Keep your answers brief and to the point.
       `,
-       config: {
+      config: {
         temperature: 0.5,
       },
     });
-
     return response.text;
   }
 );
 
-
-export async function chat(messages: Message[], input: string): Promise<string> {
-    const allMessages = [...messages, { role: 'user', content: input }];
-    const response = await chatbotFlow({ messages: allMessages });
-    return response;
+export async function chat(
+  messages: Message[],
+  input: string
+): Promise<string> {
+  const allMessages = [...messages, { role: 'user', content: input }];
+  const response = await chatbotFlow({ messages: allMessages });
+  return response;
 }

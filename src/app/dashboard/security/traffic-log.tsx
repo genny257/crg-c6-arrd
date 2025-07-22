@@ -1,147 +1,78 @@
-
-"use client"
+"use client";
 
 import * as React from "react";
-import { ColumnDef } from "@tanstack/react-table";
-import { DataTable } from "@/components/ui/data-table";
-import { useAuth } from "@/hooks/use-auth";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
-import * as XLSX from 'xlsx';
-import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { format } from 'date-fns';
 
-// This would be in a types file, e.g., src/types/security.ts
-type RequestLog = {
+interface TrafficLog {
     id: string;
     ip: string;
     method: string;
     path: string;
     statusCode: number;
     createdAt: string;
-    isThreat: boolean;
-};
-
-const columns: ColumnDef<RequestLog>[] = [
-    {
-        accessorKey: "createdAt",
-        header: "Date",
-        cell: ({ row }) => format(new Date(row.getValue("createdAt")), "dd/MM/yyyy HH:mm:ss"),
-    },
-    {
-        accessorKey: "ip",
-        header: "IP",
-    },
-    {
-        accessorKey: "method",
-        header: "Method",
-        cell: ({ row }) => {
-            const method = row.getValue("method") as string;
-            const color = method === "GET" ? "bg-blue-100 text-blue-800" :
-                          method === "POST" ? "bg-green-100 text-green-800" :
-                          method === "PUT" ? "bg-yellow-100 text-yellow-800" :
-                          method === "DELETE" ? "bg-red-100 text-red-800" :
-                          "bg-gray-100 text-gray-800";
-            return <Badge variant="outline" className={color}>{method}</Badge>
-        }
-    },
-    {
-        accessorKey: "path",
-        header: "Path",
-    },
-    {
-        accessorKey: "statusCode",
-        header: "Status",
-         cell: ({ row }) => {
-            const status = row.getValue("statusCode") as number;
-            const color = status >= 500 ? "bg-red-500" :
-                          status >= 400 ? "bg-yellow-500" :
-                          status >= 300 ? "bg-blue-500" :
-                          "bg-green-500";
-            return <Badge className={color}>{status}</Badge>
-        }
-    },
-    {
-        accessorKey: "isThreat",
-        header: "Threat",
-        cell: ({ row }) => (row.getValue("isThreat") ? <Badge variant="destructive">Yes</Badge> : "No"),
-    },
-];
+}
 
 export function TrafficLogTab() {
     const { token } = useAuth();
     const { toast } = useToast();
-    const [data, setData] = React.useState<RequestLog[]>([]);
-    const [pageCount, setPageCount] = React.useState(0);
-    const [pageIndex, setPageIndex] = React.useState(0);
-    const pageSize = 15; // Or make this configurable
-
-    const handleExport = async () => {
-        if (!token) return;
-        toast({ title: "Exporting...", description: "Fetching all logs for export." });
-        try {
-            // Fetch all data without pagination for export
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/traffic?limit=99999`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (!response.ok) throw new Error("Failed to fetch all traffic logs");
-            const result = await response.json();
-            
-            const dataToExport = result.data.map((log: RequestLog) => ({
-                Date: format(new Date(log.createdAt), "dd/MM/yyyy HH:mm:ss"),
-                IP: log.ip,
-                Method: log.method,
-                Path: log.path,
-                Status: log.statusCode,
-                Threat: log.isThreat ? "Yes" : "No",
-            }));
-
-            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Traffic Logs");
-            XLSX.writeFile(workbook, "traffic_logs.xlsx");
-
-            toast({ title: "Export Successful", description: "Traffic logs have been downloaded." });
-        } catch (error) {
-            toast({ title: "Export Error", description: "Could not export traffic logs.", variant: "destructive" });
-        }
-    };
+    const [logs, setLogs] = React.useState<TrafficLog[]>([]);
+    const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
-        const fetchData = async () => {
+        const fetchLogs = async () => {
             if (!token) return;
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/traffic?page=${pageIndex + 1}&limit=${pageSize}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/traffic`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response.ok) throw new Error("Failed to fetch traffic logs");
-                const result = await response.json();
-                setData(result.data);
-                setPageCount(Math.ceil(result.total / pageSize));
+                const data = await response.json();
+                setLogs(data);
             } catch (error) {
-                toast({ title: "Error", description: "Could not fetch traffic logs.", variant: "destructive" });
+                console.error("Error fetching traffic logs:", error);
+                toast({ title: "Erreur", description: "Impossible de charger le journal du trafic.", variant: "destructive" });
+            } finally {
+                setLoading(false);
             }
         };
-        fetchData();
-    }, [token, pageIndex, toast]);
+        fetchLogs();
+    }, [token, toast]);
 
     return (
-        <>
-            <DataTable
-                columns={columns}
-                data={data}
-                pageCount={pageCount}
-                pageIndex={pageIndex}
-                pageSize={pageSize}
-                onPageChange={setPageIndex}
-            />
-            <div className="flex justify-end mt-4">
-                <Button onClick={handleExport}>
-                    <Download className="mr-2 h-4 w-4" />
-                    Export to Excel
-                </Button>
-            </div>
-        </>
+        <Card>
+            <CardHeader>
+                <CardTitle>Journal du Trafic API</CardTitle>
+            </CardHeader>
+            <CardContent>
+                {loading ? <p>Chargement...</p> : (
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Date</TableHead>
+                                <TableHead>IP</TableHead>
+                                <TableHead>Méthode</TableHead>
+                                <TableHead>Chemin</TableHead>
+                                <TableHead>Status</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {logs.map((log) => (
+                                <TableRow key={log.id}>
+                                    <TableCell>{format(new Date(log.createdAt), 'dd/MM/yyyy HH:mm')}</TableCell>
+                                    <TableCell>{log.ip}</TableCell>
+                                    <TableCell>{log.method}</TableCell>
+                                    <TableCell>{log.path}</TableCell>
+                                    <TableCell>{log.statusCode}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                )}
+            </CardContent>
+        </Card>
     );
 }

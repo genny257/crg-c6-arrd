@@ -2,19 +2,20 @@
 import { Request, Response } from 'express';
 import Stripe from 'stripe';
 import * as donationService from '../services/donation.service';
+import { DonationStatus } from '@prisma/client';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-06-20',
+  apiVersion: '2024-06-20' as any,
 });
 
 export const createDonation = async (req: Request, res: Response) => {
   try {
     const { amount, name, email, method, type } = req.body;
 
-    // 1. Save the donation to your database with status 'En_attente'
+    // 1. Save the donation to your database with status 'PENDING'
     const donation = await donationService.createDonation({
       ...req.body,
-      status: 'En_attente',
+      status: DonationStatus.PENDING,
     });
 
     // 2. Create a Payment Intent with Stripe
@@ -47,7 +48,7 @@ export const confirmDonation = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Donation ID is required.' });
     }
 
-    const updatedDonation = await donationService.updateDonationStatus(donationId, 'Confirmé');
+    const updatedDonation = await donationService.updateDonationStatus(donationId, DonationStatus.CONFIRMED);
     
     // TODO: Trigger sending a receipt email here in a future step
 
@@ -65,7 +66,8 @@ export const getDonations = async (req: Request, res: Response) => {
   try {
     const donations = await donationService.getAllDonations();
     res.json(donations);
-  } catch (error) {
+  } catch (error)
+ {
     res.status(500).json({ message: 'Error fetching donations', error });
   }
 };

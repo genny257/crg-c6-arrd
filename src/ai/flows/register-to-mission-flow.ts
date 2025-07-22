@@ -1,24 +1,20 @@
-
 'use server';
-/**
- * @fileOverview Flow to handle volunteer registration for a mission.
- *
- * - registerToMission - Handles the business logic for registering a volunteer.
- */
+
 import { ai } from '@/ai/genkit';
 import prisma from '@/lib/prisma';
-import type { RegisterToMissionInput, RegisterToMissionOutput } from '@/ai/schemas/register-to-mission-schema';
-import { RegisterToMissionInputSchema, RegisterToMissionOutputSchema } from '@/ai/schemas/register-to-mission-schema';
+import {
+  RegisterToMissionInputSchema,
+  RegisterToMissionOutputSchema,
+  type RegisterToMissionInput,
+  type RegisterToMissionOutput,
+} from '@/ai/schemas/register-to-mission-schema';
 
-
-// Exported wrapper function that calls the flow.
 export async function registerToMission(
   input: RegisterToMissionInput
 ): Promise<RegisterToMissionOutput> {
   return registerToMissionFlow(input);
 }
 
-// Genkit flow definition
 const registerToMissionFlow = ai.defineFlow(
   {
     name: 'registerToMissionFlow',
@@ -26,62 +22,62 @@ const registerToMissionFlow = ai.defineFlow(
     outputSchema: RegisterToMissionOutputSchema,
   },
   async ({ missionId, matricule }) => {
-    // 1. Find the volunteer by matricule
+    // 1. Check if volunteer exists and is active
     const volunteer = await prisma.volunteer.findUnique({
       where: { matricule },
+      include: { missions: true },
     });
 
     if (!volunteer) {
       return {
         success: false,
-        message: `Aucun volontaire trouvé avec le matricule ${matricule}. Veuillez vérifier et réessayer.`,
+        message:
+          "Matricule non trouvé. Veuillez vérifier votre matricule et réessayer.",
       };
     }
-
-    // 2. Check volunteer's status
     if (volunteer.status !== 'Actif') {
       return {
         success: false,
-        message: `Votre statut de volontaire (${volunteer.status}) ne vous permet pas de vous inscrire. Veuillez contacter un administrateur.`,
+        message: `Votre statut de volontaire est "${volunteer.status}". Vous ne pouvez pas vous inscrire aux missions.`,
       };
     }
 
-    // 3. Find the mission
+    // 2. Check if mission exists
     const mission = await prisma.mission.findUnique({
       where: { id: missionId },
-      include: {
-        participants: true,
-      },
+      include: { participants: true },
     });
 
     if (!mission) {
-      return { success: false, message: 'Mission non trouvée.' };
+      return {
+        success: false,
+        message: 'Mission non trouvée. Impossible de vous inscrire.',
+      };
     }
 
-    // 4. Check if mission is full
+    // 3. Check if mission is full
     if (
       mission.maxParticipants &&
       mission.participants.length >= mission.maxParticipants
     ) {
       return {
         success: false,
-        message: 'Cette mission est complète. Il n’y a plus de places disponibles.',
+        message: 'Cette mission est complète. Vous ne pouvez plus vous inscrire.',
       };
     }
 
-    // 5. Check if volunteer is already registered
+    // 4. Check if volunteer is already registered
     const isAlreadyRegistered = mission.participants.some(
       (p) => p.id === volunteer.id
     );
-
     if (isAlreadyRegistered) {
       return {
         success: false,
-        message: 'Vous êtes déjà inscrit à cette mission.',
+        message: 'Vous êtes déjà inscrit(e) à cette mission.',
       };
     }
 
-    // 6. Register the volunteer
+    // 5. Register volunteer to the mission
     await prisma.mission.update({
       where: { id: missionId },
       data: {
@@ -93,7 +89,8 @@ const registerToMissionFlow = ai.defineFlow(
 
     return {
       success: true,
-      message: `Félicitations, ${volunteer.firstName} ! Votre inscription à la mission "${mission.title}" a été confirmée.`,
+      message:
+        'Félicitations ! Votre inscription à la mission a été confirmée.',
     };
   }
 );

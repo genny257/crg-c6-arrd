@@ -27,19 +27,21 @@ export function Chatbot() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!input || isLoading) return
+    if (!input.trim() || isLoading) return;
 
     setIsLoading(true)
-    const newMessages: Message[] = [...messages, { role: "user", content: input }]
-    setMessages(newMessages)
+    const currentInput = input;
     setInput("")
 
+    const newMessages: Message[] = [...messages, { role: "user", content: currentInput }]
+    setMessages(newMessages)
+    
     try {
-      const response = await chat(messages, input)
-      setMessages([...newMessages, { role: "model", content: response }])
+      const response = await chat(messages, currentInput)
+      setMessages(prevMessages => [...prevMessages, { role: "model", content: response }])
     } catch (error) {
       console.error("Chatbot error:", error)
-      setMessages([...newMessages, { role: "model", content: "Désolé, une erreur est survenue. Veuillez réessayer." }])
+      setMessages(prevMessages => [...prevMessages, { role: "model", content: "Désolé, une erreur est survenue. Veuillez réessayer." }])
     } finally {
       setIsLoading(false)
     }
@@ -108,7 +110,7 @@ export function Chatbot() {
                   placeholder="Posez votre question..."
                   disabled={isLoading}
                 />
-                <Button type="submit" size="icon" disabled={isLoading}>
+                <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
                   <Send className="h-4 w-4" />
                   <span className="sr-only">Envoyer</span>
                 </Button>

@@ -53,6 +53,10 @@ export default function MecenatPage() {
         throw new Error("La soumission a échoué.");
       }
       
+      toast({
+        title: "Message envoyé avec succès",
+        description: "Nous vous remercions pour votre confiance. Un e-mail de confirmation vous a été envoyé.",
+      });
       setIsSubmitted(true);
       form.reset();
 

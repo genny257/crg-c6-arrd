@@ -38,7 +38,7 @@ export const getBlockedIPs = async (req: Request, res: Response) => {
 };
 
 const blockIPSchema = z.object({
-    ip: z.string().ip("Invalid IP address format"),
+    ip: z.string(),
     reason: z.string().optional(),
 });
 
@@ -49,7 +49,7 @@ export const blockIP = async (req: Request, res: Response) => {
         res.status(201).json(blockedIP);
     } catch (error) {
          if (error instanceof z.ZodError) {
-            return res.status(400).json({ message: 'Validation failed', errors: error.errors });
+            return res.status(400).json({ message: 'Validation failed', errors: error.flatten().fieldErrors });
         }
         res.status(500).json({ message: 'Error blocking IP', error });
     }
