@@ -55,13 +55,20 @@ export default function NewEventPage() {
   const onSubmit = async (data: EventFormValues) => {
     setIsSubmitting(true);
     try {
-      // TODO: Replace with API call to POST /api/events
-      console.log("Creating event with data:", data);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) throw new Error("La création a échoué.");
+      
       toast({
         title: "Événement créé",
-        description: "Le nouvel événement a été ajouté avec succès (simulation).",
+        description: "Le nouvel événement a été ajouté avec succès.",
       });
       router.push("/events");
+      router.refresh();
     } catch (error) {
       console.error("Error creating event: ", error);
       toast({

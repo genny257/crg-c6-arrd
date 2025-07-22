@@ -15,17 +15,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
-// Mock data
-const mockEvents: Event[] = [
-    { id: '1', title: 'Grande Collecte de Sang', date: '2024-09-01T10:00:00Z', location: 'Siège du Comité, Libreville', description: 'Rejoignez-nous pour cette collecte vitale. Chaque don compte !', image: 'https://placehold.co/600x400.png', imageHint: 'blood donation', status: 'À venir' },
-    { id: '2', title: 'Formation Premiers Secours', date: '2024-09-15T09:00:00Z', location: 'Salle Polyvalente', description: 'Apprenez les gestes qui sauvent. Places limitées.', image: 'https://placehold.co/600x400.png', imageHint: 'first aid', status: 'À venir' },
-    { id: '3', title: 'Journée de l\'Hygiène', date: '2024-06-20T10:00:00Z', location: 'École Publique d\'Ondogo', description: 'Sensibilisation aux bonnes pratiques d\'hygiène.', image: 'https://placehold.co/600x400.png', imageHint: 'hygiene promotion', status: 'Terminé' },
-    { id: '4', title: 'Évènement Annulé', date: '2024-09-25T10:00:00Z', location: 'Lieu à définir', description: 'Cet évènement a été annulé.', image: 'https://placehold.co/600x400.png', imageHint: 'event cancelled', status: 'Annulé' },
-];
-
 export default function EventsPage() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin' || user?.role === 'ADMIN' || user?.role === 'SUPERADMIN';
   const [events, setEvents] = React.useState<Event[]>([]);
   const [loading, setLoading] = React.useState(true);
   const { toast } = useToast();
@@ -33,11 +25,13 @@ export default function EventsPage() {
   const fetchEvents = React.useCallback(async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:3001/api/events');
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             let eventsData: Event[] = await response.json();
+            
+            // On the public page, only admins see cancelled events
             if (!isAdmin) {
                 eventsData = eventsData.filter(e => e.status !== 'Annulé');
             }
@@ -60,17 +54,40 @@ export default function EventsPage() {
 
   const handleDelete = async (id: string) => {
     if (!id) return;
-    // TODO: Replace with API call to DELETE /api/events/{id}
+
+    const originalEvents = [...events];
     setEvents(events.filter(e => e.id !== id));
-    toast({ title: "Succès", description: "L'événement a été supprimé." });
+
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${id}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error("La suppression a échoué.");
+        toast({ title: "Succès", description: "L'événement a été supprimé." });
+    } catch(error) {
+        toast({ title: "Erreur", description: "La suppression a échoué.", variant: "destructive" });
+        setEvents(originalEvents);
+    }
   };
 
   const toggleStatus = async (id: string, currentStatus: Event['status']) => {
-     if (!id) return;
-     const newStatus = currentStatus === 'Annulé' ? 'À venir' : 'Annulé';
-    // TODO: Replace with API call to PATCH /api/events/{id}
+    if (!id) return;
+    const newStatus = currentStatus === 'Annulé' ? 'À venir' : 'Annulé';
+    
+    const originalEvents = [...events];
     setEvents(events.map(e => e.id === id ? { ...e, status: newStatus } : e));
-    toast({ title: "Succès", description: `L'événement est maintenant marqué comme ${newStatus.toLowerCase()}.` });
+    
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus }),
+        });
+        if (!response.ok) throw new Error("La mise à jour a échoué.");
+        toast({ title: "Succès", description: `L'événement est maintenant marqué comme ${newStatus.toLowerCase()}.` });
+        fetchEvents();
+    } catch (error) {
+        toast({ title: "Erreur", description: "La mise à jour a échoué.", variant: "destructive" });
+        setEvents(originalEvents);
+    }
   };
 
   return (
@@ -168,7 +185,7 @@ export default function EventsPage() {
                 <CardDescription>{event.description}</CardDescription>
               </CardContent>
               <CardFooter className="p-6 pt-0 flex justify-between items-center">
-                <Button disabled={event.status === 'Annulé'}>S'inscrire</Button>
+                <Button disabled={event.status === 'Annulé' || event.status === 'Terminé'}>S'inscrire</Button>
                 {event.status === 'Annulé' && <span className="text-xs font-semibold text-destructive">Annulé</span>}
                 {event.status === 'Terminé' && <span className="text-xs font-semibold text-gray-500">Terminé</span>}
               </CardFooter>

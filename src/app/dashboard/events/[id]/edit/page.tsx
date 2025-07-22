@@ -37,8 +37,6 @@ const eventSchema = z.object({
 
 type EventFormValues = z.infer<typeof eventSchema>;
 
-const mockEvent: Event = { id: '1', title: 'Grande Collecte de Sang', date: '2024-09-01T10:00:00Z', location: 'Siège du Comité, Libreville', description: 'Rejoignez-nous pour cette collecte vitale.', status: 'À venir', image: 'https://placehold.co/600x400.png' };
-
 export default function EditEventPage() {
   const router = useRouter();
   const params = useParams();
@@ -56,18 +54,20 @@ export default function EditEventPage() {
     if (typeof id !== 'string') return;
     const fetchEvent = async () => {
         setPageLoading(true);
-        // TODO: Replace with API call to /api/events/{id}
-        const eventData = mockEvent;
-        if (eventData) {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${id}`);
+            if (!response.ok) throw new Error("Événement non trouvé.");
+            const eventData: Event = await response.json();
             form.reset({
                 ...eventData,
                 date: new Date(eventData.date),
             });
-        } else {
+        } catch (error) {
             toast({ title: "Erreur", description: "Événement non trouvé.", variant: "destructive" });
             router.push('/events');
+        } finally {
+            setPageLoading(false);
         }
-        setPageLoading(false);
     };
     fetchEvent();
   }, [id, form, router, toast]);
@@ -76,13 +76,19 @@ export default function EditEventPage() {
     if(typeof id !== 'string') return;
     setIsSubmitting(true);
     try {
-      // TODO: Replace with API call to PUT /api/events/{id}
-      console.log("Updating event with data:", data);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("La mise à jour a échoué.");
+      
       toast({
         title: "Événement modifié",
-        description: "L'événement a été mis à jour avec succès (simulation).",
+        description: "L'événement a été mis à jour avec succès.",
       });
       router.push('/events');
+      router.refresh();
     } catch (error) {
       console.error("Error updating event: ", error);
       toast({
