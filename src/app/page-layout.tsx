@@ -1,7 +1,1 @@
-
-import { PublicLayout } from '@/components/public-layout';
-import type { ReactNode } from 'react';
-
-export default function PageLayout({ children }: { children: ReactNode }) {
-  return <PublicLayout>{children}</PublicLayout>;
-}
+// This file is no longer needed after the layout correction.
