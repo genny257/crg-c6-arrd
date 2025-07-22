@@ -18,7 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { cn } from "@/lib/utils";
 import { PublicLayout } from "@/components/public-layout";
 
-import { loadStripe } from '@stripe/stripe-js';
+import { loadStripe, StripePaymentElementOptions } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
@@ -150,12 +150,14 @@ const donationSchema = z.object({
     email: z.string().email("L'adresse e-mail n'est pas valide."),
 });
 
+type FormValues = z.infer<typeof donationSchema>;
 
 const StripeDonationForm = ({ onFormSuccess, isMonthly }: { onFormSuccess: () => void, isMonthly: boolean }) => {
     const [clientSecret, setClientSecret] = React.useState<string | null>(null);
-    const [donationData, setDonationData] = React.useState<any>(null);
+    const [donationId, setDonationId] = React.useState<string | null>(null);
+    const { toast } = useToast();
 
-    const form = useForm<z.infer<typeof donationSchema>>({
+    const form = useForm<FormValues>({
         resolver: zodResolver(donationSchema),
         defaultValues: {
             amount: 5000,
@@ -164,48 +166,61 @@ const StripeDonationForm = ({ onFormSuccess, isMonthly }: { onFormSuccess: () =>
             email: "",
         },
     });
-    
-    const amount = form.watch("amount");
 
-    React.useEffect(() => {
-        // Create a new Payment Intent whenever the amount changes
-        if (amount >= 1000) {
-            const data = {
-                ...form.getValues(),
-                name: `${form.getValues().firstName} ${form.getValues().lastName}`,
+    const handleProceedToPayment = async (data: FormValues) => {
+        try {
+            const donationPayload = {
+                ...data,
+                name: `${data.firstName} ${data.lastName}`,
                 type: isMonthly ? 'Mensuel' : 'Ponctuel',
                 method: 'Carte_Bancaire',
             };
-            setDonationData(data);
 
-            fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            })
-            .then(res => res.json())
-            .then(data => setClientSecret(data.clientSecret));
+                body: JSON.stringify(donationPayload),
+            });
+
+            if (!response.ok) {
+                throw new Error("Impossible de préparer le paiement.");
+            }
+
+            const { clientSecret, donationId } = await response.json();
+            setClientSecret(clientSecret);
+            setDonationId(donationId);
+        } catch (error) {
+            console.error("Error creating payment intent:", error);
+            toast({
+                title: "Erreur",
+                description: "Une erreur est survenue lors de la préparation du paiement.",
+                variant: "destructive",
+            });
         }
-    }, [amount, form, isMonthly]);
+    };
+    
+    const paymentElementOptions: StripePaymentElementOptions = {
+        layout: "tabs",
+    };
 
     return (
         <div>
             {!clientSecret ? (
-                <DonationDetailsForm form={form} />
+                <DonationDetailsForm form={form} onSubmit={handleProceedToPayment} />
             ) : (
                 <Elements stripe={stripePromise} options={{ clientSecret }}>
-                    <CheckoutForm onFormSuccess={onFormSuccess} />
+                    <CheckoutForm onFormSuccess={onFormSuccess} donationId={donationId!} />
                 </Elements>
             )}
         </div>
     );
 }
 
-const DonationDetailsForm = ({ form }: { form: any }) => {
+const DonationDetailsForm = ({ form, onSubmit }: { form: any, onSubmit: (data: FormValues) => void }) => {
     const selectedAmount = form.watch("amount");
     return (
         <Form {...form}>
-            <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div>
                     <Label className="text-base font-semibold mb-2 block">Choisissez un montant</Label>
                     <FormField
@@ -309,14 +324,15 @@ const DonationDetailsForm = ({ form }: { form: any }) => {
                         )}
                     />
                 </div>
-                 <p className="text-sm text-muted-foreground text-center">Remplissez vos informations pour continuer vers le paiement.</p>
+                <Button type="submit" className="w-full">
+                    Procéder au paiement
+                </Button>
             </form>
         </Form>
     )
 }
 
-
-const CheckoutForm = ({ onFormSuccess }: { onFormSuccess: () => void }) => {
+const CheckoutForm = ({ onFormSuccess, donationId }: { onFormSuccess: () => void, donationId: string }) => {
   const stripe = useStripe();
   const elements = useElements();
   const { toast } = useToast();
@@ -331,22 +347,32 @@ const CheckoutForm = ({ onFormSuccess }: { onFormSuccess: () => void }) => {
 
     setIsProcessing(true);
 
-    const { error } = await stripe.confirmPayment({
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/donations`,
+        return_url: `${window.location.origin}/donations?success=true`,
       },
       redirect: 'if_required',
     });
 
     if (error) {
       toast({ title: "Erreur de paiement", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Paiement réussi!", description: "Votre don a été accepté. Merci !" });
-      onFormSuccess();
+      setIsProcessing(false);
+    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+      try {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/confirm`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ donationId: donationId })
+        });
+        toast({ title: "Paiement réussi!", description: "Votre don a été accepté. Merci !" });
+        onFormSuccess();
+      } catch (confirmError) {
+          toast({ title: "Erreur de confirmation", description: "Votre paiement a été traité, mais nous n'avons pas pu confirmer la donation. Veuillez nous contacter.", variant: "destructive" });
+      } finally {
+        setIsProcessing(false);
+      }
     }
-
-    setIsProcessing(false);
   };
 
   return (
