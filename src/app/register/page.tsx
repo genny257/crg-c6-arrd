@@ -69,11 +69,11 @@ import {
   educationLevels,
 } from "@/lib/locations";
 import { useToast } from "@/hooks/use-toast";
-import { registerUser } from "@/ai/flows/register-flow";
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { RegisterUserInputSchema } from "@/ai/schemas/register-user-schema";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { uploadFile } from "@/lib/firebase/storage";
 
 const totalSteps = 5;
 
@@ -348,6 +348,7 @@ type UploadableField = "photo" | "idCardFront" | "idCardBack";
 export default function RegisterPage() {
   const [step, setStep] = React.useState(1);
   const { toast } = useToast();
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [uploading, setUploading] = React.useState<
     Partial<Record<UploadableField, boolean>>
@@ -369,6 +370,7 @@ export default function RegisterPage() {
       idNumber: "",
       phone: "",
       email: "",
+      password: "",
       address: "",
       educationLevel: "",
       profession: "",
@@ -413,17 +415,25 @@ export default function RegisterPage() {
     if (!file) return;
 
     setUploading((prev) => ({ ...prev, [fieldName]: true }));
-    setUploadProgress((prev) => ({ ...prev, [fieldName]: 0 }));
+
+    const formData = new FormData();
+    formData.append('file', file);
 
     try {
-      const downloadURL = await uploadFile(
-        file,
-        `volunteers/${fieldName}/${file.name}-${Date.now()}`,
-        (progress) => {
-          setUploadProgress((prev) => ({ ...prev, [fieldName]: progress }));
-        }
-      );
-      form.setValue(fieldName, downloadURL);
+      // This is the API endpoint on your Next.js app.
+      // You can implement the backend logic for this in `/src/app/api/upload/route.ts`
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Upload failed');
+      }
+      
+      form.setValue(fieldName, result.url);
       toast({
         title: "Fichier téléversé",
         description: "Le fichier a été ajouté avec succès.",
@@ -444,20 +454,59 @@ export default function RegisterPage() {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      const result = await registerUser(data);
-      if (result.success) {
-        toast({
-          title: "Candidature Soumise",
-          description: "Votre inscription a été envoyée avec succès.",
-        });
-        setStep((prev) => prev + 1);
-      } else {
-        toast({
-          title: "Erreur de soumission",
-          description: result.message || "Une erreur inconnue est survenue.",
+      // 1. Create the user account
+      const userResponse = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      if (!userResponse.ok) {
+        const errorData = await userResponse.text();
+        throw new Error(errorData || "La création du compte a échoué.");
+      }
+
+      // 2. Create the volunteer profile
+      const volunteerResponse = await fetch('/api/volunteers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!volunteerResponse.ok) {
+        const errorData = await volunteerResponse.text();
+        throw new Error(errorData || "L'enregistrement des informations du bénévole a échoué.");
+      }
+      
+      toast({
+        title: "Candidature Soumise",
+        description: "Votre inscription a été envoyée avec succès.",
+      });
+      
+      // 3. Log the user in
+      const signInResult = await signIn('credentials', {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
+
+      if (signInResult?.error) {
+         toast({
+          title: "Connexion automatique échouée",
+          description: "Votre compte a été créé, mais la connexion a échoué. Veuillez vous connecter manuellement.",
           variant: "destructive",
         });
+        // Redirect to login even if auto-login fails
+        router.push('/login');
+      } else {
+        router.push('/dashboard');
       }
+
     } catch (error: any) {
       toast({
         title: "Erreur",
@@ -494,6 +543,31 @@ export default function RegisterPage() {
   const idCardFrontPreview = form.watch("idCardFront");
   const idCardBackPreview = form.watch("idCardBack");
   const selectedIdType = form.watch("idType");
+
+  if (step > totalSteps) {
+    return (
+       <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
+            <Card className="w-full max-w-lg text-center">
+                <CardHeader>
+                    <div className="p-4 bg-green-100 rounded-full w-20 h-20 mx-auto flex items-center justify-center">
+                        <Check className="h-12 w-12 text-green-600" />
+                    </div>
+                    <CardTitle className="text-2xl font-bold font-headline mt-4">Inscription terminée !</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground max-w-md mx-auto">
+                        Merci pour votre engagement. Votre candidature a été soumise
+                        avec succès. Nous l'examinerons attentivement et vous
+                        contacterons très prochainement.
+                    </p>
+                    <Button asChild className="mt-6">
+                        <Link href="/dashboard">Accéder à mon espace</Link>
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
+    )
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
@@ -712,41 +786,42 @@ export default function RegisterPage() {
                     Coordonnées & Résidence
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Numéro de téléphone</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="tel"
-                              placeholder="+241 XX XX XX XX"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Adresse e-mail</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="email"
-                              placeholder="nom@exemple.com"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Adresse e-mail</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="email"
+                                placeholder="nom@exemple.com"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Mot de passe</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="password"
+                                placeholder="********"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="address"
@@ -771,6 +846,7 @@ export default function RegisterPage() {
                     title="Lieu de résidence actuel"
                     fieldPrefix="residence"
                   />
+                </div>
                 </div>
               )}
 
@@ -1260,7 +1336,7 @@ export default function RegisterPage() {
                                   htmlFor="photo-upload"
                                   className="cursor-pointer"
                                 >
-                                  <Upload className="mr-2 h-4 w-4" />
+                                  {uploading.photo ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Upload className="mr-2 h-4 w-4" />}
                                   Choisir un fichier
                                   <Input
                                     id="photo-upload"
@@ -1276,12 +1352,6 @@ export default function RegisterPage() {
                               </Button>
                             </div>
                           </FormControl>
-                          {uploading.photo && (
-                            <Progress
-                              value={uploadProgress.photo}
-                              className="w-full mt-2"
-                            />
-                          )}
                           <FormDescription>
                             Facultatif, pour votre profil.
                           </FormDescription>
@@ -1316,7 +1386,7 @@ export default function RegisterPage() {
                               htmlFor="idCardFront-upload"
                               className="cursor-pointer"
                             >
-                              <Upload className="mr-2 h-4 w-4" />
+                              {uploading.idCardFront ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Upload className="mr-2 h-4 w-4" />}
                               Téléverser Recto
                               <Input
                                 id="idCardFront-upload"
@@ -1330,12 +1400,6 @@ export default function RegisterPage() {
                               />
                             </label>
                           </Button>
-                          {uploading.idCardFront && (
-                            <Progress
-                              value={uploadProgress.idCardFront}
-                              className="w-full mt-2"
-                            />
-                          )}
                           <FormDescription>Facultatif</FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -1365,7 +1429,7 @@ export default function RegisterPage() {
                               htmlFor="idCardBack-upload"
                               className="cursor-pointer"
                             >
-                              <Upload className="mr-2 h-4 w-4" />
+                             {uploading.idCardBack ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Upload className="mr-2 h-4 w-4" />}
                               Téléverser Verso
                               <Input
                                 id="idCardBack-upload"
@@ -1379,12 +1443,6 @@ export default function RegisterPage() {
                               />
                             </label>
                           </Button>
-                          {uploading.idCardBack && (
-                            <Progress
-                              value={uploadProgress.idCardBack}
-                              className="w-full mt-2"
-                            />
-                          )}
                           <FormDescription>Facultatif</FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -1421,8 +1479,7 @@ export default function RegisterPage() {
                 </div>
               )}
 
-              {step <= totalSteps && (
-                <div className="flex justify-between mt-8">
+              <div className="flex justify-between mt-8">
                   <Button
                     type="button"
                     variant="outline"
@@ -1453,27 +1510,8 @@ export default function RegisterPage() {
                     </Button>
                   )}
                 </div>
-              )}
             </form>
           </Form>
-          {step === totalSteps + 1 && (
-            <div className="text-center space-y-4 flex flex-col items-center">
-              <div className="p-4 bg-green-100 rounded-full">
-                <Check className="h-12 w-12 text-green-600" />
-              </div>
-              <h3 className="text-2xl font-bold font-headline">
-                Inscription terminée !
-              </h3>
-              <p className="text-muted-foreground max-w-md">
-                Merci pour votre engagement. Votre candidature a été soumise
-                avec succès. Nous l'examinerons attentivement et vous
-                contacterons très prochainement.
-              </p>
-              <Button asChild>
-                <Link href="/dashboard">Accéder à mon espace</Link>
-              </Button>
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>

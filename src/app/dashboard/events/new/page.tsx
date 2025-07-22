@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { addDoc, collection } from "firebase/firestore";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { ArrowLeft, CalendarIcon } from "lucide-react";
 import Link from "next/link";
@@ -57,13 +55,11 @@ export default function NewEventPage() {
   const onSubmit = async (data: EventFormValues) => {
     setIsSubmitting(true);
     try {
-      await addDoc(collection(db, "events"), {
-        ...data,
-        date: data.date.toISOString(),
-      });
+      // TODO: Replace with API call to POST /api/events
+      console.log("Creating event with data:", data);
       toast({
         title: "Événement créé",
-        description: "Le nouvel événement a été ajouté avec succès.",
+        description: "Le nouvel événement a été ajouté avec succès (simulation).",
       });
       router.push("/events");
     } catch (error) {

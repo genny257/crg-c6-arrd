@@ -2,16 +2,14 @@
 "use client";
 
 import * as React from "react";
-import { collection, getDocs, doc, updateDoc, query, orderBy, where, Timestamp } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { UserPlus, MoreHorizontal, Search, ArrowDownUp, Download, Check, X, Shield, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { db } from "@/lib/firebase/client"; 
 import type { Volunteer } from "@/types/volunteer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cells, professionsList, skillsList } from "@/lib/locations";
@@ -41,11 +39,9 @@ const getStatusBadgeVariant = (status?: Volunteer['status']) => {
 
 interface VolunteersClientPageProps {
     initialVolunteers: Volunteer[];
-    allSkills: string[];
-    allProfessions: string[];
 }
 
-export function VolunteersClientPage({ initialVolunteers, allSkills, allProfessions }: VolunteersClientPageProps) {
+export function VolunteersClientPage({ initialVolunteers }: VolunteersClientPageProps) {
     const { toast } = useToast();
     const [volunteers, setVolunteers] = React.useState<Volunteer[]>(initialVolunteers);
     const [searchTerm, setSearchTerm] = React.useState("");
@@ -58,10 +54,18 @@ export function VolunteersClientPage({ initialVolunteers, allSkills, allProfessi
 
 
     const updateVolunteerStatus = async (id: string, status: 'Actif' | 'Rejeté') => {
-        if (!id || !db) return;
+        if (!id) return;
         try {
-            const volunteerRef = doc(db, "volunteers", id);
-            await updateDoc(volunteerRef, { status: status });
+            const response = await fetch(`http://localhost:3001/api/volunteers/${id}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+
+            if (!response.ok) {
+                 throw new Error('Failed to update status');
+            }
+
             setVolunteers(volunteers.map(v => v.id === id ? { ...v, status } : v));
             toast({
                 title: "Statut mis à jour",
@@ -99,7 +103,7 @@ export function VolunteersClientPage({ initialVolunteers, allSkills, allProfessi
         if (searchTerm) {
             sortedVolunteers = sortedVolunteers.filter(v =>
                 `${v.firstName} ${v.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                v.email.toLowerCase().includes(searchTerm.toLowerCase())
+                (v.email && v.email.toLowerCase().includes(searchTerm.toLowerCase()))
             );
         }
 
@@ -275,6 +279,11 @@ export function VolunteersClientPage({ initialVolunteers, allSkills, allProfessi
                                                             <X className="h-4 w-4" />
                                                         </Button>
                                                     </AlertDialogTrigger>
+                                                     <Button asChild variant="ghost" size="icon">
+                                                        <Link href={`/dashboard/volunteers/${volunteer.id}`}>
+                                                            <Eye className="h-4 w-4" />
+                                                        </Link>
+                                                    </Button>
                                                 </div>
                                             ) : (
                                                 <DropdownMenu>

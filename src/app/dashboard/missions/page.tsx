@@ -34,7 +34,6 @@ export default function MissionsPage() {
     const fetchMissions = React.useCallback(async () => {
         setLoading(true);
         try {
-            // L'URL de votre API backend. Assurez-vous que le serveur API tourne sur le port 3001.
             const response = await fetch('http://localhost:3001/api/missions');
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -53,8 +52,6 @@ export default function MissionsPage() {
         }
     }, [toast]);
     
-    // Pour l'instant, la mise à jour du statut se fait en local.
-    // Prochaine étape : appeler un endpoint PATCH /api/missions/:id/status
     const updateMissionStatus = async (id: string, status: 'Annulée' | 'Planifiée') => {
         if (!id) return;
         
@@ -62,11 +59,29 @@ export default function MissionsPage() {
         const updatedMissions = missions.map(m => m.id === id ? { ...m, status } : m);
         setMissions(updatedMissions);
 
-        toast({
-            title: "Action non connectée",
-            description: `Le statut a été mis à jour localement. Prochaine étape : connecter à l'API.`,
-            variant: "default"
-        });
+        try {
+             const response = await fetch(`http://localhost:3001/api/missions/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+
+            if (!response.ok) throw new Error("Failed to update status");
+
+            toast({
+                title: "Statut mis à jour",
+                description: `Le statut de la mission a été mis à jour.`,
+            });
+            fetchMissions(); // Refresh the list
+        } catch(error) {
+             console.error("Error updating mission status: ", error);
+             toast({
+                title: "Erreur",
+                description: "La mise à jour du statut a échoué.",
+                variant: "destructive",
+            });
+            setMissions(originalMissions); // Revert on error
+        }
     };
     
     React.useEffect(() => {
@@ -187,4 +202,3 @@ export default function MissionsPage() {
         </div>
     );
 }
-

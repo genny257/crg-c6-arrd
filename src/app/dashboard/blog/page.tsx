@@ -13,13 +13,6 @@ import { useToast } from "@/hooks/use-toast";
 import type { BlogPost } from "@/types/blog";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Mock data, to be replaced by API call
-const mockPosts: BlogPost[] = [
-    { id: '1', title: 'Première mission de sensibilisation', date: '2024-07-10T10:00:00Z', excerpt: 'Retour sur notre première mission de sensibilisation dans les écoles.', image: 'https://placehold.co/600x400.png', imageHint: 'school children', slug: 'premiere-mission-sensibilisation', visible: true, content: 'Le contenu complet de l\'article sur la **première mission**.' },
-    { id: '2', title: 'Collecte de dons pour les sinistrés', date: '2024-07-09T10:00:00Z', excerpt: 'Un grand merci à tous les donateurs pour leur générosité.', image: 'https://placehold.co/600x400.png', imageHint: 'donation box', slug: 'collecte-de-dons', visible: true, content: 'Le contenu complet de l\'article sur la **collecte de dons**.' },
-    { id: '3', title: 'Article masqué pour les admins', date: '2024-07-08T10:00:00Z', excerpt: 'Cet article n\'est visible que par les administrateurs.', image: 'https://placehold.co/600x400.png', imageHint: 'private content', slug: 'article-masque', visible: false, content: 'Contenu de l\'article masqué.' },
-];
-
 export default function BlogPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
@@ -30,8 +23,13 @@ export default function BlogPage() {
   const fetchPosts = React.useCallback(async () => {
     setLoading(true);
     try {
-        // TODO: Replace with API call to /api/blog
-      const postsData = isAdmin ? mockPosts : mockPosts.filter(p => p.visible);
+      const response = await fetch('http://localhost:3001/api/blog');
+      if (!response.ok) throw new Error("Failed to fetch posts");
+      let postsData = await response.json();
+      
+      if (!isAdmin) {
+        postsData = postsData.filter((p: BlogPost) => p.visible);
+      }
       setBlogPosts(postsData);
     } catch (error) {
       console.error("Error fetching blog posts: ", error);
@@ -51,16 +49,30 @@ export default function BlogPage() {
 
   const handleDelete = async (id: string) => {
     if (!id) return;
-    // TODO: Replace with API call to DELETE /api/blog/{id}
-    setBlogPosts(blogPosts.filter(p => p.id !== id));
-    toast({ title: "Succès", description: "L'article a été supprimé." });
+    try {
+        const response = await fetch(`http://localhost:3001/api/blog/${id}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error("Failed to delete post");
+        setBlogPosts(blogPosts.filter(p => p.id !== id));
+        toast({ title: "Succès", description: "L'article a été supprimé." });
+    } catch(error) {
+        toast({ title: "Erreur", description: "La suppression a échoué.", variant: "destructive" });
+    }
   };
 
   const toggleVisibility = async (id: string, currentVisibility: boolean) => {
      if (!id) return;
-    // TODO: Replace with API call to PATCH /api/blog/{id}
-    setBlogPosts(blogPosts.map(p => p.id === id ? { ...p, visible: !p.visible } : p));
-    toast({ title: "Succès", description: `L'article est maintenant ${!currentVisibility ? 'visible' : 'masqué'}.` });
+    try {
+        const response = await fetch(`http://localhost:3001/api/blog/${id}`, { 
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ visible: !currentVisibility })
+        });
+        if (!response.ok) throw new Error("Failed to update visibility");
+        setBlogPosts(blogPosts.map(p => p.id === id ? { ...p, visible: !p.visible } : p));
+        toast({ title: "Succès", description: `L'article est maintenant ${!currentVisibility ? 'visible' : 'masqué'}.` });
+    } catch (error) {
+         toast({ title: "Erreur", description: "La mise à jour a échoué.", variant: "destructive" });
+    }
   };
 
   return (

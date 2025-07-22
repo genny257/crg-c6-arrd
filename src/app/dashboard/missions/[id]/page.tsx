@@ -2,10 +2,8 @@
 "use client";
 
 import * as React from "react";
-import { doc, getDoc, collection, getDocs, query, where, documentId } from "firebase/firestore";
 import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase/client";
 import type { Mission } from "@/types/mission";
 import type { Volunteer } from "@/types/volunteer";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -39,28 +37,28 @@ export default function MissionDetailPage() {
 
     React.useEffect(() => {
         const fetchMissionDetails = async () => {
-            if (typeof id !== 'string' || !db) return;
+            if (typeof id !== 'string') return;
             setLoading(true);
             try {
-                // Fetch mission data
-                const missionRef = doc(db, "missions", id);
-                const missionSnap = await getDoc(missionRef);
-
-                if (!missionSnap.exists()) {
-                    toast({ title: "Erreur", description: "Mission non trouvée.", variant: "destructive" });
-                    router.push('/dashboard/missions');
-                    return;
+                // TODO: Replace with API call to /api/missions/{id} and /api/volunteers?ids=...
+                const missionResponse = await fetch(`http://localhost:3001/api/missions/${id}`);
+                if (!missionResponse.ok) {
+                    throw new Error('Mission not found');
                 }
                 
-                const missionData = { id: missionSnap.id, ...missionSnap.data() } as Mission;
+                const missionData: Mission = await missionResponse.json();
                 setMission(missionData);
 
-                // Fetch participants data if any
+                // Fetch participants data if any - this part needs a dedicated backend endpoint
                 if (missionData.participants && missionData.participants.length > 0) {
-                    const participantsQuery = query(collection(db, "volunteers"), where(documentId(), "in", missionData.participants));
-                    const participantsSnap = await getDocs(participantsQuery);
-                    const participantsData = participantsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Volunteer));
-                    setParticipants(participantsData);
+                     // const participantsResponse = await fetch(`/api/volunteers?ids=${missionData.participants.join(',')}`);
+                    // const participantsData = await participantsResponse.json();
+                    // For now, using mock data
+                     const mockParticipants: Volunteer[] = [
+                        { id: '1', firstName: 'John', lastName: 'Doe', email: 'john@doe.com', photo: 'https://placehold.co/100x100.png', termsAccepted: true, createdAt: new Date().toISOString(), birthDate: new Date().toISOString(), address: '123 street', phone: '123' },
+                        { id: '2', firstName: 'Jane', lastName: 'Smith', email: 'jane@smith.com', photo: 'https://placehold.co/100x100.png', termsAccepted: true, createdAt: new Date().toISOString(), birthDate: new Date().toISOString(), address: '123 street', phone: '123' },
+                    ];
+                    setParticipants(mockParticipants);
                 }
             } catch (error) {
                 console.error("Error fetching mission details: ", error);
@@ -70,9 +68,7 @@ export default function MissionDetailPage() {
             }
         };
 
-        if (db) {
-            fetchMissionDetails();
-        }
+        fetchMissionDetails();
     }, [id, router, toast]);
 
     if (loading) {

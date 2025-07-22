@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter, useParams } from "next/navigation";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Link from "next/link";
 import { ArrowLeft, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
@@ -22,7 +21,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import type { Event } from "@/types/event";
@@ -38,6 +36,8 @@ const eventSchema = z.object({
 });
 
 type EventFormValues = z.infer<typeof eventSchema>;
+
+const mockEvent: Event = { id: '1', title: 'Grande Collecte de Sang', date: '2024-09-01T10:00:00Z', location: 'Siège du Comité, Libreville', description: 'Rejoignez-nous pour cette collecte vitale.', status: 'À venir', image: 'https://placehold.co/600x400.png' };
 
 export default function EditEventPage() {
   const router = useRouter();
@@ -56,10 +56,9 @@ export default function EditEventPage() {
     if (typeof id !== 'string') return;
     const fetchEvent = async () => {
         setPageLoading(true);
-        const eventRef = doc(db, "events", id);
-        const eventSnap = await getDoc(eventRef);
-        if (eventSnap.exists()) {
-            const eventData = eventSnap.data() as Event;
+        // TODO: Replace with API call to /api/events/{id}
+        const eventData = mockEvent;
+        if (eventData) {
             form.reset({
                 ...eventData,
                 date: new Date(eventData.date),
@@ -77,14 +76,11 @@ export default function EditEventPage() {
     if(typeof id !== 'string') return;
     setIsSubmitting(true);
     try {
-      const eventRef = doc(db, "events", id);
-      await updateDoc(eventRef, {
-        ...data,
-        date: data.date.toISOString(),
-      });
+      // TODO: Replace with API call to PUT /api/events/{id}
+      console.log("Updating event with data:", data);
       toast({
         title: "Événement modifié",
-        description: "L'événement a été mis à jour avec succès.",
+        description: "L'événement a été mis à jour avec succès (simulation).",
       });
       router.push('/events');
     } catch (error) {

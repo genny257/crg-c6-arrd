@@ -1,11 +1,10 @@
+
 "use client"
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Mission } from "@/types/mission";
 import type { Event } from "@/types/event";
@@ -29,6 +28,15 @@ const getEventTypeClass = (type: CalendarEvent['type']) => {
     }
 };
 
+// Mock data
+const mockMissions: Mission[] = [
+    { id: '1', title: 'Sensibilisation Sida', description: '', location: 'Lycée X', startDate: '2024-08-05T09:00:00Z', endDate: '2024-08-05T17:00:00Z', status: 'Planifiée', requiredSkills: [] },
+    { id: '2', title: 'Collecte de sang', description: '', location: 'Hôtel de ville', startDate: '2024-08-15T09:00:00Z', endDate: '2024-08-16T17:00:00Z', status: 'Planifiée', requiredSkills: [] },
+];
+const mockEvents: Event[] = [
+    { id: '1', title: 'Journée Mondiale du Don de Sang', date: '2024-08-14T10:00:00Z', location: 'Siège', description: '', status: 'À venir' },
+];
+
 export default function CalendarPage() {
     const { toast } = useToast();
     const [date, setDate] = React.useState<Date | undefined>(new Date());
@@ -38,40 +46,26 @@ export default function CalendarPage() {
 
     React.useEffect(() => {
       const fetchEventsAndMissions = async () => {
-          if (!db) return;
           setLoading(true);
           try {
-              const missionsQuery = query(collection(db, "missions"), where("status", "in", ["Planifiée", "En cours"]));
-              const eventsQuery = query(collection(db, "events"), where("status", "==", "À venir"));
+              // TODO: Replace with API calls to /api/missions and /api/events
+              const missionsData = mockMissions.map(data => ({
+                  id: data.id,
+                  date: new Date(data.startDate),
+                  title: data.title,
+                  type: 'Mission' as const,
+                  status: data.status,
+                  href: `/dashboard/missions/${data.id}`
+              }));
 
-              const [missionsSnapshot, eventsSnapshot] = await Promise.all([
-                  getDocs(missionsQuery),
-                  getDocs(eventsQuery)
-              ]);
-
-              const missionsData = missionsSnapshot.docs.map(doc => {
-                  const data = doc.data() as Mission;
-                  return {
-                      id: doc.id,
-                      date: new Date(data.startDate),
-                      title: data.title,
-                      type: 'Mission' as const,
-                      status: data.status,
-                      href: `/dashboard/missions/${doc.id}`
-                  };
-              });
-
-              const eventsData = eventsSnapshot.docs.map(doc => {
-                  const data = doc.data() as Event;
-                   return {
-                      id: doc.id,
-                      date: new Date(data.date),
-                      title: data.title,
-                      type: 'Événement' as const,
-                      status: data.status,
-                      href: `/events`
-                  };
-              });
+              const eventsData = mockEvents.map(data => ({
+                  id: data.id,
+                  date: new Date(data.date),
+                  title: data.title,
+                  type: 'Événement' as const,
+                  status: data.status,
+                  href: `/events`
+              }));
 
               setEvents([...missionsData, ...eventsData]);
 
@@ -113,6 +107,7 @@ export default function CalendarPage() {
                             month={currentMonth}
                             onMonthChange={setCurrentMonth}
                             className="p-0"
+                            locale={fr}
                             classNames={{
                                 months: "flex flex-col sm:flex-row",
                                 month: "space-y-4 p-4",
@@ -153,7 +148,7 @@ export default function CalendarPage() {
                         <CardHeader>
                             <CardTitle>Évènements du mois</CardTitle>
                             <CardDescription>
-                                {currentMonth.toLocaleString('fr-FR', { month: 'long', year: 'numeric' })}
+                                {format(currentMonth, "LLLL yyyy", { locale: fr })}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4 h-[30rem] overflow-y-auto">

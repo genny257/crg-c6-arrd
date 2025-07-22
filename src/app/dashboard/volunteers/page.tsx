@@ -1,35 +1,24 @@
 
 import * as React from "react";
-import { getFirestore, Timestamp } from "firebase-admin/firestore";
-import { adminDb } from "@/lib/firebase/admin";
 import type { Volunteer } from "@/types/volunteer";
 import { VolunteersClientPage } from "./client-page";
 
 async function getVolunteers(): Promise<Volunteer[]> {
-    if (!adminDb) {
-        console.error("Firebase Admin DB is not initialized.");
-        return [];
-    }
     try {
-        const volunteersRef = adminDb.collection("volunteers");
-        const q = volunteersRef.orderBy("createdAt", "desc");
-        const querySnapshot = await q.get();
-        
-        const volunteersData = querySnapshot.docs.map(doc => {
-            const data = doc.data();
-            // Firestore Timestamps need to be converted to serializable format (ISO string)
-            const createdAt = (data.createdAt as Timestamp)?.toDate()?.toISOString() ?? new Date().toISOString();
-            return { 
-                id: doc.id, 
-                ...data,
-                createdAt: createdAt,
-                // Ensure other potential timestamps are handled
-                birthDate: (data.birthDate instanceof Timestamp) ? data.birthDate.toDate().toISOString() : data.birthDate,
-            } as Volunteer
-        });
-        return volunteersData;
+        // In a real app, you'd fetch from your API
+        // For now, let's assume this is your API endpoint
+        const res = await fetch('http://localhost:3001/api/volunteers', { cache: 'no-store' });
+
+        if (!res.ok) {
+            // This will activate the closest `error.js` Error Boundary
+            throw new Error('Failed to fetch volunteers');
+        }
+
+        const volunteers = await res.json();
+        return volunteers;
     } catch (error) {
-        console.error("Error fetching volunteers from server: ", error);
+        console.error("Could not fetch volunteers:", error);
+        // In case of error, return an empty array to prevent the page from crashing.
         return [];
     }
 }
@@ -38,14 +27,9 @@ async function getVolunteers(): Promise<Volunteer[]> {
 export default async function VolunteersPage() {
     const volunteers = await getVolunteers();
 
-    const allSkills = Array.from(new Set(volunteers.flatMap(v => v.skills || []))).sort();
-    const allProfessions = Array.from(new Set(volunteers.map(v => v.profession).filter(Boolean) as string[])).sort();
-
     return (
         <VolunteersClientPage 
             initialVolunteers={JSON.parse(JSON.stringify(volunteers))}
-            allSkills={allSkills}
-            allProfessions={allProfessions}
         />
     );
 }

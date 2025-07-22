@@ -2,7 +2,6 @@
 "use client"
 
 import * as React from "react";
-import { collection, getDocs, doc, deleteDoc, updateDoc, query, orderBy } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -10,12 +9,18 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Download, FileText, MoreHorizontal, Eye, Pencil, Trash2, PlusCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import Link from "next/link";
-import { db } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Report } from "@/types/report";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+
+// Mock data
+const mockReports: Report[] = [
+    { id: '1', title: 'Rapport Annuel 2023', date: '2024-01-15T10:00:00Z', fileUrl: 'https://example.com/report1.pdf', visible: true },
+    { id: '2', title: 'Rapport Financier T1 2024', date: '2024-04-10T10:00:00Z', fileUrl: 'https://example.com/report2.pdf', visible: true },
+    { id: '3', title: 'Brouillon Rapport T2 2024', date: '2024-07-05T10:00:00Z', fileUrl: 'https://example.com/report3.pdf', visible: false },
+];
 
 export default function ReportsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -27,9 +32,8 @@ export default function ReportsPage() {
   const fetchReports = React.useCallback(async () => {
     setLoading(true);
     try {
-      const q = query(collection(db, "reports"), orderBy("date", "desc"));
-      const querySnapshot = await getDocs(q);
-      const reportsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Report));
+      // TODO: Replace with API call to /api/reports
+      const reportsData = mockReports;
       setReports(reportsData);
     } catch (error) {
       console.error("Error fetching reports: ", error);
@@ -49,27 +53,16 @@ export default function ReportsPage() {
 
   const handleDelete = async (id: string) => {
     if (!id) return;
-    try {
-      await deleteDoc(doc(db, "reports", id));
-      setReports(reports.filter(r => r.id !== id));
-      toast({ title: "Succès", description: "Le rapport a été supprimé." });
-    } catch (error) {
-      console.error("Error deleting report: ", error);
-      toast({ title: "Erreur", description: "La suppression du rapport a échoué.", variant: "destructive" });
-    }
+    // TODO: Replace with API call to DELETE /api/reports/{id}
+    setReports(reports.filter(r => r.id !== id));
+    toast({ title: "Succès", description: "Le rapport a été supprimé." });
   };
 
   const toggleVisibility = async (id: string, currentVisibility: boolean) => {
      if (!id) return;
-    try {
-      const reportRef = doc(db, "reports", id);
-      await updateDoc(reportRef, { visible: !currentVisibility });
-      setReports(reports.map(r => r.id === id ? { ...r, visible: !r.visible } : r));
-      toast({ title: "Succès", description: `Le rapport est maintenant ${!currentVisibility ? 'visible' : 'masqué'}.` });
-    } catch (error) {
-      console.error("Error toggling visibility: ", error);
-      toast({ title: "Erreur", description: "Le changement de visibilité a échoué.", variant: "destructive" });
-    }
+    // TODO: Replace with API call to PATCH /api/reports/{id}
+    setReports(reports.map(r => r.id === id ? { ...r, visible: !r.visible } : r));
+    toast({ title: "Succès", description: `Le rapport est maintenant ${!currentVisibility ? 'visible' : 'masqué'}.` });
   };
   
   if (authLoading) return <div>Chargement...</div>;

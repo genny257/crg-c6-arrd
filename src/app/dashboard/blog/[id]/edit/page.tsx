@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter, useParams } from "next/navigation";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Link from "next/link";
 import { ArrowLeft, Sparkles, Loader2 } from "lucide-react";
 
@@ -16,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,6 +33,7 @@ const blogPostSchema = z.object({
 });
 
 type BlogPostFormValues = z.infer<typeof blogPostSchema>;
+
 
 export default function EditBlogPostPage() {
   const router = useRouter();
@@ -55,17 +54,18 @@ export default function EditBlogPostPage() {
     if (typeof id !== 'string') return;
     const fetchPost = async () => {
         setPageLoading(true);
-        const postRef = doc(db, "blogPosts", id);
-        const postSnap = await getDoc(postRef);
-        if (postSnap.exists()) {
-            const postData = postSnap.data() as BlogPost;
+        try {
+            const response = await fetch(`http://localhost:3001/api/blog/${id}`);
+            if (!response.ok) throw new Error("Failed to fetch post");
+            const postData = await response.json();
             form.reset(postData);
             setGenerationTopic(postData.title);
-        } else {
+        } catch(error) {
             toast({ title: "Erreur", description: "Article non trouvé.", variant: "destructive" });
             router.push('/blog');
+        } finally {
+            setPageLoading(false);
         }
-        setPageLoading(false);
     };
     fetchPost();
   }, [id, form, router, toast]);
@@ -96,8 +96,13 @@ export default function EditBlogPostPage() {
     if(typeof id !== 'string') return;
     setIsSubmitting(true);
     try {
-      const postRef = doc(db, "blogPosts", id);
-      await updateDoc(postRef, data);
+        const response = await fetch(`http://localhost:3001/api/blog/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error("Failed to update post");
+      
       toast({
         title: "Article modifié",
         description: "L'article a été mis à jour avec succès.",

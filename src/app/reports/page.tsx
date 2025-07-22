@@ -2,23 +2,28 @@
 "use client"
 
 import * as React from "react";
-import { collection, getDocs, doc, deleteDoc, updateDoc, query, orderBy, where } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Download, FileText, MoreHorizontal, Eye, Pencil, Trash2, PlusCircle } from "lucide-react";
+import { Download, FileText, PlusCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import Link from "next/link";
-import { db } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Report } from "@/types/report";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
+// Mock Data
+const mockReports: Report[] = [
+    { id: '1', title: 'Rapport Annuel 2023', date: '2024-01-15T10:00:00Z', fileUrl: 'https://example.com/report1.pdf', visible: true },
+    { id: '2', title: 'Rapport Financier T1 2024', date: '2024-04-10T10:00:00Z', fileUrl: 'https://example.com/report2.pdf', visible: true },
+    { id: '3', title: 'Brouillon Rapport T2 2024', date: '2024-07-05T10:00:00Z', fileUrl: 'https://example.com/report3.pdf', visible: false },
+];
+
+
 export default function ReportsPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
   const [reports, setReports] = React.useState<Report[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -27,13 +32,9 @@ export default function ReportsPage() {
   const fetchReports = React.useCallback(async () => {
     setLoading(true);
     try {
-      // Admins see all reports, others only see visible ones.
-      const q = isAdmin 
-        ? query(collection(db, "reports"), orderBy("date", "desc"))
-        : query(collection(db, "reports"), where("visible", "==", true), orderBy("date", "desc"));
+      // TODO: Replace with API call to /api/reports
+      const reportsData = isAdmin ? mockReports : mockReports.filter(r => r.visible);
         
-      const querySnapshot = await getDocs(q);
-      const reportsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Report));
       setReports(reportsData);
     } catch (error) {
       console.error("Error fetching reports: ", error);

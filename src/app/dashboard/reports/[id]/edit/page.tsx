@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter, useParams } from "next/navigation";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
@@ -15,7 +14,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -28,6 +26,8 @@ const reportSchema = z.object({
 });
 
 type ReportFormValues = z.infer<typeof reportSchema>;
+
+const mockReport: Report = { id: '1', title: 'Rapport Annuel 2023', date: '2024-01-15T10:00:00Z', fileUrl: 'https://example.com/report.pdf', visible: true };
 
 export default function EditReportPage() {
   const router = useRouter();
@@ -46,11 +46,9 @@ export default function EditReportPage() {
     if (typeof id !== 'string') return;
     const fetchReport = async () => {
         setPageLoading(true);
-        const reportRef = doc(db, "reports", id);
-        const reportSnap = await getDoc(reportRef);
-        if (reportSnap.exists()) {
-            const reportData = reportSnap.data() as Report;
-            form.reset(reportData);
+        // TODO: Replace with API call to /api/reports/{id}
+        if (mockReport) {
+            form.reset(mockReport);
         } else {
             toast({ title: "Erreur", description: "Rapport non trouvé.", variant: "destructive" });
             router.push('/dashboard/reports');
@@ -64,11 +62,11 @@ export default function EditReportPage() {
     if(typeof id !== 'string') return;
     setIsSubmitting(true);
     try {
-      const reportRef = doc(db, "reports", id);
-      await updateDoc(reportRef, data);
+      // TODO: Replace with API call to PUT /api/reports/{id}
+      console.log("Updating report with data:", data);
       toast({
         title: "Rapport modifié",
-        description: "Le rapport a été mis à jour avec succès.",
+        description: "Le rapport a été mis à jour avec succès (simulation).",
       });
       router.push('/dashboard/reports');
     } catch (error) {
@@ -104,7 +102,6 @@ export default function EditReportPage() {
                 <CardContent className="space-y-6">
                     <Skeleton className="h-10 w-full" />
                     <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-24 w-full" />
                     <Skeleton className="h-10 w-32" />
                 </CardContent>
             </Card>
@@ -155,7 +152,7 @@ export default function EditReportPage() {
                         <Input type="url" placeholder="https://..." {...field} />
                         </FormControl>
                         <FormDescription>
-                            Collez ici le lien vers le fichier PDF hébergé (par exemple sur Firebase Storage).
+                            Collez ici le lien vers le fichier PDF hébergé.
                         </FormDescription>
                         <FormMessage />
                     </FormItem>

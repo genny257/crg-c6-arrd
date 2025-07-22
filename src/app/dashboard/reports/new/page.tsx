@@ -6,14 +6,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { addDoc, collection } from "firebase/firestore";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -45,13 +43,11 @@ export default function NewReportPage() {
   const onSubmit = async (data: ReportFormValues) => {
     setIsSubmitting(true);
     try {
-      await addDoc(collection(db, "reports"), {
-        ...data,
-        date: new Date().toISOString(),
-      });
+      // TODO: Replace with API call to POST /api/reports
+      console.log("Creating report with data:", data);
       toast({
         title: "Rapport créé",
-        description: "Le nouveau rapport a été ajouté avec succès.",
+        description: "Le nouveau rapport a été ajouté avec succès (simulation).",
       });
       router.push("/dashboard/reports");
     } catch (error) {
@@ -118,7 +114,7 @@ export default function NewReportPage() {
                         <Input type="url" placeholder="https://..." {...field} />
                         </FormControl>
                         <FormDescription>
-                            Collez ici le lien vers le fichier PDF hébergé (par exemple sur Firebase Storage).
+                            Collez ici le lien vers le fichier PDF hébergé.
                         </FormDescription>
                         <FormMessage />
                     </FormItem>

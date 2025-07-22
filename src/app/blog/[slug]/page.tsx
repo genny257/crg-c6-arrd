@@ -2,15 +2,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  DocumentData,
-} from "firebase/firestore";
 import { notFound } from "next/navigation";
-import { db } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
@@ -20,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { BlogPost } from "@/types/blog";
+
 
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
   const [post, setPost] = React.useState<BlogPost | null>(null);
@@ -31,21 +24,14 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       if (!params.slug) return notFound();
       setLoading(true);
       try {
-        const q = query(
-          collection(db, "blogPosts"),
-          where("slug", "==", params.slug)
-        );
-        const querySnapshot = await getDocs(q);
+        const response = await fetch(`http://localhost:3001/api/blog/slug/${params.slug}`);
+        if (!response.ok) throw new Error("Post not found");
+        const foundPost = await response.json();
 
-        if (querySnapshot.empty) {
+        if (!foundPost || !foundPost.visible) {
           notFound();
         } else {
-          const postData = querySnapshot.docs[0].data() as BlogPost;
-           if (!postData.visible) {
-             // In a real app, you might check for admin role here to allow preview
-             notFound();
-           }
-          setPost(postData);
+          setPost(foundPost);
         }
       } catch (error) {
         console.error("Error fetching post: ", error);
@@ -123,5 +109,3 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
     </article>
   );
 }
-
-    

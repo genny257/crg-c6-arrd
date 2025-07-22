@@ -6,16 +6,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { addDoc, collection } from "firebase/firestore";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -34,6 +31,7 @@ const missionSchema = z.object({
   endDate: z.date({ required_error: "La date de fin est requise." }),
   maxParticipants: z.coerce.number().int().positive("Le nombre doit être positif.").optional(),
   status: z.enum(['Planifiée', 'En cours', 'Terminée', 'Annulée']).default('Planifiée'),
+  requiredSkills: z.array(z.string()).default([]), // Added requiredSkills
 });
 
 type MissionFormValues = z.infer<typeof missionSchema>;
@@ -51,18 +49,23 @@ export default function NewMissionPage() {
       description: "",
       location: "",
       status: "Planifiée",
+      requiredSkills: [],
     },
   });
 
   const onSubmit = async (data: MissionFormValues) => {
     setIsSubmitting(true);
     try {
-      await addDoc(collection(db, "missions"), {
-        ...data,
-        startDate: data.startDate.toISOString(),
-        endDate: data.endDate.toISOString(),
-        requiredSkills: [], // Add logic for skills if needed
+      // TODO: Replace with API call to POST /api/missions
+      const response = await fetch('http://localhost:3001/api/missions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
       });
+      if (!response.ok) {
+          throw new Error('Failed to create mission');
+      }
+
       toast({
         title: "Mission créée",
         description: "La nouvelle mission a été ajoutée avec succès.",

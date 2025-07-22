@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter, useParams } from "next/navigation";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { ArrowLeft, CalendarIcon } from "lucide-react";
 import Link from "next/link";
@@ -56,20 +54,25 @@ export default function EditMissionPage() {
     if (typeof id !== 'string') return;
     const fetchMission = async () => {
         setPageLoading(true);
-        const missionRef = doc(db, "missions", id);
-        const missionSnap = await getDoc(missionRef);
-        if (missionSnap.exists()) {
-            const missionData = missionSnap.data() as Mission;
+        try {
+            const response = await fetch(`http://localhost:3001/api/missions/${id}`);
+            if (!response.ok) {
+                 throw new Error('Network response was not ok');
+            }
+            const missionData: Mission = await response.json();
+
             form.reset({
                 ...missionData,
                 startDate: new Date(missionData.startDate),
                 endDate: new Date(missionData.endDate),
             });
-        } else {
+        } catch (error) {
+            console.error("Error fetching mission:", error);
             toast({ title: "Erreur", description: "Mission non trouvée.", variant: "destructive" });
             router.push('/dashboard/missions');
+        } finally {
+            setPageLoading(false);
         }
-        setPageLoading(false);
     };
     fetchMission();
   }, [id, form, router, toast]);
@@ -78,12 +81,15 @@ export default function EditMissionPage() {
     if(typeof id !== 'string') return;
     setIsSubmitting(true);
     try {
-      const missionRef = doc(db, "missions", id);
-      await updateDoc(missionRef, {
-        ...data,
-        startDate: data.startDate.toISOString(),
-        endDate: data.endDate.toISOString(),
+      const response = await fetch(`http://localhost:3001/api/missions/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
       });
+      if (!response.ok) {
+          throw new Error('Failed to update mission');
+      }
+
       toast({
         title: "Mission modifiée",
         description: "La mission a été mise à jour avec succès.",

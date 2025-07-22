@@ -2,10 +2,8 @@
 "use client";
 
 import * as React from "react";
-import { doc, getDoc } from "firebase/firestore";
 import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase/client";
 import type { Volunteer } from "@/types/volunteer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,15 +39,19 @@ export default function VolunteerProfilePage() {
             }
             setLoading(true);
             try {
-                const volunteerRef = doc(db, "volunteers", id);
-                const docSnap = await getDoc(volunteerRef);
-
-                if (docSnap.exists()) {
-                    setVolunteer({ id: docSnap.id, ...docSnap.data() } as Volunteer);
-                } else {
-                    toast({ title: "Erreur", description: "Volontaire non trouvé.", variant: "destructive" });
-                    router.push('/dashboard/volunteers');
+                const response = await fetch(`http://localhost:3001/api/volunteers/${id}`);
+                if (!response.ok) {
+                    throw new Error('Volunteer not found');
                 }
+                const volunteerData = await response.json();
+                
+                if (volunteerData) {
+                     setVolunteer(volunteerData);
+                } else {
+                     toast({ title: "Erreur", description: "Volontaire non trouvé.", variant: "destructive" });
+                     router.push('/dashboard/volunteers');
+                }
+
             } catch (error) {
                 console.error("Error fetching volunteer: ", error);
                 toast({ title: "Erreur", description: "Impossible de charger le profil du volontaire.", variant: "destructive" });

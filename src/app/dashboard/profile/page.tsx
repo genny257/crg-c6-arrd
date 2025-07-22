@@ -10,11 +10,26 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { X, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { doc, getDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Volunteer } from "@/types/volunteer";
 import { Skeleton } from "@/components/ui/skeleton";
+
+// Mock Data
+const mockProfile: Volunteer = {
+    id: 'user1',
+    firstName: "Jean",
+    lastName: "Volontaire",
+    email: "user@example.com",
+    phone: "061234567",
+    skills: ["Secourisme", "Logistique"],
+    availability: ["Week-end"],
+    status: 'Actif',
+    profession: 'Comptable',
+    address: '123 Rue de la Paix',
+    birthDate: '1990-01-15T00:00:00Z',
+    createdAt: '2023-01-10T00:00:00Z',
+    termsAccepted: true,
+};
 
 export default function ProfilePage() {
     const { user, loading: authLoading } = useAuth();
@@ -26,16 +41,9 @@ export default function ProfilePage() {
 
     React.useEffect(() => {
         const fetchProfile = async () => {
-            if (user?.email && db) {
-                 const q = query(collection(db, "volunteers"), where("email", "==", user.email));
-                 const querySnapshot = await getDocs(q);
-                 
-                 if (!querySnapshot.empty) {
-                     const userDoc = querySnapshot.docs[0];
-                     setProfile({ id: userDoc.id, ...userDoc.data() } as Volunteer);
-                 } else {
-                     console.log("No profile found for email:", user.email);
-                 }
+            if (user?.email) {
+                 // TODO: Replace with API call to /api/volunteers/me or /api/volunteers?email={user.email}
+                 setProfile(mockProfile);
             }
             setLoading(false);
         };
@@ -79,23 +87,14 @@ export default function ProfilePage() {
     };
 
     const handleSaveChanges = async () => {
-        if (!profile?.id || !db) return;
+        if (!profile?.id) return;
         setIsSaving(true);
         try {
-            const profileRef = doc(db, "volunteers", profile.id);
-            // We only update a subset of fields, not the whole object
-            const dataToUpdate = {
-                phone: profile.phone,
-                skills: profile.skills,
-                availability: profile.availability,
-                // Add any other fields you want to be editable by the user
-            };
-
-            await updateDoc(profileRef, dataToUpdate);
-
+            // TODO: Replace with API call to PUT /api/volunteers/{id}
+            console.log("Saving profile data:", profile);
             toast({
                 title: "Succès",
-                description: "Votre profil a été mis à jour.",
+                description: "Votre profil a été mis à jour (simulation).",
             });
         } catch (error) {
             console.error("Error updating profile:", error);

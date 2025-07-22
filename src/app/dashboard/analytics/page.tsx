@@ -5,119 +5,43 @@ import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Briefcase, HeartHandshake, Percent } from "lucide-react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
-import { collection, getDocs, query, where, Timestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
-import type { StatsData, MonthlyData } from "@/types/stats";
-import { subMonths, format, getMonth, getYear, startOfMonth } from "date-fns";
+import type { StatsData } from "@/types/stats";
+import { subMonths, format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 
-async function getStatsData(db: any): Promise<StatsData> {
-    const volunteersSnap = await getDocs(collection(db, "volunteers"));
-    const activeMissionsSnap = await getDocs(query(collection(db, "missions"), where("status", "==", "En cours")));
-    const donationsSnap = await getDocs(collection(db, "donations"));
+// Mock data, to be replaced by API call
+const getMockStatsData = async (): Promise<StatsData> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+        const now = new Date();
+        const volunteersHistory = Array.from({ length: 6 }, (_, i) => {
+            const d = subMonths(now, 5 - i);
+            return { name: format(d, 'MMM', { locale: fr }), count: 15 + i * 5 + Math.floor(Math.random() * 5) };
+        });
+         const donationsHistory = Array.from({ length: 6 }, (_, i) => {
+            const d = subMonths(now, 5 - i);
+            return { name: format(d, 'MMM', { locale: fr }), total: 100000 + i * 50000 + Math.floor(Math.random() * 20000) };
+        });
 
-    const now = new Date();
-    const sixMonthsAgo = startOfMonth(subMonths(now, 5));
-
-    const volunteersByMonth: { name: string; count: number }[] = Array.from({ length: 6 }, (_, i) => {
-        const d = subMonths(now, 5 - i);
-        return { name: format(d, 'MMM', { locale: fr }), count: 0 };
-    });
-
-    const donationsByMonth: { name: string; total: number }[] = Array.from({ length: 6 }, (_, i) => {
-        const d = subMonths(now, 5 - i);
-        return { name: format(d, 'MMM', { locale: fr }), total: 0 };
-    });
-    
-    let totalDonationsLastMonth = 0;
-    const lastMonth = subMonths(now, 1);
-    const startOfLastMonth = startOfMonth(lastMonth);
-    const endOfLastMonth = startOfMonth(now);
-
-    volunteersSnap.forEach(doc => {
-        const data = doc.data();
-        const createdAt = (data.createdAt as any)?.toDate ? (data.createdAt as any).toDate() : new Date(data.createdAt);
-        if (createdAt >= sixMonthsAgo) {
-            const monthIndex = (getMonth(createdAt) - getMonth(sixMonthsAgo) + 12) % 12;
-            if (monthIndex >= 0 && monthIndex < volunteersByMonth.length) {
-                 volunteersByMonth[monthIndex]!.count++;
-            }
-        }
-    });
-
-    // Accumulate counts for volunteers
-    for (let i = 1; i < volunteersByMonth.length; i++) {
-        const currentMonth = volunteersByMonth[i];
-        const prevMonth = volunteersByMonth[i - 1];
-        if (currentMonth && prevMonth) {
-            currentMonth.count = (currentMonth.count ?? 0) + (prevMonth.count ?? 0);
-        }
-    }
-    const totalVolunteersLastMonth = volunteersByMonth[4]?.count ?? 0;
-    const newVolunteersThisMonth = (volunteersByMonth[5]?.count ?? 0) - totalVolunteersLastMonth;
-
-    let totalDonationsThisMonth = 0;
-
-    donationsSnap.forEach(doc => {
-        const data = doc.data();
-        const donationDate = (data.date as any)?.toDate ? (data.date as any).toDate() : new Date(data.date);
-        
-        if (donationDate >= sixMonthsAgo) {
-             const month = getMonth(donationDate);
-             const year = getYear(donationDate);
-             const currentYear = getYear(now);
-
-            // Find the correct month index in our 6-month array
-             for (let i = 0; i < 6; i++) {
-                const d = subMonths(now, 5 - i);
-                if (getMonth(d) === month && getYear(d) === year) {
-                     if (donationsByMonth[i]) {
-                        donationsByMonth[i].total = (donationsByMonth[i].total || 0) + data.amount;
-                    }
-                    break;
-                }
-            }
-        }
-        
-        if (getYear(donationDate) === getYear(now) && getMonth(donationDate) === getMonth(now)) {
-            totalDonationsThisMonth += data.amount;
-        }
-        if (donationDate >= startOfLastMonth && donationDate < endOfLastMonth) {
-            totalDonationsLastMonth += data.amount;
-        }
-    });
-    
-    const donationChangePercentage = totalDonationsLastMonth > 0
-        ? ((totalDonationsThisMonth - totalDonationsLastMonth) / totalDonationsLastMonth) * 100
-        : totalDonationsThisMonth > 0 ? 100 : 0;
-
-    const activeVolunteersCount = volunteersSnap.docs.filter(d => d.data().status === 'Actif').length;
-    const allMissionsSnap = await getDocs(collection(db, "missions"));
-    const assignedVolunteers = new Set();
-    allMissionsSnap.forEach(missionDoc => {
-        const participants = missionDoc.data().participants || [];
-        participants.forEach((p: string) => assignedVolunteers.add(p));
-    });
-
-    const engagementRate = activeVolunteersCount > 0 ? (assignedVolunteers.size / activeVolunteersCount) * 100 : 0;
-
-    return {
+      resolve({
         keyMetrics: {
-            activeVolunteers: activeVolunteersCount,
-            newVolunteersThisMonth,
-            ongoingMissions: activeMissionsSnap.size,
-            donationsThisMonth: totalDonationsThisMonth,
-            donationChangePercentage,
-            engagementRate,
+          activeVolunteers: 85,
+          newVolunteersThisMonth: 8,
+          ongoingMissions: 4,
+          donationsThisMonth: 250000,
+          donationChangePercentage: 15.2,
+          engagementRate: 65,
         },
         charts: {
-            volunteersHistory: volunteersByMonth,
-            donationsHistory: donationsByMonth,
+          volunteersHistory,
+          donationsHistory,
         }
-    };
-}
+      });
+    }, 1000);
+  });
+};
 
 
 export default function AnalyticsPage() {
@@ -127,10 +51,10 @@ export default function AnalyticsPage() {
 
     React.useEffect(() => {
         const fetchData = async () => {
-            if (!db) return;
             setLoading(true);
             try {
-                const data = await getStatsData(db);
+                // TODO: Replace with API call to /api/analytics
+                const data = await getMockStatsData();
                 setStats(data);
             } catch (error) {
                 console.error("Error fetching analytics data:", error);

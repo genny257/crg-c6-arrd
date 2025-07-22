@@ -2,10 +2,8 @@
 "use client";
 
 import * as React from "react";
-import { doc, getDoc } from "firebase/firestore";
 import { useParams, notFound } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase/client";
 import type { Mission } from "@/types/mission";
 import { PublicLayout } from "@/components/public-layout";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -41,21 +39,17 @@ export default function PublicMissionPage() {
 
     React.useEffect(() => {
         const fetchMission = async () => {
-            if (typeof id !== 'string' || !db) return;
+            if (typeof id !== 'string') return;
             setLoading(true);
             try {
-                const missionRef = doc(db, "missions", id);
-                const missionSnap = await getDoc(missionRef);
-
-                if (!missionSnap.exists()) {
-                    notFound();
-                    return;
+                // TODO: Replace with API call to /api/missions/{id}
+                const response = await fetch(`http://localhost:3001/api/missions/${id}`);
+                 if (!response.ok) {
+                    throw new Error('Mission not found');
                 }
-                
-                const missionData = { id: missionSnap.id, ...missionSnap.data() } as Mission;
+                const missionData: Mission = await response.json();
 
                 if (missionData.status !== "Planifiée" && missionData.status !== "En cours") {
-                    // Or redirect to a "mission closed" page
                     notFound();
                     return;
                 }
@@ -64,14 +58,13 @@ export default function PublicMissionPage() {
             } catch (error) {
                 console.error("Error fetching mission: ", error);
                 toast({ title: "Erreur", description: "Impossible de charger la mission.", variant: "destructive" });
+                 notFound();
             } finally {
                 setLoading(false);
             }
         };
 
-        if (db) {
-            fetchMission();
-        }
+        fetchMission();
     }, [id, toast]);
 
     const handleRegistration = async (e: React.FormEvent) => {

@@ -9,29 +9,33 @@ import { Label } from "@/components/ui/label"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useAuth, UserRole } from "@/hooks/use-auth"
+import { signIn } from "next-auth/react"
 import Image from "next/image"
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
-  const [email, setEmail] = React.useState("user@example.com");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    let role: UserRole = 'user';
-    let name = 'Utilisateur';
+    setLoading(true);
+    setError(null);
 
-    if (email === 'admin@example.com') {
-      role = 'admin';
-      name = 'Admin';
-    } else if (email === 'superadmin@example.com') {
-      role = 'superadmin';
-      name = 'Super Admin';
+    const result = await signIn('credentials', {
+      redirect: false,
+      email,
+      password,
+    });
+
+    if (result?.error) {
+      setError("Email ou mot de passe incorrect.");
+      setLoading(false);
+    } else {
+      router.push('/dashboard');
     }
-
-    login({ name: name, role, email: email });
-    router.push('/dashboard');
   };
 
   return (
@@ -52,7 +56,7 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-2xl font-headline text-center">Connexion</CardTitle>
           <CardDescription className="text-center">
-            Accédez à votre espace ou inscrivez-vous
+            Accédez à votre espace personnel
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -67,9 +71,6 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-               <p className="text-xs text-muted-foreground pt-1">
-                Utilisez <code className="font-mono bg-muted p-1 rounded">admin@example.com</code> ou <code className="font-mono bg-muted p-1 rounded">superadmin@example.com</code> pour tester les différents rôles.
-              </p>
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
@@ -81,14 +82,19 @@ export default function LoginPage() {
                   Mot de passe oublié ?
                 </Link>
               </div>
-              <Input id="password" type="password" required defaultValue="password" />
+              <Input 
+                id="password" 
+                type="password" 
+                required 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
+            
+            {error && <p className="text-sm text-destructive">{error}</p>}
 
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-              Se connecter
-            </Button>
-            <Button variant="outline" className="w-full">
-              Se connecter avec Google
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={loading}>
+              {loading ? "Connexion..." : "Se connecter"}
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">

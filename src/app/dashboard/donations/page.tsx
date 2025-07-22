@@ -1,7 +1,6 @@
 
 "use client"
 import * as React from "react";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -14,7 +13,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel
 } from "@/components/ui/dropdown-menu";
-import { db } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Donation } from "@/types/donation";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -30,6 +28,13 @@ const getStatusBadgeVariant = (status: string) => {
     }
 };
 
+// Mock data
+const mockDonations: Donation[] = [
+    { id: '1', name: 'Jean Dupont', amount: 5000, type: 'Ponctuel', method: 'Mobile Money', date: '2024-07-15T10:00:00Z', status: 'Confirmé', email: 'jean.dupont@example.com' },
+    { id: '2', name: 'Marie Claire', amount: 10000, type: 'Mensuel', method: 'Carte Bancaire', date: '2024-07-14T11:00:00Z', status: 'En attente', email: 'marie.claire@example.com' },
+    { id: '3', name: 'Paul Martin', amount: 2000, type: 'Ponctuel', method: 'Mobile Money', date: '2024-07-13T12:00:00Z', status: 'Échoué', email: 'paul.martin@example.com' },
+];
+
 export default function DonationPage() {
     const [donations, setDonations] = React.useState<Donation[]>([]);
     const [loading, setLoading] = React.useState(true);
@@ -37,20 +42,9 @@ export default function DonationPage() {
 
     const fetchDonations = React.useCallback(async () => {
         setLoading(true);
-        if (!db) {
-             toast({
-                title: "Erreur de connexion",
-                description: "Impossible de se connecter à la base de données.",
-                variant: "destructive",
-            });
-            setLoading(false);
-            return;
-        }
         try {
-            const q = query(collection(db, "donations"), orderBy("date", "desc"));
-            const querySnapshot = await getDocs(q);
-            const donationsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Donation));
-            setDonations(donationsData);
+            // TODO: Replace with API call to /api/donations
+            setDonations(mockDonations);
         } catch (error) {
             console.error("Error fetching donations: ", error);
             toast({

@@ -4,10 +4,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Network, Users, Briefcase, Search, ArrowDownUp, Archive, Truck, Banknote, HeartPulse, LifeBuoy, HandHeart, Droplets, Shield, GraduationCap, ClipboardCheck, Siren, Soup } from "lucide-react";
+import { Network, Users, Search, ArrowDownUp, Archive, Truck, Banknote, HeartPulse, LifeBuoy, HandHeart, Droplets, Shield, GraduationCap, ClipboardCheck, Siren, Soup } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
 import type { Volunteer } from "@/types/volunteer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
@@ -131,6 +129,12 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => (
     </div>
 )
 
+// Mock Data
+const mockVolunteers: Volunteer[] = [
+    { id: '1', firstName: 'Alice', lastName: 'Dubois', email: 'alice.d@example.com', status: 'Actif', createdAt: '2024-07-20T10:00:00Z', termsAccepted: true, address: '', phone: '', birthDate: '', assignedCell: 'Nzeng-Ayong Lac', skills: ['Secourisme'], profession: 'Infirmier(e)', photo: 'https://placehold.co/100x100.png' },
+    { id: '2', firstName: 'Bob', lastName: 'Martin', email: 'bob.m@example.com', status: 'Actif', createdAt: '2024-07-19T11:00:00Z', termsAccepted: true, address: '', phone: '', birthDate: '', assignedCell: 'PK6-PK9', skills: ['Logistique'], profession: 'Chauffeur', photo: 'https://placehold.co/100x100.png' },
+];
+
 export default function TeamPage() {
     const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
     const [loading, setLoading] = useState(true);
@@ -145,16 +149,10 @@ export default function TeamPage() {
     
     useEffect(() => {
         const fetchVolunteers = async () => {
-             if (!db) {
-                console.error("Firestore is not initialized");
-                setLoading(false);
-                return;
-            }
             setLoading(true);
             try {
-                const q = query(collection(db, "volunteers"), where("status", "==", "Actif"));
-                const querySnapshot = await getDocs(q);
-                const volunteersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Volunteer));
+                // TODO: Replace with API call to /api/volunteers?status=Actif
+                const volunteersData = mockVolunteers;
                 setVolunteers(volunteersData);
 
                  const skills = new Set<string>();
@@ -379,4 +377,3 @@ export default function TeamPage() {
         </div>
     );
 }
-

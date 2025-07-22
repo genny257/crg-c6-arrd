@@ -4,9 +4,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { addDoc, collection } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase/client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -163,13 +161,9 @@ const DonationForm = ({ onFormSuccess, isMonthly }: { onFormSuccess: () => void,
 
     const onSubmit = async (data: z.infer<typeof donationSchema>) => {
         setIsSubmitting(true);
-        if (!db) {
-            toast({ title: "Erreur de connexion", description: "Impossible de se connecter à la base de données. Veuillez réessayer plus tard.", variant: "destructive" });
-            setIsSubmitting(false);
-            return;
-        }
         try {
-            await addDoc(collection(db, "donations"), {
+            // TODO: Replace with API call to POST /api/donations
+             const donationData = {
                 name: `${data.firstName} ${data.lastName}`,
                 email: data.email,
                 amount: data.amount,
@@ -177,7 +171,9 @@ const DonationForm = ({ onFormSuccess, isMonthly }: { onFormSuccess: () => void,
                 method: data.paymentMethod === 'mobile' ? 'Mobile Money' : 'Carte Bancaire',
                 date: new Date().toISOString(),
                 status: 'En attente',
-            });
+            };
+            console.log("Submitting donation:", donationData);
+            
             toast({
                 title: "Promesse de don enregistrée",
                 description: "Merci pour votre soutien ! Nous vous contacterons bientôt.",

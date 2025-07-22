@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { addDoc, collection } from "firebase/firestore";
 import Link from "next/link";
 import { ArrowLeft, Sparkles, Loader2 } from "lucide-react";
 
@@ -17,7 +16,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Switch } from "@/components/ui/switch";
 import { generateBlogPost } from "@/ai/flows/generate-blog-post-flow";
@@ -79,10 +77,13 @@ export default function NewBlogPostPage() {
   const onSubmit = async (data: BlogPostFormValues) => {
     setIsSubmitting(true);
     try {
-      await addDoc(collection(db, "blogPosts"), {
-        ...data,
-        date: new Date().toISOString(),
+      const response = await fetch('http://localhost:3001/api/blog', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
       });
+      if (!response.ok) throw new Error("Failed to create post");
+
       toast({
         title: "Article créé",
         description: "Le nouvel article de blog a été ajouté avec succès.",

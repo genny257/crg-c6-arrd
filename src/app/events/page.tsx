@@ -2,7 +2,6 @@
 "use client"
 
 import * as React from "react";
-import { collection, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -10,12 +9,19 @@ import { Calendar, MapPin, MoreVertical, Pencil, PlusCircle, Trash2, XCircle, Re
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
-import { db } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Event } from "@/types/event";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+
+// Mock data
+const mockEvents: Event[] = [
+    { id: '1', title: 'Grande Collecte de Sang', date: '2024-09-01T10:00:00Z', location: 'Siège du Comité, Libreville', description: 'Rejoignez-nous pour cette collecte vitale. Chaque don compte !', image: 'https://placehold.co/600x400.png', imageHint: 'blood donation', status: 'À venir' },
+    { id: '2', title: 'Formation Premiers Secours', date: '2024-09-15T09:00:00Z', location: 'Salle Polyvalente', description: 'Apprenez les gestes qui sauvent. Places limitées.', image: 'https://placehold.co/600x400.png', imageHint: 'first aid', status: 'À venir' },
+    { id: '3', title: 'Journée de l\'Hygiène', date: '2024-06-20T10:00:00Z', location: 'École Publique d\'Ondogo', description: 'Sensibilisation aux bonnes pratiques d\'hygiène.', image: 'https://placehold.co/600x400.png', imageHint: 'hygiene promotion', status: 'Terminé' },
+    { id: '4', title: 'Évènement Annulé', date: '2024-09-25T10:00:00Z', location: 'Lieu à définir', description: 'Cet évènement a été annulé.', image: 'https://placehold.co/600x400.png', imageHint: 'event cancelled', status: 'Annulé' },
+];
 
 export default function EventsPage() {
   const { user } = useAuth();
@@ -27,12 +33,8 @@ export default function EventsPage() {
   const fetchEvents = React.useCallback(async () => {
     setLoading(true);
     try {
-      const q = isAdmin 
-        ? query(collection(db, "events"), orderBy("date", "desc"))
-        : query(collection(db, "events"), where("status", "in", ["À venir", "Terminé"]), orderBy("date", "desc"));
-      
-      const querySnapshot = await getDocs(q);
-      const eventsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Event));
+      // TODO: Replace with API call to /api/events
+      const eventsData = isAdmin ? mockEvents : mockEvents.filter(e => e.status !== 'Annulé');
       setEvents(eventsData);
     } catch (error) {
       console.error("Error fetching events: ", error);
@@ -52,28 +54,17 @@ export default function EventsPage() {
 
   const handleDelete = async (id: string) => {
     if (!id) return;
-    try {
-      await deleteDoc(doc(db, "events", id));
-      setEvents(events.filter(e => e.id !== id));
-      toast({ title: "Succès", description: "L'événement a été supprimé." });
-    } catch (error) {
-      console.error("Error deleting event: ", error);
-      toast({ title: "Erreur", description: "La suppression de l'événement a échoué.", variant: "destructive" });
-    }
+    // TODO: Replace with API call to DELETE /api/events/{id}
+    setEvents(events.filter(e => e.id !== id));
+    toast({ title: "Succès", description: "L'événement a été supprimé." });
   };
 
   const toggleStatus = async (id: string, currentStatus: Event['status']) => {
      if (!id) return;
      const newStatus = currentStatus === 'Annulé' ? 'À venir' : 'Annulé';
-    try {
-      const eventRef = doc(db, "events", id);
-      await updateDoc(eventRef, { status: newStatus });
-      setEvents(events.map(e => e.id === id ? { ...e, status: newStatus } : e));
-      toast({ title: "Succès", description: `L'événement est maintenant marqué comme ${newStatus.toLowerCase()}.` });
-    } catch (error) {
-      console.error("Error toggling status: ", error);
-      toast({ title: "Erreur", description: "Le changement de statut a échoué.", variant: "destructive" });
-    }
+    // TODO: Replace with API call to PATCH /api/events/{id}
+    setEvents(events.map(e => e.id === id ? { ...e, status: newStatus } : e));
+    toast({ title: "Succès", description: `L'événement est maintenant marqué comme ${newStatus.toLowerCase()}.` });
   };
 
   return (

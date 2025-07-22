@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -25,8 +26,6 @@ import {
 } from "lucide-react";
 import type { ArchiveItem } from "@/types/archive";
 import { FileIcon } from "@/components/file-icon";
-import { collection, getDocs, addDoc, query, where, orderBy, deleteDoc, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -43,6 +42,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
+
+// Mock data
+const mockArchive: ArchiveItem[] = [
+    { id: '1', name: 'Rapports Annuels', type: 'folder', parentId: null, createdAt: '2024-01-01T10:00:00Z' },
+    { id: '2', name: 'Photos Missions', type: 'folder', parentId: null, createdAt: '2024-02-01T10:00:00Z' },
+    { id: '3', name: 'Budget 2024.xlsx', type: 'spreadsheet', parentId: null, createdAt: '2024-03-01T10:00:00Z' },
+    { id: '4', name: 'Rapport 2023.pdf', type: 'pdf', parentId: '1', createdAt: '2024-01-05T10:00:00Z' },
+    { id: '5', name: 'Mission Yumbi - Mai 2024', type: 'folder', parentId: '2', createdAt: '2024-05-01T10:00:00Z' },
+];
 
 
 export default function ArchivePage() {
@@ -61,14 +69,8 @@ export default function ArchivePage() {
   const fetchItems = React.useCallback(async (folderId: string | null) => {
     setLoading(true);
     try {
-      const q = query(
-        collection(db, "archive"),
-        where("parentId", "==", folderId),
-        orderBy("type", "desc"), // folders first
-        orderBy("name", "asc")
-      );
-      const querySnapshot = await getDocs(q);
-      const itemsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ArchiveItem));
+      // TODO: Replace with API call to /api/archive?parentId={folderId}
+      const itemsData = mockArchive.filter(item => item.parentId === folderId);
       setItems(itemsData);
     } catch (error) {
       console.error("Error fetching archive items:", error);
@@ -88,13 +90,8 @@ export default function ArchivePage() {
       return;
     }
     try {
-      await addDoc(collection(db, "archive"), {
-        name: newFolderName,
-        type: "folder",
-        parentId: currentFolderId,
-        createdAt: new Date().toISOString(),
-      });
-      toast({ title: "Succès", description: "Dossier créé avec succès." });
+      // TODO: Replace with API call to POST /api/archive
+      toast({ title: "Succès", description: "Dossier créé avec succès (simulation)." });
       fetchItems(currentFolderId); // Refresh list
     } catch (error) {
         console.error("Error creating folder:", error);
@@ -113,8 +110,10 @@ export default function ArchivePage() {
 
   const navigateToBreadcrumb = (crumbIndex: number) => {
     const crumb = breadcrumbs[crumbIndex];
-    setCurrentFolderId(crumb.id);
-    setBreadcrumbs(breadcrumbs.slice(0, crumbIndex + 1));
+    if (crumb) {
+        setCurrentFolderId(crumb.id);
+        setBreadcrumbs(breadcrumbs.slice(0, crumbIndex + 1));
+    }
   };
 
   if (authLoading) return <div>Chargement...</div>;

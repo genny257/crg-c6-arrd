@@ -1,57 +1,21 @@
-'use server';
-/**
- * @fileOverview A chatbot flow for the Croix-Rouge Gabonaise.
- *
- * - chat - A function that handles chatbot conversations.
- */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'zod';
+"use server";
 
-const prompt = ai.definePrompt({
-  name: 'chatbotPrompt',
-  input: {
-    schema: z.object({
-      history: z.array(z.object({
-        role: z.enum(['user', 'model']),
-        content: z.string(),
-      })),
-      question: z.string(),
-    }),
-  },
-  prompt: `Vous êtes un assistant virtuel de la Croix-Rouge Gabonaise, comité du 6ème arrondissement de Libreville.
-  Votre ton doit être institutionnel, rassurant et informatif.
-  Votre mission est de répondre aux questions des visiteurs sur l'organisation, ses missions, comment devenir volontaire, et comment faire un don.
-  Ne répondez pas aux questions qui ne concernent pas la Croix-Rouge Gabonaise. Soyez concis et clair.
+interface Message {
+  role: "user" | "model";
+  content: string;
+}
 
-  Voici l'historique de la conversation :
-  {{#each history}}
-    {{#if (eq role 'user')}}De: Utilisateur{{else}}De: Assistant{{/if}}
-    {{content}}
-  {{/each}}
+export async function chat(messages: Message[], input: string): Promise<string> {
+  console.log("Chatbot flow received messages:", messages);
+  console.log("Chatbot flow received input:", input);
 
-  Nouvelle question de l'utilisateur : {{{question}}}`,
-});
+  // Dummy response for now
+  const response = `This is a dummy response to your message: "${input}"`;
 
-const chatbotFlow = ai.defineFlow(
-  {
-    name: 'chatbotFlow',
-    inputSchema: z.object({
-      history: z.array(z.object({
-        role: z.enum(['user', 'model']),
-        content: z.string(),
-      })),
-      question: z.string(),
-    }),
-    outputSchema: z.string(),
-  },
-  async (input) => {
-    const llmResponse = await prompt(input);
-    return llmResponse.text;
-  }
-);
-
-export async function chat(history: any[], question: string): Promise<string> {
-  const result = await chatbotFlow({history, question});
-  return result;
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(response);
+    }, 1000);
+  });
 }

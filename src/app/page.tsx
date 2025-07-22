@@ -4,7 +4,7 @@ import * as React from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
-import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users, HandHeart, CheckCircle2, Droplets, Siren, Soup, ClipboardCheck, GraduationCap, Archive, Truck, Banknote, Shield } from "lucide-react"
+import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users, CheckCircle2, Droplets, Siren, Soup } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   Dialog,
@@ -14,9 +14,6 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog"
-import { useAuth } from "@/hooks/use-auth"
-import { doc, getDoc } from "firebase/firestore"
-import { db } from "@/lib/firebase/client"
 import type { HomePageContent } from "@/types/homepage"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -56,22 +53,15 @@ export default function Home() {
 
   React.useEffect(() => {
     const fetchContent = async () => {
-      if (!db) {
-        console.warn("Home page content not loaded: Firestore not initialized.");
-        setContent(initialContent);
-        setLoading(false);
-        return;
-      }
       setLoading(true);
       try {
-        const docRef = doc(db, "pages", "home");
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setContent(docSnap.data() as HomePageContent);
-        } else {
-          console.warn("Home page content not found in Firestore, using initial content.");
-          setContent(initialContent);
-        }
+        // Here you would fetch from your API:
+        // const response = await fetch('http://localhost:3001/api/content/home');
+        // const data = await response.json();
+        // setContent(data);
+        
+        // For now, we continue using initial static content
+        setContent(initialContent);
       } catch (error) {
         console.error("Error fetching home page content: ", error);
         setContent(initialContent); // Fallback to initial content on error

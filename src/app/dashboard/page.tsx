@@ -2,11 +2,9 @@
 "use client";
 
 import * as React from "react";
-import { collection, getDocs, query, where, orderBy, limit } from "firebase/firestore";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Briefcase, HeartHandshake, ArrowRight, CheckCircle, Clock } from "lucide-react";
-import { db } from "@/lib/firebase/client";
+import { Users, Briefcase, HeartHandshake, ArrowRight } from "lucide-react";
 import type { Volunteer } from "@/types/volunteer";
 import type { Mission } from "@/types/mission";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +21,7 @@ const getStatusBadgeVariant = (status: string) => {
     }
 };
 
+
 export default function DashboardPage() {
     const [stats, setStats] = React.useState({ volunteers: 0, missions: 0, donations: 0 });
     const [pendingVolunteers, setPendingVolunteers] = React.useState<Volunteer[]>([]);
@@ -31,24 +30,27 @@ export default function DashboardPage() {
 
     React.useEffect(() => {
         const fetchData = async () => {
-            if (!db) return;
             setLoading(true);
             try {
-                // Fetch stats
-                const volunteersSnap = await getDocs(collection(db, "volunteers"));
-                const missionsSnap = await getDocs(query(collection(db, "missions"), where("status", "==", "En cours")));
-                const donationsSnap = await getDocs(collection(db, "donations"));
-                setStats({ volunteers: volunteersSnap.size, missions: missionsSnap.size, donations: donationsSnap.size });
+                // In a real app, you'd fetch this from multiple API endpoints
+                // For now, we simulate this with a slight delay
+                const [volunteersRes, missionsRes] = await Promise.all([
+                    fetch('http://localhost:3001/api/volunteers'),
+                    fetch('http://localhost:3001/api/missions')
+                ]);
+                
+                const volunteersData: Volunteer[] = await volunteersRes.json();
+                const missionsData: Mission[] = await missionsRes.json();
 
-                // Fetch pending volunteers
-                const pendingQ = query(collection(db, "volunteers"), where("status", "==", "En attente"), orderBy("createdAt", "desc"), limit(5));
-                const pendingSnap = await getDocs(pendingQ);
-                setPendingVolunteers(pendingSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Volunteer)));
+                setStats({ 
+                    volunteers: volunteersData.length, 
+                    missions: missionsData.filter(m => m.status === 'En cours').length, 
+                    donations: 0 // To be replaced by a donations endpoint
+                });
 
-                // Fetch upcoming missions
-                const upcomingQ = query(collection(db, "missions"), where("status", "in", ["Planifiée", "En cours"]), orderBy("startDate", "asc"), limit(5));
-                const upcomingSnap = await getDocs(upcomingQ);
-                setUpcomingMissions(upcomingSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Mission)));
+                setPendingVolunteers(volunteersData.filter(v => v.status === 'En attente').slice(0, 3));
+                setUpcomingMissions(missionsData.filter(m => m.status === 'Planifiée' || m.status === 'En cours').slice(0, 3));
+
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
             } finally {
