@@ -31,22 +31,28 @@ export default function EventsPage() {
   const { toast } = useToast();
 
   const fetchEvents = React.useCallback(async () => {
-    setLoading(true);
-    try {
-      // TODO: Replace with API call to /api/events
-      const eventsData = isAdmin ? mockEvents : mockEvents.filter(e => e.status !== 'Annulé');
-      setEvents(eventsData);
-    } catch (error) {
-      console.error("Error fetching events: ", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les évènements.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [isAdmin, toast]);
+        setLoading(true);
+        try {
+            const response = await fetch('http://localhost:3001/api/events');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            let eventsData: Event[] = await response.json();
+            if (!isAdmin) {
+                eventsData = eventsData.filter(e => e.status !== 'Annulé');
+            }
+            setEvents(eventsData);
+        } catch (error) {
+            console.error("Error fetching events: ", error);
+            toast({
+                title: "Erreur",
+                description: "Impossible de charger les évènements.",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
+    }, [isAdmin, toast]);
 
   React.useEffect(() => {
     fetchEvents();

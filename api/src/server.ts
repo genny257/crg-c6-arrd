@@ -6,6 +6,8 @@ import swaggerUi from 'swagger-ui-express';
 import missionRoutes from './routes/mission.routes';
 import volunteerRoutes from './routes/volunteer.routes';
 import blogRoutes from './routes/blog.routes';
+import eventRoutes from './routes/event.routes';
+import reportRoutes from './routes/report.routes';
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -52,6 +54,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/api', missionRoutes);
 app.use('/api', volunteerRoutes);
 app.use('/api', blogRoutes);
+app.use('/api', eventRoutes);
 
 // Route de base pour vérifier que le serveur fonctionne
 app.get('/', (req, res) => {
