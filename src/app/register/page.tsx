@@ -74,6 +74,7 @@ import { signIn } from 'next-auth/react';
 import { RegisterUserInputSchema } from "@/ai/schemas/register-user-schema";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { countries } from "@/lib/countries";
 
 const totalSteps = 5;
 
@@ -82,7 +83,7 @@ const allProfessions = professionsList.flatMap((group) => group.professions);
 
 type FormValues = z.infer<typeof RegisterUserInputSchema>;
 
-const idTypes = [
+const allIdTypes = [
     "CNI",
     "RECEPICE CNI",
     "CNIE",
@@ -92,6 +93,8 @@ const idTypes = [
     "CARTE DE SÉJOURS",
     "RECEPICE CARTE DE SEJOURS",
 ];
+
+const foreignIdTypes = allIdTypes.filter(type => type.includes("PASSPORT") || type.includes("CARTE DE SÉJOURS"));
 
 const LocationSelector = ({
   form,
@@ -362,6 +365,7 @@ export default function RegisterPage() {
     defaultValues: {
       firstName: "",
       lastName: "",
+      nationality: "Gabonaise",
       birthDate: "",
       birthPlace: "",
       sex: "masculin",
@@ -403,6 +407,8 @@ export default function RegisterPage() {
   const [professionPopoverOpen, setProfessionPopoverOpen] =
     React.useState(false);
   const [professionInputValue, setProfessionInputValue] = React.useState("");
+  
+  const [nationalityPopoverOpen, setNationalityPopoverOpen] = React.useState(false);
 
   const handleNext = () => setStep((prev) => Math.min(prev + 1, totalSteps));
   const handlePrevious = () => setStep((prev) => Math.max(prev - 1, 1));
@@ -420,8 +426,6 @@ export default function RegisterPage() {
     formData.append('file', file);
 
     try {
-      // This is the API endpoint on your Next.js app.
-      // You can implement the backend logic for this in `/src/app/api/upload/route.ts`
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
@@ -488,7 +492,6 @@ export default function RegisterPage() {
         description: "Votre inscription a été envoyée avec succès.",
       });
       
-      // 3. Log the user in
       const signInResult = await signIn('credentials', {
         redirect: false,
         email: data.email,
@@ -501,7 +504,6 @@ export default function RegisterPage() {
           description: "Votre compte a été créé, mais la connexion a échoué. Veuillez vous connecter manuellement.",
           variant: "destructive",
         });
-        // Redirect to login even if auto-login fails
         router.push('/login');
       } else {
         router.push('/dashboard');
@@ -542,7 +544,14 @@ export default function RegisterPage() {
   const photoPreview = form.watch("photo");
   const idCardFrontPreview = form.watch("idCardFront");
   const idCardBackPreview = form.watch("idCardBack");
+  const selectedNationality = form.watch("nationality");
   const selectedIdType = form.watch("idType");
+  const availableIdTypes = selectedNationality === 'Gabonaise' ? allIdTypes : foreignIdTypes;
+
+  const capitalizeFirstLetter = (string: string) => {
+    if (!string) return string;
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
 
   if (step > totalSteps) {
     return (
@@ -614,7 +623,7 @@ export default function RegisterPage() {
                               <Input
                                 placeholder="Votre prénom"
                                 {...field}
-                                className="capitalize"
+                                onChange={e => field.onChange(capitalizeFirstLetter(e.target.value))}
                               />
                             </FormControl>
                             <FormMessage />
@@ -631,7 +640,7 @@ export default function RegisterPage() {
                               <Input
                                 placeholder="Votre nom"
                                 {...field}
-                                className="uppercase"
+                                 onChange={e => field.onChange(e.target.value.toUpperCase())}
                               />
                             </FormControl>
                             <FormMessage />
@@ -639,6 +648,49 @@ export default function RegisterPage() {
                         )}
                       />
                     </div>
+                     <FormField
+                        control={form.control}
+                        name="nationality"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-col">
+                                <FormLabel>Nationalité</FormLabel>
+                                <Popover open={nationalityPopoverOpen} onOpenChange={setNationalityPopoverOpen}>
+                                    <PopoverTrigger asChild>
+                                        <FormControl>
+                                            <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
+                                                {field.value ? countries.find((c) => c === field.value) : "Sélectionner un pays"}
+                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                            </Button>
+                                        </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
+                                        <Command>
+                                            <CommandInput placeholder="Rechercher un pays..." />
+                                            <CommandList>
+                                                <CommandEmpty>Aucun pays trouvé. Vous pouvez l'ajouter manuellement.</CommandEmpty>
+                                                <CommandGroup>
+                                                    {countries.map((country) => (
+                                                        <CommandItem
+                                                            value={country}
+                                                            key={country}
+                                                            onSelect={() => {
+                                                                form.setValue("nationality", country);
+                                                                setNationalityPopoverOpen(false);
+                                                            }}
+                                                        >
+                                                            <Check className={cn("mr-2 h-4 w-4", country === field.value ? "opacity-100" : "opacity-0")} />
+                                                            {country}
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
@@ -663,7 +715,7 @@ export default function RegisterPage() {
                               <Input
                                 placeholder="Lieu de naissance"
                                 {...field}
-                                className="capitalize"
+                                onChange={e => field.onChange(capitalizeFirstLetter(e.target.value))}
                               />
                             </FormControl>
                             <FormMessage />
@@ -751,7 +803,7 @@ export default function RegisterPage() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {idTypes.map(type => (
+                                  {availableIdTypes.map(type => (
                                     <SelectItem key={type} value={type}>{type}</SelectItem>
                                   ))}
                                 </SelectContent>

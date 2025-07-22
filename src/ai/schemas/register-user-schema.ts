@@ -13,6 +13,7 @@ export const RegisterUserInputSchema = z.object({
   // Step 1: Personal Information
   firstName: z.string().min(2, "Le prénom doit contenir au moins 2 caractères."),
   lastName: z.string().min(2, "Le nom doit contenir au moins 2 caractères."),
+  nationality: z.string().min(1, "La nationalité est requise."),
   birthDate: z.string().refine((date) => new Date(date).toString() !== 'Invalid Date', "La date de naissance est invalide."),
   birthPlace: z.string().min(2, "Le lieu de naissance est requis."),
   sex: z.enum(["masculin", "féminin"]),
