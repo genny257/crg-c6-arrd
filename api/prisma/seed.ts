@@ -48,7 +48,9 @@ async function main() {
 
   } else {
     // Fallback to original behavior: create SUPERADMIN from .env
-    console.log('No arguments provided. Attempting to create SUPERADMIN from .env file...');
+    console.log('No arguments provided. To create a user, run the script with --email, --password, and --role arguments.');
+    console.log('Example: npm run create-user -- --email user@example.com --password "your-password" --role ADMIN');
+    console.log('Attempting to create SUPERADMIN from .env file as a fallback...');
     
     const superAdminEmail = process.env.SUPERADMIN_EMAIL;
     const superAdminPassword = process.env.SUPERADMIN_PASSWORD;

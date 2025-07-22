@@ -1,70 +1,48 @@
-# Guide de Gestion des Utilisateurs Administrateurs
+# Gestion des Utilisateurs
 
-Ce document explique comment utiliser le script de "seeding" pour créer des utilisateurs `ADMIN` et `SUPERADMIN` pour votre application. C'est un outil essentiel pour la maintenance, surtout après un déploiement initial en production sur une base de données vide.
+Ce document explique comment utiliser le script de gestion des utilisateurs pour créer de nouveaux administrateurs pour la plateforme.
 
-**IMPORTANT :** N'exécutez ces commandes que si vous savez ce que vous faites. Elles modifient directement la base de données.
+## Rôles Disponibles
 
----
+Il existe deux types de rôles que vous pouvez assigner :
 
-## Scénario 1 : Créer le tout premier Super Administrateur
+-   `SUPERADMIN` : A tous les droits sur la plateforme.
+-   `ADMIN` : A des droits limités (gestion des missions, des articles, etc.).
 
-Ce scénario est à utiliser lors du premier déploiement en production.
+## Prérequis
 
-### Étape 1 : Configurer les variables d'environnement
+-   Avoir accès à l'environnement de développement.
+-   Le service de l'API doit être configuré avec la base de données.
 
-1.  Créez un fichier `.env.local` à la racine de votre projet s'il n'existe pas.
-2.  Assurez-vous que ce fichier contient les informations de votre super administrateur par défaut. Remplacez les valeurs d'exemple par des informations sécurisées.
+## Comment créer un utilisateur
 
-    ```dotenv
-    # ... autres variables ...
+Pour créer un nouvel utilisateur, vous utiliserez une commande `npm` dans le répertoire `api` du projet. La commande nécessite trois arguments :
 
-    # Informations pour le premier super administrateur (utilisé par le script de seeding)
-    SUPERADMIN_EMAIL="votre-email-securise@domaine.com"
-    SUPERADMIN_PASSWORD="un-mot-de-passe-tres-solide"
+-   `--email` : L'adresse e-mail du nouvel utilisateur.
+-   `--password` : Le mot de passe du nouvel utilisateur.
+-   `--role` : Le rôle à assigner (`SUPERADMIN` ou `ADMIN`).
+
+### Procédure
+
+1.  Ouvrez un terminal et naviguez jusqu'au répertoire `api` :
+    ```bash
+    cd /path/to/your/project/api
     ```
 
-### Étape 2 : Lancer le script
+2.  Exécutez la commande `npm run create-user` en fournissant les arguments. Notez l'utilisation de `--` après `create-user` pour passer les arguments directement au script.
 
-Exécutez la commande suivante dans votre terminal. Le script lira les informations du fichier `.env.local` et créera le compte.
+    **Exemple pour créer un ADMIN :**
+    ```bash
+    npm run create-user -- --email nouvel.admin@example.com --password "motdepassesecurise123" --role ADMIN
+    ```
 
-```bash
-npm run prisma:seed
-```
+    **Exemple pour créer un SUPERADMIN :**
+    ```bash
+    npm run create-user -- --email super.admin@example.com --password "motdepassesupersecret" --role SUPERADMIN
+    ```
 
-Le script confirmera la création de l'utilisateur. Vous pourrez alors vous connecter avec ces identifiants.
+3.  Le script confirmera la création de l'utilisateur ou affichera une erreur si l'utilisateur existe déjà ou si les informations sont incorrectes.
 
----
+### Création par défaut
 
-## Scénario 2 : Créer un nouvel Administrateur (ou un autre Super Administrateur)
-
-Utilisez cette méthode à tout moment pour ajouter de nouveaux comptes administrateurs sans avoir à modifier le fichier `.env.local`.
-
-### Étape 1 : Préparer la commande
-
-Vous allez passer les informations de l'utilisateur (email, mot de passe, rôle) directement dans la commande. Le rôle doit être `ADMIN` ou `SUPERADMIN`.
-
-### Étape 2 : Lancer le script avec des arguments
-
-Exécutez la commande suivante en remplaçant les valeurs d'exemple. **Notez bien le `--` après `npm run prisma:seed`**, il est essentiel pour que les arguments soient passés au script.
-
-**Exemple pour créer un compte `ADMIN` :**
-
-```bash
-npm run prisma:seed -- --email nouvel.admin@domaine.com --password autre-pass-solide --role ADMIN
-```
-
-**Exemple pour créer un autre `SUPERADMIN` :**
-
-```bash
-npm run prisma:seed -- --email autre.superadmin@domaine.com --password encore-un-pass --role SUPERADMIN
-```
-
-Le script confirmera la création de l'utilisateur avec le rôle spécifié.
-
----
-
-### Notes de sécurité
-
--   Utilisez toujours des mots de passe forts et uniques.
--   Le fichier `.env.local` ne doit **jamais** être partagé ou versionné dans Git. Assurez-vous qu'il est bien présent dans votre fichier `.gitignore`.
--   Limitez le nombre de comptes `SUPERADMIN`.
+Si vous exécutez `npm run create-user` sans arguments, le script tentera de créer un utilisateur `SUPERADMIN` en utilisant les informations définies dans le fichier `.env` de l'API (`SUPERADMIN_EMAIL` et `SUPERADMIN_PASSWORD`).
