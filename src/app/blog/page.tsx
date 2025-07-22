@@ -28,22 +28,28 @@ export default function BlogPage() {
   const { toast } = useToast();
 
   const fetchPosts = React.useCallback(async () => {
-    setLoading(true);
-    try {
-        // TODO: Replace with API call to /api/blog
-      const postsData = isAdmin ? mockPosts : mockPosts.filter(p => p.visible);
-      setBlogPosts(postsData);
-    } catch (error) {
-      console.error("Error fetching blog posts: ", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les articles.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [isAdmin, toast]);
+        setLoading(true);
+        try {
+            const response = await fetch('http://localhost:3001/api/blog');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            let postsData: BlogPost[] = await response.json();
+            if (!isAdmin) {
+                postsData = postsData.filter(p => p.visible);
+            }
+            setBlogPosts(postsData);
+        } catch (error) {
+            console.error("Error fetching blog posts: ", error);
+            toast({
+                title: "Erreur",
+                description: "Impossible de charger les articles.",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
+    }, [isAdmin, toast]);
 
   React.useEffect(() => {
     fetchPosts();
