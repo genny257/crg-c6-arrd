@@ -131,7 +131,7 @@ export default function Home() {
     <PublicLayout>
       <main className="flex-1">
         <section className="w-full h-[60vh] md:h-[70vh] relative">
-             <Carousel 
+            <Carousel 
                 className="w-full h-full" 
                 plugins={[Autoplay({ delay: 5000 })]}
                 opts={{ loop: true }}
@@ -139,7 +139,7 @@ export default function Home() {
                 <CarouselContent className="h-full">
                     {finalCarouselItems.map((item, index) => (
                         <CarouselItem key={item.id} className="h-full">
-                            <Link href={item.href}>
+                            <Link href={item.href} className="w-full h-full block relative">
                                 <Image
                                     src={item.image}
                                     alt={item.title}
@@ -157,9 +157,8 @@ export default function Home() {
                 </CarouselContent>
                 <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2" />
                 <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2" />
-             </Carousel>
-            <div className="absolute inset-0 bg-black/50 pointer-events-none" />
-            <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white p-4 pointer-events-none">
+            </Carousel>
+            <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center text-white p-4 pointer-events-none">
                 {loading ? (
                     <>
                         <Skeleton className="h-16 w-3/4 mb-4 bg-white/20" />
