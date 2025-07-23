@@ -48,6 +48,18 @@ const swaggerOptions = {
         description: 'Serveur de développement',
       },
     ],
+    components: {
+        securitySchemes: {
+            bearerAuth: {
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JWT',
+            }
+        }
+    },
+    security: [{
+        bearerAuth: []
+    }]
   },
   apis: ['./src/routes/*.ts'],
 };
@@ -70,10 +82,7 @@ app.use(limiter);
 
 // --- Middlewares Généraux ---
 // Configuration CORS flexible pour le développement
-app.use(cors({
-    origin: true, // Reflect the request origin, as defined by `req.header('Origin')`
-    credentials: true,
-}));
+app.use(cors());
 
 
 // Parser les corps de requête JSON (avec une limite de taille pour la sécurité)
