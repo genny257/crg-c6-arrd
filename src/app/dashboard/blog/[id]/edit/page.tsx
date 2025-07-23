@@ -18,8 +18,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { BlogPost } from "@/types/blog";
-import { generateBlogPost } from "@/ai/flows/generate-blog-post-flow";
 import { Label } from "@/components/ui/label";
 
 const blogPostSchema = z.object({
@@ -40,7 +38,7 @@ export default function EditBlogPostPage() {
   const params = useParams();
   const { id } = params;
   const { toast } = useToast();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, token } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [pageLoading, setPageLoading] = React.useState(true);
   const [isGenerating, setIsGenerating] = React.useState(false);
@@ -75,9 +73,26 @@ export default function EditBlogPostPage() {
       toast({ title: "Sujet manquant", description: "Veuillez entrer un sujet pour la génération.", variant: "destructive" });
       return;
     }
+     if (!token) {
+        toast({ title: "Non authentifié", description: "Vous devez être connecté pour utiliser cette fonctionnalité.", variant: "destructive" });
+        return;
+    }
     setIsGenerating(true);
     try {
-      const result = await generateBlogPost(generationTopic);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/generate`, {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ topic: generationTopic })
+      });
+
+      if (!response.ok) {
+          throw new Error('La génération a échoué.');
+      }
+      
+      const result = await response.json();
       form.setValue("title", result.title);
       form.setValue("slug", result.slug);
       form.setValue("excerpt", result.excerpt);
@@ -93,12 +108,15 @@ export default function EditBlogPostPage() {
 
 
   const onSubmit = async (data: BlogPostFormValues) => {
-    if(typeof id !== 'string') return;
+    if(typeof id !== 'string' || !token) return;
     setIsSubmitting(true);
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify(data)
         });
         if (!response.ok) throw new Error("Failed to update post");
@@ -163,16 +181,16 @@ export default function EditBlogPostPage() {
       
         <Card>
             <CardHeader>
-                <CardTitle>Détails de l'article</CardTitle>
+                <CardTitle>Détails de l&apos;article</CardTitle>
                 <CardDescription>Mettez à jour les informations de l'article ci-dessous. Vous pouvez utiliser l'IA pour vous aider.</CardDescription>
             </CardHeader>
             <CardContent>
              <div className="space-y-2 mb-6 p-4 border bg-muted/50 rounded-lg">
-                <Label htmlFor="generation-topic">Sujet pour l'IA</Label>
+                <Label htmlFor="generation-topic">Sujet pour l&apos;IA</Label>
                 <div className="flex gap-2">
                   <Input
                     id="generation-topic"
-                    placeholder="Ex: L'importance du secourisme en milieu scolaire"
+                    placeholder="Ex: L&apos;importance du secourisme en milieu scolaire"
                     value={generationTopic}
                     onChange={(e) => setGenerationTopic(e.target.value)}
                     disabled={isGenerating}
@@ -243,7 +261,7 @@ export default function EditBlogPostPage() {
                     name="image"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>URL de l'image de couverture</FormLabel>
+                        <FormLabel>URL de l&apos;image de couverture</FormLabel>
                         <FormControl>
                         <Input type="url" placeholder="https://exemple.com/image.png" {...field} />
                         </FormControl>
@@ -256,7 +274,7 @@ export default function EditBlogPostPage() {
                     name="imageHint"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Indice pour l'image (IA)</FormLabel>
+                        <FormLabel>Indice pour l&apos;image (IA)</FormLabel>
                         <FormControl>
                         <Input placeholder="Ex: 'aide humanitaire'" {...field} />
                         </FormControl>

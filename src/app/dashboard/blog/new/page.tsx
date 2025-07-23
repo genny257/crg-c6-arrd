@@ -18,7 +18,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { Switch } from "@/components/ui/switch";
-import { generateBlogPost } from "@/ai/flows/generate-blog-post-flow";
 
 const blogPostSchema = z.object({
   title: z.string().min(1, "Le titre est requis."),
@@ -35,7 +34,7 @@ type BlogPostFormValues = z.infer<typeof blogPostSchema>;
 export default function NewBlogPostPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const { user, loading } = useAuth();
+  const { user, loading, token } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [generationTopic, setGenerationTopic] = React.useState("");
@@ -58,9 +57,26 @@ export default function NewBlogPostPage() {
       toast({ title: "Sujet manquant", description: "Veuillez entrer un sujet pour la génération.", variant: "destructive" });
       return;
     }
+    if (!token) {
+        toast({ title: "Non authentifié", description: "Vous devez être connecté pour utiliser cette fonctionnalité.", variant: "destructive" });
+        return;
+    }
     setIsGenerating(true);
     try {
-      const result = await generateBlogPost(generationTopic);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/generate`, {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ topic: generationTopic })
+      });
+
+      if (!response.ok) {
+          throw new Error('La génération a échoué.');
+      }
+
+      const result = await response.json();
       form.setValue("title", result.title);
       form.setValue("slug", result.slug);
       form.setValue("excerpt", result.excerpt);
@@ -75,11 +91,15 @@ export default function NewBlogPostPage() {
   };
 
   const onSubmit = async (data: BlogPostFormValues) => {
+    if (!token) return;
     setIsSubmitting(true);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}` 
+          },
           body: JSON.stringify(data)
       });
       if (!response.ok) throw new Error("Failed to create post");
@@ -125,11 +145,11 @@ export default function NewBlogPostPage() {
         <Card>
             <CardHeader>
                 <CardTitle>Rédiger un nouvel article</CardTitle>
-                <CardDescription>Remplissez le sujet et laissez l'IA vous aider, ou remplissez les champs manuellement.</CardDescription>
+                <CardDescription>Remplissez le sujet et laissez l&apos;IA vous aider, ou remplissez les champs manuellement.</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 mb-6 p-4 border bg-muted/50 rounded-lg">
-                <Label htmlFor="generation-topic">Idée ou sujet de l'article</Label>
+                <Label htmlFor="generation-topic">Idée ou sujet de l&apos;article</Label>
                 <div className="flex gap-2">
                   <Input
                     id="generation-topic"
@@ -203,7 +223,7 @@ export default function NewBlogPostPage() {
                     name="image"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>URL de l'image de couverture</FormLabel>
+                        <FormLabel>URL de l&apos;image de couverture</FormLabel>
                         <FormControl>
                         <Input type="url" placeholder="https://exemple.com/image.png" {...field} />
                         </FormControl>
@@ -216,7 +236,7 @@ export default function NewBlogPostPage() {
                     name="imageHint"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Indice pour l'image (IA)</FormLabel>
+                        <FormLabel>Indice pour l&apos;image (IA)</FormLabel>
                         <FormControl>
                         <Input placeholder="Ex: 'aide humanitaire'" {...field} />
                         </FormControl>

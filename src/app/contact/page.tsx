@@ -16,7 +16,7 @@ export default function ContactPage() {
         <div>
           <h1 className="text-4xl font-headline font-bold text-primary mb-2">Contactez-nous</h1>
           <p className="text-lg text-muted-foreground">
-            Une question ? Une suggestion ? N'hésitez pas à nous écrire.
+            Une question ? Une suggestion ? N&apos;hésitez pas à nous écrire.
           </p>
         </div>
         <Card>

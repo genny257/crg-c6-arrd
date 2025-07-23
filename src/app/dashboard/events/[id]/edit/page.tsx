@@ -138,13 +138,13 @@ export default function EditEventPage() {
                     <ArrowLeft className="h-4 w-4" />
                 </Link>
             </Button>
-            <h1 className="text-3xl font-headline font-bold">Modifier l'Événement</h1>
+            <h1 className="text-3xl font-headline font-bold">Modifier l&apos;Événement</h1>
         </div>
       
         <Card>
             <CardHeader>
-                <CardTitle>Informations de l'événement</CardTitle>
-                <CardDescription>Mettez à jour les détails de l'événement ci-dessous.</CardDescription>
+                <CardTitle>Informations de l&apos;événement</CardTitle>
+                <CardDescription>Mettez à jour les détails de l&apos;événement ci-dessous.</CardDescription>
             </CardHeader>
             <CardContent>
             <Form {...form}>
@@ -154,7 +154,7 @@ export default function EditEventPage() {
                         name="title"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Titre de l'événement</FormLabel>
+                            <FormLabel>Titre de l&apos;événement</FormLabel>
                             <FormControl>
                             <Input placeholder="Ex: Grande Collecte de Sang" {...field} />
                             </FormControl>
@@ -180,7 +180,7 @@ export default function EditEventPage() {
                         name="date"
                         render={({ field }) => (
                             <FormItem className="flex flex-col">
-                            <FormLabel>Date de l'événement</FormLabel>
+                            <FormLabel>Date de l&apos;événement</FormLabel>
                             <Popover>
                                 <PopoverTrigger asChild>
                                 <FormControl>
@@ -232,7 +232,7 @@ export default function EditEventPage() {
                         name="status"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Statut de l'événement</FormLabel>
+                                <FormLabel>Statut de l&apos;événement</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
@@ -254,7 +254,7 @@ export default function EditEventPage() {
                         name="image"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>URL de l'image de couverture</FormLabel>
+                            <FormLabel>URL de l&apos;image de couverture</FormLabel>
                             <FormControl>
                             <Input type="url" placeholder="https://exemple.com/image.png" {...field} />
                             </FormControl>
@@ -267,7 +267,7 @@ export default function EditEventPage() {
                         name="imageHint"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Indice pour l'image (IA)</FormLabel>
+                            <FormLabel>Indice pour l&apos;image (IA)</FormLabel>
                             <FormControl>
                             <Input placeholder="Ex: 'aide humanitaire'" {...field} />
                             </FormControl>

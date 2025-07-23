@@ -1,3 +1,4 @@
+
 // src/app/api/auth/[...nextauth]/route.ts
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
@@ -22,9 +23,14 @@ const handler = NextAuth({
             headers: { "Content-Type": "application/json" }
           });
 
+          if (!res.ok) {
+            console.error('Login failed with status:', res.status);
+            return null;
+          }
+
           const response = await res.json();
           
-          if (res.ok && response.user) {
+          if (response.user && response.token) {
             return {
                 ...response.user,
                 apiToken: response.token

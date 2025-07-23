@@ -16,7 +16,6 @@ import { fr } from "date-fns/locale";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { registerToMission } from "@/ai/flows/register-to-mission-flow";
 
 const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -37,34 +36,34 @@ export default function PublicMissionPage() {
     const [isSubmitting, setIsSubmitting] = React.useState(false);
     const [registrationResult, setRegistrationResult] = React.useState<{success: boolean, message: string} | null>(null);
 
-    React.useEffect(() => {
-        const fetchMission = async () => {
-            if (typeof id !== 'string') return;
-            setLoading(true);
-            try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions/${id}`);
-                 if (!response.ok) {
-                    throw new Error('Mission not found');
-                }
-                const missionData: Mission = await response.json();
-
-                if (missionData.status !== "Planifiée" && missionData.status !== "En cours") {
-                    notFound();
-                    return;
-                }
-                setMission(missionData);
-
-            } catch (error) {
-                console.error("Error fetching mission: ", error);
-                toast({ title: "Erreur", description: "Impossible de charger la mission.", variant: "destructive" });
-                 notFound();
-            } finally {
-                setLoading(false);
+    const fetchMission = React.useCallback(async () => {
+        if (typeof id !== 'string') return;
+        setLoading(true);
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions/${id}`);
+             if (!response.ok) {
+                throw new Error('Mission not found');
             }
-        };
+            const missionData: Mission = await response.json();
 
-        fetchMission();
+            if (missionData.status !== "Planifiée" && missionData.status !== "En cours") {
+                notFound();
+                return;
+            }
+            setMission(missionData);
+
+        } catch (error) {
+            console.error("Error fetching mission: ", error);
+            toast({ title: "Erreur", description: "Impossible de charger la mission.", variant: "destructive" });
+             notFound();
+        } finally {
+            setLoading(false);
+        }
     }, [id, toast]);
+
+    React.useEffect(() => {
+        fetchMission();
+    }, [fetchMission]);
 
     const handleRegistration = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -74,14 +73,18 @@ export default function PublicMissionPage() {
         setRegistrationResult(null);
 
         try {
-            const result = await registerToMission({ missionId: mission.id, matricule });
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions/${mission.id}/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ matricule }),
+            });
+            const result = await response.json();
+
             setRegistrationResult(result);
             if (result.success) {
                 setMatricule("");
                 // Refresh mission data to update participant count
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions/${id}`);
-                const updatedMission = await response.json();
-                setMission(updatedMission);
+                fetchMission();
             }
         } catch (error) {
             console.error("Registration error:", error);

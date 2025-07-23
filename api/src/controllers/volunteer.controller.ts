@@ -36,7 +36,7 @@ export const getVolunteerById = async (req: Request, res: Response) => {
 };
 
 const statusUpdateSchema = z.object({
-  status: z.enum(['Actif', 'Inactif', 'Rejeté', 'En_attente']),
+  status: z.enum(['ACTIVE', 'INACTIVE', 'REJECTED', 'PENDING']),
 });
 
 export const updateVolunteerStatus = async (req: Request, res: Response) => {
@@ -49,7 +49,7 @@ export const updateVolunteerStatus = async (req: Request, res: Response) => {
         res.json(updatedVolunteer);
     } catch (error) {
         if (error instanceof z.ZodError) {
-            return res.status(400).json({ message: 'Validation failed', errors: error.errors });
+            return res.status(400).json({ message: 'Validation failed', errors: error.issues });
         }
         res.status(500).json({ message: 'Error updating volunteer status', error });
     }

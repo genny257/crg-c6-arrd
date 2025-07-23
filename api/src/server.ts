@@ -16,6 +16,7 @@ import userRoutes from './routes/user.routes';
 import sponsorshipRoutes from './routes/sponsorship.routes';
 import adminRoutes from './routes/admin.routes';
 import volunteerRoutes from './routes/volunteer.routes';
+import aiRoutes from './routes/ai.routes';
 import { loggingMiddleware } from './middleware/logging';
 
 // Charger les variables d'environnement
@@ -88,6 +89,7 @@ app.use('/api', userRoutes);
 app.use('/api', sponsorshipRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api', volunteerRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Route de base pour vérifier que le serveur fonctionne
 app.get('/', (req, res) => {

@@ -64,7 +64,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { RegisterUserInputSchema } from "@/ai/schemas/register-user-schema";
+import { RegisterUserInputSchema } from '@/ai/schemas/register-user-schema';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -463,7 +463,7 @@ export default function RegisterPage() {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     
-    const finalCauses = data.causes?.filter(c => c !== 'Autre');
+    const finalCauses = data.causes?.filter((c: string) => c !== 'Autre');
     if (otherCauseChecked && otherCause) {
         finalCauses?.push(otherCause);
     }
@@ -520,7 +520,7 @@ export default function RegisterPage() {
     const currentSkills = form.getValues("skills") || [];
     form.setValue(
       "skills",
-      currentSkills.filter((s) => s !== skill)
+      currentSkills.filter((s: string) => s !== skill)
     );
   };
 
@@ -1264,7 +1264,7 @@ export default function RegisterPage() {
                                       onCheckedChange={(checked) => {
                                         return checked
                                           ? field.onChange([...(field.value || []), item])
-                                          : field.onChange(field.value?.filter((value) => value !== item));
+                                          : field.onChange(field.value?.filter((value: string) => value !== item));
                                       }}
                                     />
                                   </FormControl>
@@ -1350,7 +1350,7 @@ export default function RegisterPage() {
                                               ])
                                             : field.onChange(
                                                 field.value?.filter(
-                                                  (value) => value !== item
+                                                  (value: string) => value !== item
                                                 )
                                               );
                                         }}

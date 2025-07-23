@@ -114,7 +114,7 @@ export default function NewEventPage() {
                         name="title"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Titre de l'événement</FormLabel>
+                            <FormLabel>Titre de l&apos;événement</FormLabel>
                             <FormControl>
                             <Input placeholder="Ex: Grande Collecte de Sang" {...field} />
                             </FormControl>
@@ -140,7 +140,7 @@ export default function NewEventPage() {
                         name="date"
                         render={({ field }) => (
                             <FormItem className="flex flex-col">
-                            <FormLabel>Date de l'événement</FormLabel>
+                            <FormLabel>Date de l&apos;événement</FormLabel>
                             <Popover>
                                 <PopoverTrigger asChild>
                                 <FormControl>

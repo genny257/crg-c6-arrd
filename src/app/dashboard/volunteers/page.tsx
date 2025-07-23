@@ -2,10 +2,16 @@
 import * as React from "react";
 import type { Volunteer } from "@/types/volunteer";
 import { VolunteersClientPage } from "./client-page";
+import { headers } from "next/headers";
+import { getServerSession } from "next-auth";
 
-async function getVolunteers(): Promise<Volunteer[]> {
+async function getVolunteers(token: string | undefined): Promise<Volunteer[]> {
+    if (!token) return [];
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/volunteers`, { cache: 'no-store' });
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/volunteers`, { 
+            cache: 'no-store',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
 
         if (!res.ok) {
             console.error('Failed to fetch volunteers, status:', res.status);
@@ -22,7 +28,10 @@ async function getVolunteers(): Promise<Volunteer[]> {
 
 
 export default async function VolunteersPage() {
-    const volunteers = await getVolunteers();
+    const session = await getServerSession();
+    // @ts-ignore
+    const token = session?.user?.apiToken;
+    const volunteers = await getVolunteers(token);
 
     return (
         <VolunteersClientPage 

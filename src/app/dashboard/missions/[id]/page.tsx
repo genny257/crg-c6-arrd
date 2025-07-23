@@ -59,7 +59,9 @@ export default function MissionDetailPage() {
             }
         };
 
-        fetchMissionDetails();
+        if (token) {
+            fetchMissionDetails();
+        }
     }, [id, router, toast, token]);
 
     if (loading) {
@@ -216,7 +218,10 @@ const VolunteerSuggestions = ({ missionId }: { missionId: string }) => {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions/${missionId}/suggest-volunteers`, {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
             });
             if (!response.ok) {
                 const errorData = await response.json();

@@ -2,14 +2,12 @@
 "use client"
 
 import * as React from "react"
-import { MessageSquare, Send, X, Bot, User, Loader2 } from "lucide-react"
+import { MessageSquare, Send, X, Bot, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
-import { chat } from "@/ai/flows/chatbot-flow"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 
 interface Message {
   role: "user" | "model"
@@ -29,16 +27,24 @@ export function Chatbot() {
     e.preventDefault()
     if (!input.trim() || isLoading) return;
 
-    setIsLoading(true)
-    const currentInput = input;
-    setInput("")
-
-    const newMessages: Message[] = [...messages, { role: "user", content: currentInput }]
+    const newMessages: Message[] = [...messages, { role: "user", content: input }]
     setMessages(newMessages)
+    setInput("")
+    setIsLoading(true)
     
     try {
-      const response = await chat(messages, currentInput)
-      setMessages(prevMessages => [...prevMessages, { role: "model", content: response }])
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: newMessages.slice(-10) }) // Send last 10 messages for context
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json();
+      setMessages(prevMessages => [...prevMessages, { role: "model", content: result.response }])
     } catch (error) {
       console.error("Chatbot error:", error)
       setMessages(prevMessages => [...prevMessages, { role: "model", content: "Désolé, une erreur est survenue. Veuillez réessayer." }])

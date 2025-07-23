@@ -1,6 +1,7 @@
 // src/routes/mission.routes.ts
 import { Router } from 'express';
 import * as missionController from '../controllers/mission.controller';
+import { protect } from '../middleware/auth';
 
 const router = Router();
 
@@ -111,7 +112,7 @@ const router = Router();
  */
 router.route('/missions')
   .get(missionController.getMissions)
-  .post(missionController.createMission);
+  .post(protect, missionController.createMission);
 
 // --- Routes pour /missions/:id ---
 
@@ -176,10 +177,12 @@ router.route('/missions')
  */
 router.route('/missions/:id')
   .get(missionController.getMissionById)
-  .put(missionController.updateMission)
-  .delete(missionController.deleteMission);
+  .put(protect, missionController.updateMission)
+  .delete(protect, missionController.deleteMission);
 
-router.post('/missions/:id/suggest-volunteers', missionController.suggestVolunteersForMission);
+// --- Routes IA ---
+router.post('/missions/:id/suggest-volunteers', protect, missionController.suggestVolunteersForMission);
+router.post('/missions/:id/register', missionController.registerToMission);
 
 
 export default router;

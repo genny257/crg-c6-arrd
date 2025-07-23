@@ -5,9 +5,9 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const THREAT_PATTERNS = [
-    /(\%27)|(\')|(\-\-)|(\%23)|(#)/ix, // SQL Injection
-    /(<script>)|(&lt;script&gt;)/ix, // XSS
-    /(\.\.\/)/ix, // Path Traversal
+    /(\%27)|(\')|(\-\-)|(\%23)|(#)/, // SQL Injection
+    /(<script>)|(&lt;script&gt;)/, // XSS
+    /(\.\.\/)/, // Path Traversal
 ];
 
 function isPotentialThreat(text: string): boolean {

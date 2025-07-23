@@ -1,11 +1,10 @@
+
 // src/controllers/mission.controller.ts
 import { Request, Response } from 'express';
 import * as missionService from '../services/mission.service';
+import * as aiService from '../services/ai.service';
+import { z } from 'zod';
 import { runFlow } from '@genkit-ai/flow';
-import { missionAssignmentFlow } from '../../src/ai/flows/mission-assignment-flow';
-import { configureGenkit } from '../../src/ai/flows/chatbot-flow';
-
-configureGenkit();
 
 /**
  * Récupère toutes les missions.
@@ -72,13 +71,37 @@ export const deleteMission = async (req: Request, res: Response) => {
 };
 
 /**
- * Suggerer des volontaires pour une mission.
+ * Suggests volunteers for a mission.
  */
 export const suggestVolunteersForMission = async (req: Request, res: Response) => {
     try {
-        const suggestions = await runFlow(missionAssignmentFlow, { missionId: req.params.id });
-        res.status(200).json(suggestions);
-    } catch (error) {
-        res.status(500).json({ message: 'Erreur lors de la suggestion de volontaires.', error: (error as Error).message });
+        const { id } = req.params;
+        const recommendations = await runFlow(aiService.missionAssignmentFlow, id);
+        res.status(200).json(recommendations);
+    } catch (error: any) {
+        res.status(500).json({ message: 'Erreur lors de la suggestion des volontaires.', error: error.message });
+    }
+};
+
+/**
+ * Register a volunteer to a mission.
+ */
+const registerToMissionSchema = z.object({
+    matricule: z.string().min(1, 'Le matricule est requis.'),
+});
+export const registerToMission = async (req: Request, res: Response) => {
+    try {
+        const { id: missionId } = req.params;
+        const { matricule } = registerToMissionSchema.parse(req.body);
+
+        // This doesn't need to be an AI flow, direct service call is better.
+        const result = await missionService.registerVolunteerToMission(missionId, matricule);
+        
+        res.status(200).json(result);
+    } catch (error: any) {
+         if (error instanceof z.ZodError) {
+            return res.status(400).json({ success: false, message: error.errors.map(e => e.message).join(', ') });
+        }
+        res.status(500).json({ success: false, message: 'Erreur lors de l\'inscription à la mission.', error: error.message });
     }
 }

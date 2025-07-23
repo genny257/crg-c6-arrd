@@ -1,6 +1,11 @@
+
 // src/controllers/blog.controller.ts
 import { Request, Response } from 'express';
 import * as blogService from '../services/blog.service';
+import * as aiService from '../services/ai.service';
+import { protect } from '../middleware/auth';
+import { z } from 'zod';
+import { runFlow } from '@genkit-ai/flow';
 
 export const getBlogPosts = async (req: Request, res: Response) => {
     try {
@@ -70,5 +75,23 @@ export const deleteBlogPost = async (req: Request, res: Response) => {
         res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: 'Error deleting blog post', error });
+    }
+};
+
+
+const generatePostSchema = z.object({
+    topic: z.string().min(1, 'Le sujet est requis.'),
+});
+
+export const generateBlogPost = async (req: Request, res: Response) => {
+    try {
+        const { topic } = generatePostSchema.parse(req.body);
+        const blogPost = await runFlow(aiService.generateBlogPostFlow, topic);
+        res.status(200).json(blogPost);
+    } catch (error) {
+         if (error instanceof z.ZodError) {
+            return res.status(400).json({ message: 'Validation failed', errors: error.flatten().fieldErrors });
+        }
+        res.status(500).json({ message: 'Error generating blog post', error });
     }
 };
