@@ -296,6 +296,7 @@ export default function RegisterPage() {
   >({});
   
   // State for dynamic lists
+  const [isLoading, setIsLoading] = React.useState(true);
   const [nationalities, setNationalities] = React.useState<string[]>([]);
   const [educationLevels, setEducationLevels] = React.useState<string[]>([]);
   const [professions, setProfessions] = React.useState<string[]>([]);
@@ -303,33 +304,51 @@ export default function RegisterPage() {
 
   React.useEffect(() => {
     const fetchData = async () => {
-        try {
-            const api_url = process.env.NEXT_PUBLIC_API_URL;
-            const [
-                nationalitiesRes,
-                educationLevelsRes,
-                professionsRes,
-                skillsRes,
-            ] = await Promise.all([
-                fetch(`${api_url}/nationalities`),
-                fetch(`${api_url}/educationLevels`),
-                fetch(`${api_url}/professions`),
-                fetch(`${api_url}/skills`),
-            ]);
-
-            setNationalities(await nationalitiesRes.json());
-            setEducationLevels(await educationLevelsRes.json());
-            setProfessions(await professionsRes.json());
-            setSkills(await skillsRes.json());
-
-        } catch (error) {
-            console.error("Failed to fetch dynamic lists", error);
-            toast({
-                title: "Erreur de chargement",
-                description: "Impossible de charger les listes de sélection. Assurez-vous que le serveur est bien démarré.",
-                variant: "destructive",
-            });
+      setIsLoading(true);
+      try {
+        const api_url = process.env.NEXT_PUBLIC_API_URL;
+        if (!api_url) {
+            throw new Error("API URL is not configured.");
         }
+
+        const fetchWithTimeout = (url: string, options = {}, timeout = 8000) => {
+            return Promise.race([
+                fetch(url, options),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), timeout))
+            ]);
+        };
+        
+        const [
+            nationalitiesRes,
+            educationLevelsRes,
+            professionsRes,
+            skillsRes,
+        ] = await Promise.all([
+            fetchWithTimeout(`${api_url}/nationalities`),
+            fetchWithTimeout(`${api_url}/educationLevels`),
+            fetchWithTimeout(`${api_url}/professions`),
+            fetchWithTimeout(`${api_url}/skills`),
+        ]);
+
+        if (!nationalitiesRes.ok || !educationLevelsRes.ok || !professionsRes.ok || !skillsRes.ok) {
+            throw new Error("One or more API requests failed.");
+        }
+
+        setNationalities(await nationalitiesRes.json());
+        setEducationLevels(await educationLevelsRes.json());
+        setProfessions(await professionsRes.json());
+        setSkills(await skillsRes.json());
+
+      } catch (error) {
+        console.error("Failed to fetch dynamic lists", error);
+        toast({
+            title: "Erreur de chargement",
+            description: "Impossible de charger les listes de sélection. Assurez-vous que le serveur est bien démarré et accessible.",
+            variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchData();
@@ -526,6 +545,17 @@ export default function RegisterPage() {
     if (!string) return string;
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
+
+  if (isLoading) {
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
+             <Card className="w-full max-w-2xl text-center p-8">
+                <Loader2 className="h-12 w-12 text-primary animate-spin mx-auto" />
+                <p className="text-muted-foreground mt-4">Chargement des ressources...</p>
+             </Card>
+        </div>
+    )
+  }
 
   if (step > totalSteps) {
     return (
