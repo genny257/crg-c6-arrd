@@ -7,54 +7,34 @@ import { Users, Briefcase, HeartHandshake, Percent } from "lucide-react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import { useToast } from "@/hooks/use-toast";
 import type { StatsData } from "@/types/stats";
-import { subMonths, format } from "date-fns";
+import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
-
-// Mock data, to be replaced by API call
-const getMockStatsData = async (): Promise<StatsData> => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-        const now = new Date();
-        const volunteersHistory = Array.from({ length: 6 }, (_, i) => {
-            const d = subMonths(now, 5 - i);
-            return { name: format(d, 'MMM', { locale: fr }), count: 15 + i * 5 + Math.floor(Math.random() * 5) };
-        });
-         const donationsHistory = Array.from({ length: 6 }, (_, i) => {
-            const d = subMonths(now, 5 - i);
-            return { name: format(d, 'MMM', { locale: fr }), total: 100000 + i * 50000 + Math.floor(Math.random() * 20000) };
-        });
-
-      resolve({
-        keyMetrics: {
-          activeVolunteers: 85,
-          newVolunteersThisMonth: 8,
-          ongoingMissions: 4,
-          donationsThisMonth: 250000,
-          donationChangePercentage: 15.2,
-          engagementRate: 65,
-        },
-        charts: {
-          volunteersHistory,
-          donationsHistory,
-        }
-      });
-    }, 1000);
-  });
-};
+import { useAuth } from "@/hooks/use-auth";
 
 
 export default function AnalyticsPage() {
+    const { token } = useAuth();
     const [stats, setStats] = React.useState<StatsData | null>(null);
     const [loading, setLoading] = React.useState(true);
     const { toast } = useToast();
 
     React.useEffect(() => {
         const fetchData = async () => {
+            if (!token) {
+                setLoading(false);
+                return;
+            }
             setLoading(true);
             try {
-                // TODO: Replace with API call to /api/analytics
-                const data = await getMockStatsData();
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/analytics`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch stats");
+                }
+                const data = await response.json();
                 setStats(data);
             } catch (error) {
                 console.error("Error fetching analytics data:", error);
@@ -64,7 +44,7 @@ export default function AnalyticsPage() {
             }
         };
         fetchData();
-    }, [toast]);
+    }, [toast, token]);
 
     if (loading || !stats) {
         return <AnalyticsSkeleton />

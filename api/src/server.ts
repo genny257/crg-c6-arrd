@@ -17,6 +17,7 @@ import sponsorshipRoutes from './routes/sponsorship.routes';
 import adminRoutes from './routes/admin.routes';
 import volunteerRoutes from './routes/volunteer.routes';
 import aiRoutes from './routes/ai.routes';
+import teamRoutes from './routes/team.routes';
 import { loggingMiddleware } from './middleware/logging';
 
 // Charger les variables d'environnement
@@ -87,6 +88,7 @@ app.use('/api', genericRoutes);
 app.use('/api', donationRoutes);
 app.use('/api', userRoutes);
 app.use('/api', sponsorshipRoutes);
+app.use('/api', teamRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api', volunteerRoutes);
 app.use('/api/ai', aiRoutes);

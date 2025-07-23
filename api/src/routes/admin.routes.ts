@@ -9,6 +9,7 @@ const router = Router();
 router.use(protect, isSuperAdmin);
 
 router.get('/stats', adminController.getStats);
+router.get('/analytics', adminController.getAnalytics);
 router.get('/traffic', adminController.getTraffic);
 router.get('/threats', adminController.getThreats);
 

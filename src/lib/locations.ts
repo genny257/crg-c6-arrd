@@ -575,3 +575,31 @@ export const professionsList = [
 export const educationLevels = [
     { group: "Niveau", levels: ["Primaire", "Collège", "Lycée", "Baccalauréat", "Bac+2 (BTS, DUT)", "Bac+3 (Licence)", "Bac+5 (Master)", "Doctorat", "Autodidacte", "Formation professionnelle"] }
 ];
+
+// Helper to get coordinates for a given location string
+export const geocodeLocation = (location: string): [number, number] | undefined => {
+    const locations: { [key: string]: [number, number] } = {
+        "Libreville": [0.3924, 9.4536],
+        "Siège du Comité, Libreville": [0.416, 9.46],
+        "Hôtel de ville": [0.390, 9.455],
+        "Port-Gentil": [-0.7193, 8.7815],
+        "Franceville": [-1.6333, 13.5833],
+        "Oyem": [1.5996, 11.5794],
+        "Moanda": [-1.565, 13.196],
+        "Lycée X": [0.45, 9.50],
+        "École Publique d'Ondogo": [0.5, 9.4]
+    };
+    const lowerCaseLocation = location.toLowerCase();
+    for (const key in locations) {
+        if (lowerCaseLocation.includes(key.toLowerCase())) {
+            return locations[key];
+        }
+    }
+    // A simple fallback for "PK" locations
+    const pkMatch = lowerCaseLocation.match(/pk(\d+)/);
+    if (pkMatch) {
+        const pkNumber = parseInt(pkMatch[1], 10);
+        return [0.4 + pkNumber * 0.01, 9.45 + pkNumber * 0.01];
+    }
+    return undefined;
+};

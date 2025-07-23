@@ -11,8 +11,8 @@ const paginationSchema = z.object({
 export const getTraffic = async (req: Request, res: Response) => {
     try {
         const { page, limit } = paginationSchema.parse(req.query);
-        const traffic = await adminService.getTraffic(page, limit);
-        res.json(traffic);
+        const {data, total} = await adminService.getTraffic(page, limit);
+        res.json({data, total, page, limit});
     } catch (error) {
         res.status(500).json({ message: 'Error fetching traffic data', error });
     }
@@ -21,8 +21,8 @@ export const getTraffic = async (req: Request, res: Response) => {
 export const getThreats = async (req: Request, res: Response) => {
     try {
         const { page, limit } = paginationSchema.parse(req.query);
-        const threats = await adminService.getThreats(page, limit);
-        res.json(threats);
+        const {data, total} = await adminService.getThreats(page, limit);
+        res.json({data, total, page, limit});
     } catch (error) {
         res.status(500).json({ message: 'Error fetching threat data', error });
     }
@@ -38,7 +38,7 @@ export const getBlockedIPs = async (req: Request, res: Response) => {
 };
 
 const blockIPSchema = z.object({
-    ip: z.string(),
+    ip: z.string().ip({ message: "Adresse IP invalide" }),
     reason: z.string().optional(),
 });
 
@@ -73,3 +73,12 @@ export const getStats = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Error fetching stats', error });
     }
 };
+
+export const getAnalytics = async (req: Request, res: Response) => {
+    try {
+        const stats = await adminService.getAnalytics();
+        res.json(stats);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching analytics', error });
+    }
+}

@@ -19,3 +19,10 @@ export interface StatsData {
     donationsHistory: MonthlyData[];
   };
 }
+
+export interface SecurityStats {
+    totalRequests: number;
+    totalThreats: number;
+    totalBlocked: number;
+    uniqueVisitors: number;
+}

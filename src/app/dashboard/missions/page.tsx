@@ -8,7 +8,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { FilePlus2, MoreHorizontal, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import type { Mission } from "@/types/mission";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,6 +15,26 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useAuth } from "@/hooks/use-auth";
+import 'leaflet/dist/leaflet.css';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import { geocodeLocation } from "@/lib/locations";
+
+// Fix for default icon issue with webpack
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon.src,
+    shadowUrl: iconShadow.src,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+
 
 const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -32,6 +51,32 @@ const statusText = {
     'IN_PROGRESS': 'En cours',
     'COMPLETED': 'Terminée',
     'CANCELLED': 'Annulée'
+}
+
+const MapComponent = ({ missions }: { missions: Mission[] }) => {
+    const missionsWithCoords = missions
+        .map(m => ({...m, coords: geocodeLocation(m.location)}))
+        .filter(m => m.coords);
+
+    return (
+        <MapContainer center={[0.3924, 9.4536]} zoom={6} style={{ height: '100%', width: '100%', borderRadius: 'inherit' }}>
+            <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            {missionsWithCoords.map(mission => (
+                 <Marker key={mission.id} position={mission.coords!}>
+                    <Popup>
+                        <div className="font-sans">
+                            <h4 className="font-bold">{mission.title}</h4>
+                            <p>{mission.location}</p>
+                            <Link href={`/dashboard/missions/${mission.id}`} className="text-blue-600 hover:underline">Voir détails</Link>
+                        </div>
+                    </Popup>
+                </Marker>
+            ))}
+        </MapContainer>
+    )
 }
 
 export default function MissionsPage() {
@@ -200,20 +245,13 @@ export default function MissionsPage() {
                         </Table>
                     </CardContent>
                 </Card>
-                <Card className="lg:col-span-3">
+                <Card className="lg:col-span-3 h-[500px] md:h-auto">
                     <CardHeader>
                         <CardTitle>Carte des Missions</CardTitle>
-                        <CardDescription>Visualisation géographique des missions actives.</CardDescription>
+                        <CardDescription>Visualisation géographique des missions.</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                         <Image
-                            src="https://placehold.co/600x400.png"
-                            width={600}
-                            height={400}
-                            alt="Map of missions"
-                            data-ai-hint="Gabon map"
-                            className="w-full h-auto rounded-lg"
-                         />
+                    <CardContent className="h-[calc(100%-4rem)]">
+                         {loading ? <Skeleton className="h-full w-full" /> : <MapComponent missions={missions} />}
                     </CardContent>
                 </Card>
             </div>

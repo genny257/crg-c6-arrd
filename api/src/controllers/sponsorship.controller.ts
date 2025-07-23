@@ -2,6 +2,7 @@
 import { Request, Response } from 'express';
 import * as sponsorshipService from '../services/sponsorship.service';
 import { z } from 'zod';
+import { EmailService } from '../services/email.service';
 
 const sponsorshipSchema = z.object({
   companyName: z.string().min(1, "Le nom de l'entreprise est requis"),
@@ -15,11 +16,16 @@ export const createSponsorship = async (req: Request, res: Response) => {
     try {
         const data = sponsorshipSchema.parse(req.body);
         const sponsorship = await sponsorshipService.createSponsorship(data);
+        
+        // Send confirmation email
+        await EmailService.sendSponsorshipConfirmation(data.email, data.companyName);
+
         res.status(201).json(sponsorship);
     } catch (error) {
         if (error instanceof z.ZodError) {
             return res.status(400).json({ message: 'Validation invalide', errors: error.issues });
         }
+        console.error("Error creating sponsorship:", error);
         res.status(500).json({ message: 'Erreur lors de la création de la demande de mécénat', error });
     }
 };
