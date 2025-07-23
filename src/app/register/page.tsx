@@ -470,7 +470,7 @@ export default function RegisterPage() {
     const finalData = { ...data, causes: finalCauses };
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
+      const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(finalData),
