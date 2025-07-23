@@ -308,7 +308,7 @@ export default function RegisterPage() {
   const [communesCantons, setCommunesCantons] = React.useState<string[]>([]);
   const [arrondissements, setArrondissements] = React.useState<string[]>([]);
   const [quartiersVillages, setQuartiersVillages] = React.useState<string[]>([]);
-  const [cells, setCells] = React.useState<string[]>([]);
+  const [cells, setCells] = React.useState<string[]>(["Nzeng-Ayong Lac", "Nzeng-Ayong Village", "Ondogo", "PK6-PK9", "PK9-Bikélé"]);
 
 
   React.useEffect(() => {
@@ -325,7 +325,7 @@ export default function RegisterPage() {
           arrondissementsRes,
           quartiersVillagesRes,
         ] = await Promise.all([
-          fetch(`${API_BASE_URL}/nationalitys`),
+          fetch(`${API_BASE_URL}/nationalities`),
           fetch(`${API_BASE_URL}/educationLevels`),
           fetch(`${API_BASE_URL}/professions`),
           fetch(`${API_BASE_URL}/skills`),
