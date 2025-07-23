@@ -4,6 +4,12 @@ import { subMonths, format, startOfMonth, endOfMonth } from 'date-fns';
 
 const prisma = new PrismaClient();
 
+/**
+ * Retrieves paginated traffic log data from the database.
+ * @param {number} page - The page number for pagination.
+ * @param {number} limit - The number of items per page.
+ * @returns {Promise<{data: any[], total: number}>} An object containing the traffic data and total count.
+ */
 export const getTraffic = async (page: number, limit: number) => {
     const skip = (page - 1) * limit;
     const [data, total] = await prisma.$transaction([
@@ -17,6 +23,12 @@ export const getTraffic = async (page: number, limit: number) => {
     return { data, total };
 };
 
+/**
+ * Retrieves paginated security threat data from the database.
+ * @param {number} page - The page number for pagination.
+ * @param {number} limit - The number of items per page.
+ * @returns {Promise<{data: any[], total: number}>} An object containing the threat data and total count.
+ */
 export const getThreats = async (page: number, limit: number) => {
     const skip = (page - 1) * limit;
     const [data, total] = await prisma.$transaction([
@@ -31,10 +43,21 @@ export const getThreats = async (page: number, limit: number) => {
     return { data, total };
 };
 
+/**
+ * Retrieves all blocked IP addresses from the database.
+ * @returns {Promise<any[]>} A list of all blocked IP objects.
+ */
 export const getBlockedIPs = async () => {
     return await prisma.blockedIP.findMany({ orderBy: { createdAt: 'desc' } });
 };
 
+/**
+ * Blocks an IP address by adding it to the database.
+ * Throws an error if the IP is already blocked.
+ * @param {string} ip - The IP address to block.
+ * @param {string} [reason] - The optional reason for blocking the IP.
+ * @returns {Promise<any>} The newly created blocked IP object.
+ */
 export const blockIP = async (ip: string, reason?: string) => {
     // Check if IP is already blocked
     const existing = await prisma.blockedIP.findUnique({ where: { ip } });
@@ -46,10 +69,19 @@ export const blockIP = async (ip: string, reason?: string) => {
     });
 };
 
+/**
+ * Unblocks an IP address by deleting it from the database.
+ * @param {string} id - The ID of the blocked IP record to delete.
+ * @returns {Promise<any>} The result of the deletion.
+ */
 export const unblockIP = async (id: string) => {
     return await prisma.blockedIP.delete({ where: { id } });
 };
 
+/**
+ * Retrieves general security and traffic statistics.
+ * @returns {Promise<object>} An object containing various site statistics.
+ */
 export const getStats = async () => {
     const totalRequests = await prisma.requestLog.count();
     const totalThreats = await prisma.requestLog.count({ where: { isThreat: true } });
@@ -74,7 +106,10 @@ export const getStats = async () => {
     };
 }
 
-
+/**
+ * Retrieves analytics data for the main dashboard, including key metrics and chart data.
+ * @returns {Promise<object>} An object containing key metrics and data for charts.
+ */
 export const getAnalytics = async () => {
     const now = new Date();
     const thisMonthStart = startOfMonth(now);

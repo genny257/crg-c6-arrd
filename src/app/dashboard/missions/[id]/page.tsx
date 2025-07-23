@@ -4,7 +4,7 @@
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import type { Mission } from "@/types/mission";
+import type { Mission, MissionStatus } from "@/types/mission";
 import type { Volunteer } from "@/types/volunteer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,15 +18,22 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/use-auth";
 
-const getStatusBadgeVariant = (status: string) => {
+const getStatusBadgeVariant = (status: MissionStatus) => {
     switch (status) {
-        case 'En cours': return 'default';
-        case 'Planifiée': return 'secondary';
-        case 'Terminée': return 'outline';
-        case 'Annulée': return 'destructive';
+        case 'IN_PROGRESS': return 'default';
+        case 'PLANNED': return 'secondary';
+        case 'COMPLETED': return 'outline';
+        case 'CANCELLED': return 'destructive';
         default: return 'secondary';
     }
 };
+
+const statusText: { [key in MissionStatus]: string } = {
+    'PLANNED': 'Planifiée',
+    'IN_PROGRESS': 'En cours',
+    'COMPLETED': 'Terminée',
+    'CANCELLED': 'Annulée'
+}
 
 export default function MissionDetailPage() {
     const { id } = useParams();
@@ -113,7 +120,7 @@ export default function MissionDetailPage() {
                         </CardHeader>
                         <CardContent className="space-y-3 text-sm">
                             <div className="flex items-center gap-2">
-                                <Badge variant={getStatusBadgeVariant(mission.status)}>{mission.status}</Badge>
+                                <Badge variant={getStatusBadgeVariant(mission.status)}>{statusText[mission.status]}</Badge>
                             </div>
                             <div className="flex items-start gap-2">
                                 <Calendar className="h-4 w-4 text-muted-foreground mt-0.5" />

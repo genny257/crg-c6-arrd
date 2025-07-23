@@ -4,15 +4,30 @@ import * as userService from '../services/user.service';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+/**
+ * Registers a new user.
+ * @param {Request} req - The Express request object, containing the user's data in the body.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A response indicating the result of the registration.
+ */
 export const register = async (req: Request, res: Response) => {
+    console.log("Registration attempt received. Body:", JSON.stringify(req.body, null, 2));
     try {
         const user = await userService.createUser(req.body);
-        res.status(201).json({ message: "User created successfully", userId: user.id });
+        console.log("User created successfully:", user.id);
+        res.status(201).json({ message: "User created successfully", userId: user.id, matricule: user.matricule });
     } catch (error) {
+        console.error("Error during user creation:", error);
         res.status(500).json({ message: 'Error creating user', error: (error as Error).message });
     }
 };
 
+/**
+ * Logs in a user.
+ * @param {Request} req - The Express request object, containing the user's credentials.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A response with the user's data and a JWT token if successful.
+ */
 export const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
@@ -43,6 +58,12 @@ export const login = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Retrieves all users.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A response containing a list of all users.
+ */
 export const getUsers = async (req: Request, res: Response) => {
     try {
         const users = await userService.getAllUsers();

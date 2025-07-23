@@ -1,16 +1,33 @@
-
 // src/services/user.service.ts
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
-export const createUser = async (data: any) => {
+/**
+ * Creates a new user in the database with hashed password and relational data.
+ * Handles dynamic creation of related entities like skills, profession, etc.
+ * @param {any} data - The user data from the request body.
+ * @returns {Promise<User>} The newly created user object.
+ */
+export const createUser = async (data: any): Promise<User> => {
   const { skills, profession, educationLevel, nationality, residence, password, ...userData } = data;
 
+  // Generate a unique matricule
+  const totalUsers = await prisma.user.count();
+  const matricule = `VOL-${(totalUsers + 1).toString().padStart(6, '0')}`;
+
+  // Hash the user's password for security
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const upsertAndGetId = async (model: 'skill' | 'profession' | 'educationLevel' | 'nationality', name: string) => {
+  /**
+   * Helper function to find or create a related entity (like a skill or profession)
+   * and return its ID. This avoids creating duplicate entries.
+   * @param model - The Prisma model to query ('skill', 'profession', etc.).
+   * @param name - The name of the entity to find or create.
+   * @returns {Promise<string|null>} The ID of the entity, or null if name is not provided.
+   */
+  const upsertAndGetId = async (model: 'skill' | 'profession' | 'educationLevel' | 'nationality', name: string): Promise<string | null> => {
     if (!name) return null;
     const result = await (prisma as any)[model].upsert({
       where: { name },
@@ -20,6 +37,7 @@ export const createUser = async (data: any) => {
     return result.id;
   };
 
+  // Process skills and other relational data
   const skillIds = await Promise.all(
     (skills || []).map((name: string) => upsertAndGetId('skill', name))
   );
@@ -28,8 +46,10 @@ export const createUser = async (data: any) => {
   const educationLevelId = await upsertAndGetId('educationLevel', educationLevel);
   const nationalityId = await upsertAndGetId('nationality', nationality);
 
+  // Prepare the final user data object for Prisma
   const finalUserData = {
     ...userData,
+    matricule,
     password: hashedPassword,
     residenceProvince: residence?.province,
     residenceDepartement: residence?.departement,
@@ -47,11 +67,20 @@ export const createUser = async (data: any) => {
   return await prisma.user.create({ data: finalUserData });
 };
 
-export const findUserByEmail = async (email: string) => {
+/**
+ * Finds a user by their email address.
+ * @param {string} email - The email of the user to find.
+ * @returns {Promise<User | null>} The user object if found, otherwise null.
+ */
+export const findUserByEmail = async (email: string): Promise<User | null> => {
     return await prisma.user.findUnique({ where: { email } });
 };
 
-export const getAllUsers = async () => {
+/**
+ * Retrieves all users from the database with a limited set of fields.
+ * @returns {Promise<Partial<User>[]>} A promise that resolves to an array of user objects.
+ */
+export const getAllUsers = async (): Promise<Partial<User>[]> => {
     return await prisma.user.findMany({
         select: {
             id: true,

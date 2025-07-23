@@ -1,12 +1,16 @@
-
 // src/controllers/blog.controller.ts
 import { Request, Response } from 'express';
 import * as blogService from '../services/blog.service';
 import * as aiService from '../services/ai.service';
-import { protect } from '../middleware/auth';
 import { z } from 'zod';
 import { runFlow } from '@genkit-ai/flow';
 
+/**
+ * Retrieves all blog posts.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response containing a list of all blog posts.
+ */
 export const getBlogPosts = async (req: Request, res: Response) => {
     try {
         const posts = await blogService.getAllBlogPosts();
@@ -16,6 +20,12 @@ export const getBlogPosts = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Retrieves featured blog posts.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response containing a list of featured blog posts.
+ */
 export const getFeaturedBlogPosts = async (req: Request, res: Response) => {
     try {
         const posts = await blogService.getFeaturedBlogPosts();
@@ -25,6 +35,12 @@ export const getFeaturedBlogPosts = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Creates a new blog post.
+ * @param {Request} req - The Express request object, containing post data in the body.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with the newly created blog post.
+ */
 export const createBlogPost = async (req: Request, res: Response) => {
     try {
         const post = await blogService.createBlogPost(req.body);
@@ -34,6 +50,12 @@ export const createBlogPost = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Retrieves a single blog post by its ID.
+ * @param {Request} req - The Express request object, containing the post ID in params.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with the blog post or a 404 error if not found.
+ */
 export const getBlogPostById = async (req: Request, res: Response) => {
     try {
         const post = await blogService.getBlogPostById(req.params.id);
@@ -47,6 +69,12 @@ export const getBlogPostById = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Retrieves a single blog post by its slug.
+ * @param {Request} req - The Express request object, containing the post slug in params.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with the blog post or a 404 error if not found.
+ */
 export const getBlogPostBySlug = async (req: Request, res: Response) => {
     try {
         const post = await blogService.getBlogPostBySlug(req.params.slug);
@@ -60,6 +88,12 @@ export const getBlogPostBySlug = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Updates an existing blog post.
+ * @param {Request} req - The Express request object, containing the ID in params and update data in the body.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with the updated blog post.
+ */
 export const updateBlogPost = async (req: Request, res: Response) => {
     try {
         const post = await blogService.updateBlogPost(req.params.id, req.body);
@@ -69,6 +103,12 @@ export const updateBlogPost = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Deletes a blog post by its ID.
+ * @param {Request} req - The Express request object, containing the post ID in params.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A 204 No Content response on success.
+ */
 export const deleteBlogPost = async (req: Request, res: Response) => {
     try {
         await blogService.deleteBlogPost(req.params.id);
@@ -78,11 +118,17 @@ export const deleteBlogPost = async (req: Request, res: Response) => {
     }
 };
 
-
+// Schema for validating the topic for AI generation
 const generatePostSchema = z.object({
     topic: z.string().min(1, 'Le sujet est requis.'),
 });
 
+/**
+ * Generates a new blog post using an AI flow based on a given topic.
+ * @param {Request} req - The Express request object, containing the topic in the body.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with the AI-generated blog post content.
+ */
 export const generateBlogPost = async (req: Request, res: Response) => {
     try {
         const { topic } = generatePostSchema.parse(req.body);

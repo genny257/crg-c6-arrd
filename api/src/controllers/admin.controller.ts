@@ -3,11 +3,18 @@ import { Request, Response } from 'express';
 import * as adminService from '../services/admin.service';
 import { z } from 'zod';
 
+// Schema for validating pagination query parameters
 const paginationSchema = z.object({
     page: z.coerce.number().int().positive().default(1),
     limit: z.coerce.number().int().positive().default(20),
 });
 
+/**
+ * Retrieves paginated traffic log data.
+ * @param {Request} req - The Express request object, containing pagination info in query params.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with traffic data and pagination details.
+ */
 export const getTraffic = async (req: Request, res: Response) => {
     try {
         const { page, limit } = paginationSchema.parse(req.query);
@@ -18,6 +25,12 @@ export const getTraffic = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Retrieves paginated security threat data.
+ * @param {Request} req - The Express request object, containing pagination info in query params.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with threat data and pagination details.
+ */
 export const getThreats = async (req: Request, res: Response) => {
     try {
         const { page, limit } = paginationSchema.parse(req.query);
@@ -28,6 +41,12 @@ export const getThreats = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Retrieves a list of all blocked IP addresses.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response containing the list of blocked IPs.
+ */
 export const getBlockedIPs = async (req: Request, res: Response) => {
     try {
         const ips = await adminService.getBlockedIPs();
@@ -37,11 +56,18 @@ export const getBlockedIPs = async (req: Request, res: Response) => {
     }
 };
 
+// Schema for validating the body of a block IP request
 const blockIPSchema = z.object({
     ip: z.string().ip({ message: "Adresse IP invalide" }),
     reason: z.string().optional(),
 });
 
+/**
+ * Blocks a new IP address.
+ * @param {Request} req - The Express request object, containing the IP and reason in the body.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with the newly created blocked IP record.
+ */
 export const blockIP = async (req: Request, res: Response) => {
     try {
         const { ip, reason } = blockIPSchema.parse(req.body);
@@ -55,6 +81,12 @@ export const blockIP = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Unblocks an IP address by its ID.
+ * @param {Request} req - The Express request object, containing the ID in the params.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A 204 No Content response on success.
+ */
 export const unblockIP = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -65,6 +97,12 @@ export const unblockIP = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Retrieves general statistics for the admin dashboard.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with various statistics.
+ */
 export const getStats = async (req: Request, res: Response) => {
     try {
         const stats = await adminService.getStats();
@@ -74,6 +112,12 @@ export const getStats = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Retrieves analytics data for the admin dashboard.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with analytics data.
+ */
 export const getAnalytics = async (req: Request, res: Response) => {
     try {
         const stats = await adminService.getAnalytics();

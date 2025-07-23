@@ -21,6 +21,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import type { MissionStatus } from "@/types/mission";
 
 const missionSchema = z.object({
   title: z.string().min(1, "Le titre est requis."),
@@ -29,7 +30,7 @@ const missionSchema = z.object({
   startDate: z.date({ required_error: "La date de début est requise." }),
   endDate: z.date({ required_error: "La date de fin est requise." }),
   maxParticipants: z.coerce.number().int().positive("Le nombre doit être positif.").optional(),
-  status: z.enum(['Planifiée', 'En cours', 'Terminée', 'Annulée']).default('Planifiée'),
+  status: z.enum(['PLANNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED']).default('PLANNED'),
   requiredSkills: z.array(z.string()).default([]),
 });
 
@@ -47,7 +48,7 @@ export default function NewMissionPage() {
       title: "",
       description: "",
       location: "",
-      status: "Planifiée",
+      status: "PLANNED",
       requiredSkills: [],
     },
   });

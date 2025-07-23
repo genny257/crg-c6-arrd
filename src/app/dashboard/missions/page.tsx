@@ -9,7 +9,7 @@ import { FilePlus2, MoreHorizontal, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import type { Mission } from "@/types/mission";
+import type { Mission, MissionStatus } from "@/types/mission";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { format } from "date-fns";
@@ -36,7 +36,7 @@ let DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 
-const getStatusBadgeVariant = (status: string) => {
+const getStatusBadgeVariant = (status: MissionStatus) => {
     switch (status) {
         case 'IN_PROGRESS': return 'default';
         case 'PLANNED': return 'secondary';
@@ -46,7 +46,7 @@ const getStatusBadgeVariant = (status: string) => {
     }
 };
 
-const statusText = {
+const statusText: { [key in MissionStatus]: string } = {
     'PLANNED': 'Planifiée',
     'IN_PROGRESS': 'En cours',
     'COMPLETED': 'Terminée',
@@ -112,21 +112,21 @@ export default function MissionsPage() {
         }
     }, [toast, token]);
     
-    const updateMissionStatus = async (id: string, status: 'CANCELLED' | 'PLANNED') => {
-        if (!id || !token) return;
+    const updateMissionStatus = async (missionToUpdate: Mission, status: MissionStatus) => {
+        if (!missionToUpdate.id || !token) return;
         
         const originalMissions = [...missions];
-        const updatedMissions = missions.map(m => m.id === id ? { ...m, status } : m);
+        const updatedMissions = missions.map(m => m.id === missionToUpdate.id ? { ...m, status } : m);
         setMissions(updatedMissions);
 
         try {
-             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions/${id}`, {
+             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions/${missionToUpdate.id}`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                  },
-                body: JSON.stringify({ status })
+                body: JSON.stringify({ ...missionToUpdate, status })
             });
 
             if (!response.ok) throw new Error("Failed to update status");
@@ -227,11 +227,11 @@ export default function MissionsPage() {
                                                         </DropdownMenuItem>
                                                         <DropdownMenuSeparator />
                                                         {mission.status !== 'CANCELLED' ? (
-                                                            <DropdownMenuItem className="text-destructive" onClick={() => updateMissionStatus(mission.id, 'CANCELLED')}>
+                                                            <DropdownMenuItem className="text-destructive" onClick={() => updateMissionStatus(mission, 'CANCELLED')}>
                                                                 Annuler
                                                             </DropdownMenuItem>
                                                         ) : (
-                                                            <DropdownMenuItem onClick={() => updateMissionStatus(mission.id, 'PLANNED')}>
+                                                            <DropdownMenuItem onClick={() => updateMissionStatus(mission, 'PLANNED')}>
                                                                 Réactiver
                                                             </DropdownMenuItem>
                                                         )}

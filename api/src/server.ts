@@ -68,8 +68,24 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // --- Middlewares Généraux ---
-// Activer CORS pour autoriser les requêtes cross-origin
-app.use(cors());
+// Configuration CORS spécifique pour autoriser le frontend
+const allowedOrigins = [
+    'https://6000-firebase-studio-1752715825525.cluster-6frnii43o5blcu522sivebzpii.cloudworkstations.dev',
+    'http://localhost:9003' // Pour le développement local
+];
+
+const corsOptions: cors.CorsOptions = {
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 // Parser les corps de requête JSON (avec une limite de taille pour la sécurité)
 app.use(express.json({ limit: '10kb' }));

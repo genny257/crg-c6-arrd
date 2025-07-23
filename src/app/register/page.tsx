@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -284,8 +283,6 @@ const LocationSelector = ({
 
 type UploadableField = "photo" | "idCardFront" | "idCardBack";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
-
 export default function RegisterPage() {
   const [step, setStep] = React.useState(1);
   const { toast } = useToast();
@@ -310,53 +307,53 @@ export default function RegisterPage() {
   const [quartiersVillages, setQuartiersVillages] = React.useState<string[]>([]);
   const [cells, setCells] = React.useState<string[]>(["Nzeng-Ayong Lac", "Nzeng-Ayong Village", "Ondogo", "PK6-PK9", "PK9-Bikélé"]);
 
+  const fetchData = React.useCallback(async () => {
+    try {
+      const [
+        nationalitiesRes,
+        educationLevelsRes,
+        professionsRes,
+        skillsRes,
+        provincesRes,
+        departementsRes,
+        communesCantonsRes,
+        arrondissementsRes,
+        quartiersVillagesRes,
+      ] = await Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/nationalities`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/educationLevels`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/professions`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/provinces`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/departements`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/communeCantons`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/arrondissements`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/quartierVillages`),
+      ]);
+      
+      setNationalities(await nationalitiesRes.json());
+      setEducationLevels(await educationLevelsRes.json());
+      setProfessions(await professionsRes.json());
+      setSkills(await skillsRes.json());
+      setProvinces(await provincesRes.json());
+      setDepartements(await departementsRes.json());
+      setCommunesCantons(await communesCantonsRes.json());
+      setArrondissements(await arrondissementsRes.json());
+      setQuartiersVillages(await quartiersVillagesRes.json());
+
+    } catch (error) {
+      console.error("Failed to fetch dynamic lists", error);
+      toast({
+        title: "Erreur de chargement",
+        description: "Impossible de charger les listes de sélection. Assurez-vous que le serveur est bien démarré.",
+        variant: "destructive",
+      });
+    }
+  }, [toast]);
 
   React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [
-          nationalitiesRes,
-          educationLevelsRes,
-          professionsRes,
-          skillsRes,
-          provincesRes,
-          departementsRes,
-          communesCantonsRes,
-          arrondissementsRes,
-          quartiersVillagesRes,
-        ] = await Promise.all([
-          fetch(`${API_BASE_URL}/nationalities`),
-          fetch(`${API_BASE_URL}/educationLevels`),
-          fetch(`${API_BASE_URL}/professions`),
-          fetch(`${API_BASE_URL}/skills`),
-          fetch(`${API_BASE_URL}/provinces`),
-          fetch(`${API_BASE_URL}/departements`),
-          fetch(`${API_BASE_URL}/communeCantons`),
-          fetch(`${API_BASE_URL}/arrondissements`),
-          fetch(`${API_BASE_URL}/quartierVillages`),
-        ]);
-        
-        setNationalities(await nationalitiesRes.json());
-        setEducationLevels(await educationLevelsRes.json());
-        setProfessions(await professionsRes.json());
-        setSkills(await skillsRes.json());
-        setProvinces(await provincesRes.json());
-        setDepartements(await departementsRes.json());
-        setCommunesCantons(await communesCantonsRes.json());
-        setArrondissements(await arrondissementsRes.json());
-        setQuartiersVillages(await quartiersVillagesRes.json());
-
-      } catch (error) {
-        console.error("Failed to fetch dynamic lists", error);
-        toast({
-          title: "Erreur de chargement",
-          description: "Impossible de charger les listes de sélection.",
-          variant: "destructive",
-        });
-      }
-    };
     fetchData();
-  }, [toast]);
+  }, [fetchData]);
 
 
   const form = useForm<FormValues>({
@@ -470,7 +467,7 @@ export default function RegisterPage() {
     const finalData = { ...data, causes: finalCauses };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/register`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(finalData),

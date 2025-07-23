@@ -21,7 +21,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import type { Mission } from "@/types/mission";
+import type { Mission, MissionStatus } from "@/types/mission";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -32,7 +32,7 @@ const missionSchema = z.object({
   startDate: z.date({ required_error: "La date de début est requise." }),
   endDate: z.date({ required_error: "La date de fin est requise." }),
   maxParticipants: z.coerce.number().int().positive("Le nombre doit être positif.").optional(),
-  status: z.enum(['Planifiée', 'En cours', 'Terminée', 'Annulée']),
+  status: z.enum(['PLANNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED']),
   requiredSkills: z.array(z.string()).default([]),
 });
 
@@ -313,10 +313,10 @@ export default function EditMissionPage() {
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        <SelectItem value="Planifiée">Planifiée</SelectItem>
-                                        <SelectItem value="En cours">En cours</SelectItem>
-                                        <SelectItem value="Terminée">Terminée</SelectItem>
-                                        <SelectItem value="Annulée">Annulée</SelectItem>
+                                        <SelectItem value="PLANNED">Planifiée</SelectItem>
+                                        <SelectItem value="IN_PROGRESS">En cours</SelectItem>
+                                        <SelectItem value="COMPLETED">Terminée</SelectItem>
+                                        <SelectItem value="CANCELLED">Annulée</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />

@@ -111,8 +111,8 @@ export default function CalendarPage() {
           setLoading(true);
           try {
               const [missionsRes, eventsRes] = await Promise.all([
-                  fetch('http://localhost:3001/api/missions'),
-                  fetch('http://localhost:3001/api/events')
+                  fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions`),
+                  fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`)
               ]);
 
               if (!missionsRes.ok || !eventsRes.ok) {
