@@ -66,6 +66,7 @@ import { signIn } from 'next-auth/react';
 import { RegisterUserInputSchema } from '@/ai/schemas/register-user-schema';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { locations, cells as allCells } from '@/lib/locations';
 
 const totalSteps = 5;
 
@@ -187,24 +188,25 @@ const LocationSelector = ({
   form,
   title,
   fieldPrefix,
-  provinces,
-  departements,
-  communesCantons,
-  arrondissements,
-  quartiersVillages,
 }: {
   form: any;
   title: string;
   fieldPrefix: string;
-  provinces: string[];
-  departements: string[];
-  communesCantons: string[];
-  arrondissements: string[];
-  quartiersVillages: string[];
 }) => {
   const selectedProvince = form.watch(`${fieldPrefix}.province`);
   const selectedDepartement = form.watch(`${fieldPrefix}.departement`);
-  const selectedCommuneCanton = form.watch(`${fieldPrefix}.communeCanton`);
+  const selectedCommune = form.watch(`${fieldPrefix}.communeCanton`);
+  const selectedArrondissement = form.watch(`${fieldPrefix}.arrondissement`);
+
+  const provinces = Object.keys(locations);
+  const departements = selectedProvince ? Object.keys(locations[selectedProvince]) : [];
+  const communes = selectedDepartement ? Object.keys(locations[selectedProvince][selectedDepartement].communes) : [];
+  const arrondissements = selectedCommune && locations[selectedProvince]?.[selectedDepartement]?.communes?.[selectedCommune]?.arrondissements
+    ? Object.keys(locations[selectedProvince][selectedDepartement].communes[selectedCommune].arrondissements)
+    : [];
+  const quartiers = selectedArrondissement && locations[selectedProvince]?.[selectedDepartement]?.communes?.[selectedCommune]?.arrondissements?.[selectedArrondissement]
+    ? locations[selectedProvince][selectedDepartement].communes[selectedCommune].arrondissements[selectedArrondissement]
+    : [];
 
   return (
     <div className="grid gap-2 p-4 border rounded-lg">
@@ -243,7 +245,7 @@ const LocationSelector = ({
           fieldName={`${fieldPrefix}.communeCanton`}
           label="Commune ou Canton"
           placeholder="Sélectionner une commune/canton"
-          options={communesCantons}
+          options={communes}
           disabled={!selectedDepartement}
           onValueChange={(value) => {
             form.setValue(`${fieldPrefix}.communeCanton`, value);
@@ -257,7 +259,7 @@ const LocationSelector = ({
           label="Arrondissement"
           placeholder="Sélectionner un arrondissement"
           options={arrondissements}
-          disabled={!selectedCommuneCanton}
+          disabled={!selectedCommune}
           onValueChange={(value) => {
             form.setValue(`${fieldPrefix}.arrondissement`, value);
             form.setValue(`${fieldPrefix}.quartierVillage`, "");
@@ -269,8 +271,8 @@ const LocationSelector = ({
             fieldName={`${fieldPrefix}.quartierVillage`}
             label="Quartier ou Village"
             placeholder="Sélectionner un quartier/village"
-            options={quartiersVillages}
-            disabled={!selectedCommuneCanton}
+            options={quartiers}
+            disabled={!selectedArrondissement}
             onValueChange={(value) => {
                 form.setValue(`${fieldPrefix}.quartierVillage`, value);
             }}
@@ -291,55 +293,32 @@ export default function RegisterPage() {
   const [uploading, setUploading] = React.useState<
     Partial<Record<UploadableField, boolean>>
   >({});
-  const [uploadProgress, setUploadProgress] = React.useState<
-    Partial<Record<UploadableField, number>>
-  >({});
   
   // State for dynamic lists
   const [nationalities, setNationalities] = React.useState<string[]>([]);
   const [educationLevels, setEducationLevels] = React.useState<string[]>([]);
   const [professions, setProfessions] = React.useState<string[]>([]);
   const [skills, setSkills] = React.useState<string[]>([]);
-  const [provinces, setProvinces] = React.useState<string[]>([]);
-  const [departements, setDepartements] = React.useState<string[]>([]);
-  const [communesCantons, setCommunesCantons] = React.useState<string[]>([]);
-  const [arrondissements, setArrondissements] = React.useState<string[]>([]);
-  const [quartiersVillages, setQuartiersVillages] = React.useState<string[]>([]);
-  const [cells, setCells] = React.useState<string[]>(["Nzeng-Ayong Lac", "Nzeng-Ayong Village", "Ondogo", "PK6-PK9", "PK9-Bikélé"]);
 
   const fetchData = React.useCallback(async () => {
     try {
+      const api_url = process.env.NEXT_PUBLIC_API_URL;
       const [
         nationalitiesRes,
         educationLevelsRes,
         professionsRes,
         skillsRes,
-        provincesRes,
-        departementsRes,
-        communesCantonsRes,
-        arrondissementsRes,
-        quartiersVillagesRes,
       ] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/nationalities`),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/educationLevels`),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/professions`),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills`),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/provinces`),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/departements`),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/communeCantons`),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/arrondissements`),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/quartierVillages`),
+        fetch(`${api_url}/nationalities`),
+        fetch(`${api_url}/educationLevels`),
+        fetch(`${api_url}/professions`),
+        fetch(`${api_url}/skills`),
       ]);
       
       setNationalities(await nationalitiesRes.json());
       setEducationLevels(await educationLevelsRes.json());
       setProfessions(await professionsRes.json());
       setSkills(await skillsRes.json());
-      setProvinces(await provincesRes.json());
-      setDepartements(await departementsRes.json());
-      setCommunesCantons(await communesCantonsRes.json());
-      setArrondissements(await arrondissementsRes.json());
-      setQuartiersVillages(await quartiersVillagesRes.json());
 
     } catch (error) {
       console.error("Failed to fetch dynamic lists", error);
@@ -938,11 +917,6 @@ export default function RegisterPage() {
                     form={form}
                     title="Lieu de résidence actuel"
                     fieldPrefix="residence"
-                    provinces={provinces}
-                    departements={departements}
-                    communesCantons={communesCantons}
-                    arrondissements={arrondissements}
-                    quartiersVillages={quartiersVillages}
                   />
                 </div>
               )}
@@ -1299,7 +1273,7 @@ export default function RegisterPage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {cells.map((cell) => (
+                            {allCells.map((cell) => (
                               <SelectItem key={cell} value={cell}>
                                 {cell}
                               </SelectItem>
