@@ -1,3 +1,4 @@
+
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -68,24 +69,12 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // --- Middlewares Généraux ---
-// Configuration CORS spécifique pour autoriser le frontend
-const allowedOrigins = [
-    'https://6000-firebase-studio-1752715825525.cluster-6frnii43o5blcu522sivebzpii.cloudworkstations.dev',
-    'http://localhost:9003' // Pour le développement local
-];
-
-const corsOptions: cors.CorsOptions = {
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+// Configuration CORS flexible pour le développement
+app.use(cors({
+    origin: true, // Reflect the request origin, as defined by `req.header('Origin')`
     credentials: true,
-};
+}));
 
-app.use(cors(corsOptions));
 
 // Parser les corps de requête JSON (avec une limite de taille pour la sécurité)
 app.use(express.json({ limit: '10kb' }));
@@ -105,7 +94,7 @@ app.use('/api', donationRoutes);
 app.use('/api', userRoutes);
 app.use('/api', sponsorshipRoutes);
 app.use('/api', teamRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/api', adminRoutes);
 app.use('/api', volunteerRoutes);
 app.use('/api/ai', aiRoutes);
 
