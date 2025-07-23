@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -300,39 +301,39 @@ export default function RegisterPage() {
   const [professions, setProfessions] = React.useState<string[]>([]);
   const [skills, setSkills] = React.useState<string[]>([]);
 
-  const fetchData = React.useCallback(async () => {
-    try {
-      const api_url = process.env.NEXT_PUBLIC_API_URL;
-      const [
-        nationalitiesRes,
-        educationLevelsRes,
-        professionsRes,
-        skillsRes,
-      ] = await Promise.all([
-        fetch(`${api_url}/nationalities`),
-        fetch(`${api_url}/educationLevels`),
-        fetch(`${api_url}/professions`),
-        fetch(`${api_url}/skills`),
-      ]);
-      
-      setNationalities(await nationalitiesRes.json());
-      setEducationLevels(await educationLevelsRes.json());
-      setProfessions(await professionsRes.json());
-      setSkills(await skillsRes.json());
-
-    } catch (error) {
-      console.error("Failed to fetch dynamic lists", error);
-      toast({
-        title: "Erreur de chargement",
-        description: "Impossible de charger les listes de sélection. Assurez-vous que le serveur est bien démarré.",
-        variant: "destructive",
-      });
-    }
-  }, [toast]);
-
   React.useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const api_url = process.env.NEXT_PUBLIC_API_URL;
+            const [
+                nationalitiesRes,
+                educationLevelsRes,
+                professionsRes,
+                skillsRes,
+            ] = await Promise.all([
+                fetch(`${api_url}/nationalities`),
+                fetch(`${api_url}/educationLevels`),
+                fetch(`${api_url}/professions`),
+                fetch(`${api_url}/skills`),
+            ]);
+
+            setNationalities(await nationalitiesRes.json());
+            setEducationLevels(await educationLevelsRes.json());
+            setProfessions(await professionsRes.json());
+            setSkills(await skillsRes.json());
+
+        } catch (error) {
+            console.error("Failed to fetch dynamic lists", error);
+            toast({
+                title: "Erreur de chargement",
+                description: "Impossible de charger les listes de sélection. Assurez-vous que le serveur est bien démarré.",
+                variant: "destructive",
+            });
+        }
+    };
+
     fetchData();
-  }, [fetchData]);
+  }, [toast]);
 
 
   const form = useForm<FormValues>({
