@@ -249,7 +249,7 @@ const VolunteerSuggestions = ({ missionId }: { missionId: string }) => {
                         Suggérer des volontaires
                     </Button>
                 </div>
-                <CardDescription>Laissez l'IA vous proposer les meilleurs profils pour cette mission.</CardDescription>
+                <CardDescription>Laissez l&apos;IA vous proposer les meilleurs profils pour cette mission.</CardDescription>
             </CardHeader>
             <CardContent>
                 {loading && (
@@ -263,7 +263,7 @@ const VolunteerSuggestions = ({ missionId }: { missionId: string }) => {
                              <div key={i} className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
                                 <div className="flex-1">
                                     <p className="font-bold">{s.volunteerName}</p>
-                                    <p className="text-sm text-muted-foreground italic">"{s.justification}"</p>
+                                    <p className="text-sm text-muted-foreground italic">&quot;{s.justification}&quot;</p>
                                 </div>
                                 <div className="text-right">
                                      <p className="text-sm font-semibold">Score</p>

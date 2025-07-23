@@ -1,4 +1,3 @@
-
 "use client"
 import * as React from "react";
 import { Button } from "@/components/ui/button";
@@ -20,13 +19,19 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useAuth } from "@/hooks/use-auth";
 
-const getStatusBadgeVariant = (status: string) => {
+const getStatusBadgeVariant = (status: Donation['status']) => {
     switch (status) {
-        case 'Confirmé': return 'default';
-        case 'En_attente': return 'secondary';
-        case 'Échoué': return 'destructive';
+        case 'CONFIRMED': return 'default';
+        case 'PENDING': return 'secondary';
+        case 'FAILED': return 'destructive';
         default: return 'outline';
     }
+};
+
+const statusText = {
+    'CONFIRMED': 'Confirmé',
+    'PENDING': 'En attente',
+    'FAILED': 'Échoué'
 };
 
 
@@ -37,7 +42,10 @@ export default function DonationPage() {
     const { toast } = useToast();
 
     const fetchDonations = React.useCallback(async () => {
-        if (!token) return;
+        if (!token) {
+            setLoading(false);
+            return;
+        }
         setLoading(true);
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations`, {
@@ -63,10 +71,8 @@ export default function DonationPage() {
     }, [toast, token]);
 
     React.useEffect(() => {
-        if (token) {
-            fetchDonations();
-        }
-    }, [fetchDonations, token]);
+        fetchDonations();
+    }, [fetchDonations]);
 
 
     return (
@@ -114,7 +120,7 @@ export default function DonationPage() {
                                             {format(new Date(donation.createdAt), "d MMM yyyy", { locale: fr })}
                                         </TableCell>
                                         <TableCell>
-                                            <Badge variant={getStatusBadgeVariant(donation.status)}>{donation.status.replace('_', ' ')}</Badge>
+                                            <Badge variant={getStatusBadgeVariant(donation.status)}>{statusText[donation.status]}</Badge>
                                         </TableCell>
                                         <TableCell>
                                         <DropdownMenu>

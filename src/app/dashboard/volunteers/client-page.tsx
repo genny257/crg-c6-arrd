@@ -12,7 +12,6 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLab
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Volunteer } from "@/types/volunteer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cells, professionsList, skillsList } from "@/lib/locations";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -30,19 +29,29 @@ import { useAuth } from "@/hooks/use-auth";
 
 const getStatusBadgeVariant = (status?: Volunteer['status']) => {
     switch (status) {
-        case 'Actif': return 'default';
-        case 'En attente': return 'secondary';
-        case 'Inactif': return 'outline';
-        case 'Rejeté': return 'destructive';
+        case 'ACTIVE': return 'default';
+        case 'PENDING': return 'secondary';
+        case 'INACTIVE': return 'outline';
+        case 'REJECTED': return 'destructive';
         default: return 'secondary';
     }
 };
 
+const statusText = {
+    'ACTIVE': 'Actif',
+    'PENDING': 'En attente',
+    'INACTIVE': 'Inactif',
+    'REJECTED': 'Rejeté'
+};
+
 interface VolunteersClientPageProps {
     initialVolunteers: Volunteer[];
+    allSkills: string[];
+    allProfessions: string[];
+    allCells: string[];
 }
 
-export function VolunteersClientPage({ initialVolunteers }: VolunteersClientPageProps) {
+export function VolunteersClientPage({ initialVolunteers, allCells, allProfessions, allSkills }: VolunteersClientPageProps) {
     const { token } = useAuth();
     const { toast } = useToast();
     const [volunteers, setVolunteers] = React.useState<Volunteer[]>(initialVolunteers);
@@ -52,10 +61,10 @@ export function VolunteersClientPage({ initialVolunteers }: VolunteersClientPage
     const [skillFilter, setSkillFilter] = React.useState<string | null>(null);
     const [professionFilter, setProfessionFilter] = React.useState<string | null>(null);
     const [sortConfig, setSortConfig] = React.useState<{ key: 'name' | 'date'; direction: 'asc' | 'desc' }>({ key: 'date', direction: 'desc' });
-    const [volunteerToUpdate, setVolunteerToUpdate] = React.useState<{id: string, status: 'Actif' | 'Rejeté'} | null>(null);
+    const [volunteerToUpdate, setVolunteerToUpdate] = React.useState<{id: string, status: 'ACTIVE' | 'REJECTED'} | null>(null);
 
 
-    const updateVolunteerStatus = async (id: string, status: 'Actif' | 'Rejeté') => {
+    const updateVolunteerStatus = async (id: string, status: 'ACTIVE' | 'REJECTED') => {
         if (!id || !token) return;
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/volunteers/${id}/status`, {
@@ -137,7 +146,7 @@ export function VolunteersClientPage({ initialVolunteers }: VolunteersClientPage
                     <AlertDialogHeader>
                     <AlertDialogTitle>Confirmer l'action</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Êtes-vous sûr de vouloir {volunteerToUpdate?.status === 'Actif' ? 'approuver' : 'rejeter'} cette candidature ?
+                        Êtes-vous sûr de vouloir {volunteerToUpdate?.status === 'ACTIVE' ? 'approuver' : 'rejeter'} cette candidature ?
                     </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -185,10 +194,10 @@ export function VolunteersClientPage({ initialVolunteers }: VolunteersClientPage
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Tous les statuts</SelectItem>
-                                    <SelectItem value="En attente">En attente</SelectItem>
-                                    <SelectItem value="Actif">Actif</SelectItem>
-                                    <SelectItem value="Inactif">Inactif</SelectItem>
-                                    <SelectItem value="Rejeté">Rejeté</SelectItem>
+                                    <SelectItem value="PENDING">En attente</SelectItem>
+                                    <SelectItem value="ACTIVE">Actif</SelectItem>
+                                    <SelectItem value="INACTIVE">Inactif</SelectItem>
+                                    <SelectItem value="REJECTED">Rejeté</SelectItem>
                                 </SelectContent>
                             </Select>
                             <Select onValueChange={(value) => setCellFilter(value === 'all' ? null : value)}>
@@ -197,7 +206,7 @@ export function VolunteersClientPage({ initialVolunteers }: VolunteersClientPage
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Toutes les cellules</SelectItem>
-                                    {cells.map(cell => (
+                                    {allCells.map(cell => (
                                         <SelectItem key={cell} value={cell}>{cell}</SelectItem>
                                     ))}
                                 </SelectContent>
@@ -208,7 +217,7 @@ export function VolunteersClientPage({ initialVolunteers }: VolunteersClientPage
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Toutes les compétences</SelectItem>
-                                    {skillsList.flatMap(g => g.skills).map(skill => (
+                                    {allSkills.map(skill => (
                                         <SelectItem key={skill} value={skill}>{skill}</SelectItem>
                                     ))}
                                 </SelectContent>
@@ -219,7 +228,7 @@ export function VolunteersClientPage({ initialVolunteers }: VolunteersClientPage
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">Toutes les professions</SelectItem>
-                                    {professionsList.flatMap(g => g.professions).map(profession => (
+                                    {allProfessions.map(profession => (
                                         <SelectItem key={profession} value={profession}>{profession}</SelectItem>
                                     ))}
                                 </SelectContent>
@@ -269,18 +278,18 @@ export function VolunteersClientPage({ initialVolunteers }: VolunteersClientPage
                                             {new Date(volunteer.createdAt).toLocaleDateString('fr-FR')}
                                         </TableCell>
                                         <TableCell>
-                                            <Badge variant={getStatusBadgeVariant(volunteer.status)}>{volunteer.status}</Badge>
+                                            <Badge variant={getStatusBadgeVariant(volunteer.status)}>{statusText[volunteer.status]}</Badge>
                                         </TableCell>
                                         <TableCell>
-                                            {volunteer.status === 'En attente' ? (
+                                            {volunteer.status === 'PENDING' ? (
                                                 <div className="flex gap-2">
                                                     <AlertDialogTrigger asChild>
-                                                        <Button variant="outline" size="icon" onClick={() => setVolunteerToUpdate({ id: volunteer.id, status: 'Actif' })}>
+                                                        <Button variant="outline" size="icon" onClick={() => setVolunteerToUpdate({ id: volunteer.id, status: 'ACTIVE' })}>
                                                             <Check className="h-4 w-4" />
                                                         </Button>
                                                     </AlertDialogTrigger>
                                                      <AlertDialogTrigger asChild>
-                                                        <Button variant="destructive" size="icon" onClick={() => setVolunteerToUpdate({ id: volunteer.id, status: 'Rejeté' })}>
+                                                        <Button variant="destructive" size="icon" onClick={() => setVolunteerToUpdate({ id: volunteer.id, status: 'REJECTED' })}>
                                                             <X className="h-4 w-4" />
                                                         </Button>
                                                     </AlertDialogTrigger>

@@ -52,7 +52,7 @@ export default function HymnePage() {
       <div className="flex flex-col items-center text-center">
         <h1 className="text-4xl font-headline font-bold text-primary mb-2">Hymne de la Croix-Rouge</h1>
         <p className="text-lg text-muted-foreground mb-8">
-          "L'humanité en marche"
+          &quot;L&apos;humanité en marche&quot;
         </p>
       </div>
       <div className="grid md:grid-cols-3 gap-8">
@@ -61,7 +61,7 @@ export default function HymnePage() {
                 <CardHeader>
                     <CardTitle className="font-headline text-2xl flex items-center gap-2">
                         <Music className="w-6 h-6 text-primary"/>
-                        Paroles de l'Hymne
+                        Paroles de l&apos;Hymne
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -74,15 +74,15 @@ export default function HymnePage() {
         <aside className="md:col-span-1">
             <Card>
                 <CardHeader>
-                    <CardTitle className="font-headline text-xl">Écouter l'hymne</CardTitle>
+                    <CardTitle className="font-headline text-xl">Écouter l&apos;hymne</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <audio controls className="w-full">
                         <source src="/hymne-crg.mp3" type="audio/mpeg" />
-                        Votre navigateur ne supporte pas l'élément audio.
+                        Votre navigateur ne supporte pas l&apos;élément audio.
                     </audio>
                     <p className="text-sm text-muted-foreground mt-4">
-                        Écoutez "L'humanité en marche", un chant qui incarne nos valeurs et notre engagement.
+                        Écoutez &quot;L&apos;humanité en marche&quot;, un chant qui incarne nos valeurs et notre engagement.
                     </p>
                 </CardContent>
             </Card>

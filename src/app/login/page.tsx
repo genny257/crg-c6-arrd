@@ -43,7 +43,7 @@ export default function LoginPage() {
       <Card className="mx-auto max-w-sm w-full relative">
         <Link href="/" className="absolute top-4 left-4 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-5 w-5" />
-            <span className="sr-only">Retour à l'accueil</span>
+            <span className="sr-only">Retour à l&apos;accueil</span>
         </Link>
         <CardHeader>
           <div className="flex flex-col items-center justify-center mb-4 pt-8">
@@ -100,7 +100,7 @@ export default function LoginPage() {
           <div className="mt-4 text-center text-sm">
             Pas encore de compte ?{" "}
             <Link href="/register" className="underline">
-              S'inscrire
+              S&apos;inscrire
             </Link>
           </div>
         </CardContent>

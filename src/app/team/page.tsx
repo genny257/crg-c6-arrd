@@ -161,10 +161,11 @@ export default function TeamPage() {
         const fetchVolunteers = async () => {
             setLoading(true);
             try {
+                // Public page doesn't need a token, so it will get all volunteers
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/volunteers`);
                 if (!response.ok) throw new Error("Failed to fetch volunteers");
                 const volunteersData = await response.json();
-                setVolunteers(volunteersData.filter((v: Volunteer) => v.status === 'Actif'));
+                setVolunteers(volunteersData.filter((v: Volunteer) => v.status === 'ACTIVE'));
             } catch (error) {
                 console.error("Error fetching active volunteers: ", error);
                 toast({ title: "Erreur", description: "Impossible de charger les volontaires.", variant: "destructive" });

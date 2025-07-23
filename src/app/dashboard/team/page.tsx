@@ -241,7 +241,7 @@ export default function TeamPage() {
                     <Network className="w-8 h-8 text-primary"/>
                     Notre Équipe
                 </h1>
-                <p className="text-muted-foreground">Découvrez l'organisation et les membres du Comité du Sixième Arrondissement.</p>
+                <p className="text-muted-foreground">Découvrez l&apos;organisation et les membres du Comité du Sixième Arrondissement.</p>
             </div>
 
             <Card className="w-full">

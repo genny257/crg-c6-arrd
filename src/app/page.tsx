@@ -286,7 +286,7 @@ export default function Home() {
                             {displayContent.engagement.volunteerDescription}
                         </p>
                         <Button asChild className="mt-4">
-                            <Link href="/register">S'inscrire</Link>
+                            <Link href="/register">S&apos;inscrire</Link>
                         </Button>
                         </>
                     )}

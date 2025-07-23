@@ -147,7 +147,7 @@ const ComboboxSelector = ({
                             setPopoverOpen(false);
                         }}
                         >
-                        Ajouter "{inputValue}"
+                        Ajouter &quot;{inputValue}&quot;
                     </CommandItem>
                   </CommandEmpty>
                   <CommandGroup>

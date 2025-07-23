@@ -185,7 +185,7 @@ export default function EventsPage() {
                 <CardDescription>{event.description}</CardDescription>
               </CardContent>
               <CardFooter className="p-6 pt-0 flex justify-between items-center">
-                <Button disabled={event.status === 'Annulé' || event.status === 'Terminé'}>S'inscrire</Button>
+                <Button disabled={event.status === 'Annulé' || event.status === 'Terminé'}>S&apos;inscrire</Button>
                 {event.status === 'Annulé' && <span className="text-xs font-semibold text-destructive">Annulé</span>}
                 {event.status === 'Terminé' && <span className="text-xs font-semibold text-gray-500">Terminé</span>}
               </CardFooter>

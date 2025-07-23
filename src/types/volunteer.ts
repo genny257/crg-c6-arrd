@@ -1,4 +1,7 @@
 
+
+export type UserStatus = 'PENDING' | 'ACTIVE' | 'INACTIVE' | 'REJECTED';
+
 export interface Volunteer {
   id: string;
   matricule?: string;
@@ -32,5 +35,5 @@ export interface Volunteer {
   idCardBack?: string;
   termsAccepted: boolean;
   createdAt: string;
-  status?: 'En attente' | 'Actif' | 'Inactif' | 'Rejeté';
+  status: UserStatus;
 }

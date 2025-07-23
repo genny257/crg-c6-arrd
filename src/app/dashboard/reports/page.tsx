@@ -23,7 +23,10 @@ export default function ReportsPage() {
   const { toast } = useToast();
 
   const fetchReports = React.useCallback(async () => {
-    if (!token) return;
+    if (!token) {
+        setLoading(false);
+        return;
+    };
     setLoading(true);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports`, {
@@ -45,10 +48,8 @@ export default function ReportsPage() {
   }, [toast, token]);
 
   React.useEffect(() => {
-    if (token) {
-        fetchReports();
-    }
-  }, [fetchReports, token]);
+    fetchReports();
+  }, [fetchReports]);
 
   const handleDelete = async (id: string) => {
     if (!id || !token) return;
@@ -141,7 +142,7 @@ export default function ReportsPage() {
                                         <FileText className="h-4 w-4 text-muted-foreground" />
                                         {report.title}
                                     </TableCell>
-                                    <TableCell className="hidden md:table-cell text-right">{format(new Date(report.date), "d MMMM yyyy", { locale: fr })}</TableCell>
+                                    <TableCell className="hidden md:table-cell text-right">{format(new Date(report.createdAt), "d MMMM yyyy", { locale: fr })}</TableCell>
                                     <TableCell className="text-center">
                                         <span className={`text-xs font-semibold ${report.visible ? 'text-green-600' : 'text-amber-600'}`}>
                                             {report.visible ? 'Visible' : 'Masqué'}

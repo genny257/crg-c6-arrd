@@ -176,7 +176,7 @@ export default function VolunteerProfilePage() {
                         <CardHeader><CardTitle className="text-lg font-headline flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" />Profil Volontaire</CardTitle></CardHeader>
                         <CardContent className="grid md:grid-cols-2 gap-6">
                              <div>
-                                <h4 className="font-semibold mb-2 flex items-center gap-2"><GraduationCap className="h-4 w-4 text-muted-foreground"/> Niveau d'études</h4>
+                                <h4 className="font-semibold mb-2 flex items-center gap-2"><GraduationCap className="h-4 w-4 text-muted-foreground"/> Niveau d&apos;études</h4>
                                 <p>{volunteer.educationLevel || "Non spécifié"}</p>
                             </div>
                             <div>
@@ -184,7 +184,7 @@ export default function VolunteerProfilePage() {
                                 <p>{volunteer.profession || "Non spécifié"}</p>
                             </div>
                             <div className="md:col-span-2">
-                                <h4 className="font-semibold mb-2 flex items-center gap-2"><Heart className="h-4 w-4 text-muted-foreground"/> Domaines d'intérêt</h4>
+                                <h4 className="font-semibold mb-2 flex items-center gap-2"><Heart className="h-4 w-4 text-muted-foreground"/> Domaines d&apos;intérêt</h4>
                                 {volunteer.causes?.length ? (
                                     <div className="flex flex-wrap gap-2">
                                         {volunteer.causes.map(cause => <Badge key={cause} variant="secondary">{cause}</Badge>)}

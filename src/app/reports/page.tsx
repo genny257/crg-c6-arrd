@@ -92,7 +92,7 @@ export default function ReportsPage() {
                                         <FileText className="h-4 w-4 text-muted-foreground" />
                                         {report.title}
                                     </TableCell>
-                                    <TableCell className="hidden md:table-cell text-right">{format(new Date(report.date), "d MMMM yyyy", { locale: fr })}</TableCell>
+                                    <TableCell className="hidden md:table-cell text-right">{format(new Date(report.createdAt), "d MMMM yyyy", { locale: fr })}</TableCell>
                                     <TableCell className="text-right">
                                         <Button variant="outline" size="sm" asChild>
                                           <a href={report.fileUrl} download target="_blank" rel="noopener noreferrer">

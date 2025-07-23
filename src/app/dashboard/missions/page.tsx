@@ -15,26 +15,41 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { useAuth } from "@/hooks/use-auth";
 
 const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-        case 'En cours': return 'default';
-        case 'Planifiée': return 'secondary';
-        case 'Terminée': return 'outline';
-        case 'Annulée': return 'destructive';
+        case 'IN_PROGRESS': return 'default';
+        case 'PLANNED': return 'secondary';
+        case 'COMPLETED': return 'outline';
+        case 'CANCELLED': return 'destructive';
         default: return 'secondary';
     }
 };
 
+const statusText = {
+    'PLANNED': 'Planifiée',
+    'IN_PROGRESS': 'En cours',
+    'COMPLETED': 'Terminée',
+    'CANCELLED': 'Annulée'
+}
+
 export default function MissionsPage() {
+    const { token } = useAuth();
     const [missions, setMissions] = React.useState<Mission[]>([]);
     const [loading, setLoading] = React.useState(true);
     const { toast } = useToast();
 
     const fetchMissions = React.useCallback(async () => {
+        if (!token) {
+            setLoading(false);
+            return;
+        }
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:3001/api/missions');
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -50,19 +65,22 @@ export default function MissionsPage() {
         } finally {
             setLoading(false);
         }
-    }, [toast]);
+    }, [toast, token]);
     
-    const updateMissionStatus = async (id: string, status: 'Annulée' | 'Planifiée') => {
-        if (!id) return;
+    const updateMissionStatus = async (id: string, status: 'CANCELLED' | 'PLANNED') => {
+        if (!id || !token) return;
         
         const originalMissions = [...missions];
         const updatedMissions = missions.map(m => m.id === id ? { ...m, status } : m);
         setMissions(updatedMissions);
 
         try {
-             const response = await fetch(`http://localhost:3001/api/missions/${id}`, {
+             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions/${id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                 },
                 body: JSON.stringify({ status })
             });
 
@@ -142,7 +160,7 @@ export default function MissionsPage() {
                                             <TableCell className="hidden lg:table-cell">
                                                 {format(new Date(mission.startDate), "d MMM yyyy", { locale: fr })}
                                             </TableCell>
-                                            <TableCell><Badge variant={getStatusBadgeVariant(mission.status)}>{mission.status}</Badge></TableCell>
+                                            <TableCell><Badge variant={getStatusBadgeVariant(mission.status)}>{statusText[mission.status]}</Badge></TableCell>
                                             <TableCell>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
@@ -163,12 +181,12 @@ export default function MissionsPage() {
                                                             </Link>
                                                         </DropdownMenuItem>
                                                         <DropdownMenuSeparator />
-                                                        {mission.status !== 'Annulée' ? (
-                                                            <DropdownMenuItem className="text-destructive" onClick={() => updateMissionStatus(mission.id, 'Annulée')}>
+                                                        {mission.status !== 'CANCELLED' ? (
+                                                            <DropdownMenuItem className="text-destructive" onClick={() => updateMissionStatus(mission.id, 'CANCELLED')}>
                                                                 Annuler
                                                             </DropdownMenuItem>
                                                         ) : (
-                                                            <DropdownMenuItem onClick={() => updateMissionStatus(mission.id, 'Planifiée')}>
+                                                            <DropdownMenuItem onClick={() => updateMissionStatus(mission.id, 'PLANNED')}>
                                                                 Réactiver
                                                             </DropdownMenuItem>
                                                         )}
@@ -202,4 +220,3 @@ export default function MissionsPage() {
         </div>
     );
 }
-

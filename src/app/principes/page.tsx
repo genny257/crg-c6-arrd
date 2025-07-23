@@ -40,7 +40,7 @@ export default function PrincipesPage() {
       <div className="flex flex-col items-center text-center">
         <h1 className="text-4xl font-headline font-bold text-primary mb-2">Nos Principes Fondamentaux</h1>
         <p className="text-lg text-muted-foreground max-w-3xl">
-          Le Mouvement international de la Croix-Rouge et du Croissant-Rouge est guidé par sept principes fondamentaux qui garantissent la cohérence et l'efficacité de son action humanitaire à travers le monde.
+          Le Mouvement international de la Croix-Rouge et du Croissant-Rouge est guidé par sept principes fondamentaux qui garantissent la cohérence et l&apos;efficacité de son action humanitaire à travers le monde.
         </p>
       </div>
 

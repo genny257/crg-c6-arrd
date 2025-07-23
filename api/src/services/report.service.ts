@@ -3,7 +3,9 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export const getAllReports = async () => {
-    return await prisma.report.findMany({ orderBy: { createdAt: 'desc' } });
+    return await prisma.report.findMany({ 
+        orderBy: { createdAt: 'desc' }
+    });
 };
 
 export const createReport = async (data: any) => {
