@@ -73,8 +73,8 @@ export default function Home() {
       try {
         const [contentRes, eventsRes, blogsRes] = await Promise.all([
            Promise.resolve(initialContent), // Mocking content fetch
-           fetch(`http://localhost:3001/api/events/featured`),
-           fetch(`http://localhost:3001/api/blog/featured`)
+           fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/featured`),
+           fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/featured`)
         ]);
 
         setContent(contentRes);
@@ -289,7 +289,7 @@ export default function Home() {
                             {displayContent.engagement.volunteerDescription}
                         </p>
                         <Button asChild className="mt-4">
-                            <Link href="/register">S&apos;inscrire</Link>
+                            <Link href="/register">S'inscrire</Link>
                         </Button>
                         </>
                     )}
