@@ -36,7 +36,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // src/routes/sponsorship.routes.ts
 const express_1 = require("express");
 const sponsorshipController = __importStar(require("../controllers/sponsorship.controller"));
+const auth_1 = require("../middleware/auth");
 const router = (0, express_1.Router)();
+// Public route for creating a request
 router.post('/sponsorships', sponsorshipController.createSponsorship);
-router.get('/sponsorships', sponsorshipController.getSponsorships);
+// Protected route for viewing requests
+router.get('/sponsorships', auth_1.protect, sponsorshipController.getSponsorships);
 exports.default = router;

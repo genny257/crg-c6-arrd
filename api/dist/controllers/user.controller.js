@@ -40,16 +40,31 @@ exports.getUsers = exports.login = exports.register = void 0;
 const userService = __importStar(require("../services/user.service"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+/**
+ * Registers a new user.
+ * @param {Request} req - The Express request object, containing the user's data in the body.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A response indicating the result of the registration.
+ */
 const register = async (req, res) => {
+    console.log("Registration attempt received. Body:", JSON.stringify(req.body, null, 2));
     try {
         const user = await userService.createUser(req.body);
-        res.status(201).json({ message: "User created successfully", userId: user.id });
+        console.log("User created successfully:", user.id);
+        res.status(201).json({ message: "User created successfully", userId: user.id, matricule: user.matricule });
     }
     catch (error) {
+        console.error("Error during user creation:", error);
         res.status(500).json({ message: 'Error creating user', error: error.message });
     }
 };
 exports.register = register;
+/**
+ * Logs in a user.
+ * @param {Request} req - The Express request object, containing the user's credentials.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A response with the user's data and a JWT token if successful.
+ */
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -70,6 +85,12 @@ const login = async (req, res) => {
     }
 };
 exports.login = login;
+/**
+ * Retrieves all users.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A response containing a list of all users.
+ */
 const getUsers = async (req, res) => {
     try {
         const users = await userService.getAllUsers();

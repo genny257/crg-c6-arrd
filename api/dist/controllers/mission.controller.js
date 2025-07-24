@@ -33,8 +33,11 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteMission = exports.updateMission = exports.createMission = exports.getMissionById = exports.getMissions = void 0;
+exports.registerToMission = exports.suggestVolunteersForMission = exports.deleteMission = exports.updateMission = exports.createMission = exports.getMissionById = exports.getMissions = void 0;
 const missionService = __importStar(require("../services/mission.service"));
+const aiService = __importStar(require("../services/ai.service"));
+const zod_1 = require("zod");
+const flow_1 = require("@genkit-ai/flow");
 /**
  * Récupère toutes les missions.
  */
@@ -105,3 +108,39 @@ const deleteMission = async (req, res) => {
     }
 };
 exports.deleteMission = deleteMission;
+/**
+ * Suggests volunteers for a mission.
+ */
+const suggestVolunteersForMission = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const recommendations = await (0, flow_1.runFlow)(aiService.missionAssignmentFlow, id);
+        res.status(200).json(recommendations);
+    }
+    catch (error) {
+        res.status(500).json({ message: 'Erreur lors de la suggestion des volontaires.', error: error.message });
+    }
+};
+exports.suggestVolunteersForMission = suggestVolunteersForMission;
+/**
+ * Register a volunteer to a mission.
+ */
+const registerToMissionSchema = zod_1.z.object({
+    matricule: zod_1.z.string().min(1, 'Le matricule est requis.'),
+});
+const registerToMission = async (req, res) => {
+    try {
+        const { id: missionId } = req.params;
+        const { matricule } = registerToMissionSchema.parse(req.body);
+        // This doesn't need to be an AI flow, direct service call is better.
+        const result = await missionService.registerVolunteerToMission(missionId, matricule);
+        res.status(200).json(result);
+    }
+    catch (error) {
+        if (error instanceof zod_1.z.ZodError) {
+            return res.status(400).json({ success: false, message: Object.values(error.flatten().fieldErrors).join(', ') });
+        }
+        res.status(500).json({ success: false, message: 'Erreur lors de l\'inscription à la mission.', error: error.message });
+    }
+};
+exports.registerToMission = registerToMission;

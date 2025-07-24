@@ -14,7 +14,7 @@ const getFeaturedEvents = async () => {
             image: {
                 not: null,
             },
-            status: client_1.EventStatus.UPCOMING,
+            status: 'À venir',
         },
         orderBy: {
             date: 'asc',

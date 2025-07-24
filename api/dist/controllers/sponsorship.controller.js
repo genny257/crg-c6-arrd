@@ -36,27 +36,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getSponsorships = exports.createSponsorship = void 0;
 const sponsorshipService = __importStar(require("../services/sponsorship.service"));
 const zod_1 = require("zod");
+const email_service_1 = require("../services/email.service");
 const sponsorshipSchema = zod_1.z.object({
     companyName: zod_1.z.string().min(1, "Le nom de l'entreprise est requis"),
     contactName: zod_1.z.string().min(1, "Le nom du contact est requis"),
     email: zod_1.z.string().email("L'adresse e-mail est invalide"),
-    phone: zod_1.z.string().optional(),
+    phone: zod_1.z.string().nullable(),
     message: zod_1.z.string().min(1, "Le message ne peut pas être vide"),
 });
 const createSponsorship = async (req, res) => {
     try {
-        const validatedData = sponsorshipSchema.parse(req.body);
-        const dataForService = {
-            ...validatedData,
-            phone: validatedData.phone || null,
-        };
-        const sponsorship = await sponsorshipService.createSponsorship(dataForService);
+        const data = sponsorshipSchema.parse(req.body);
+        const sponsorship = await sponsorshipService.createSponsorship(data);
+        // Send confirmation email
+        await email_service_1.EmailService.sendSponsorshipConfirmation(data.email, data.companyName);
         res.status(201).json(sponsorship);
     }
     catch (error) {
         if (error instanceof zod_1.z.ZodError) {
-            return res.status(400).json({ message: 'Validation invalide', errors: error.flatten().fieldErrors });
+            return res.status(400).json({ message: 'Validation invalide', errors: error.issues });
         }
+        console.error("Error creating sponsorship:", error);
         res.status(500).json({ message: 'Erreur lors de la création de la demande de mécénat', error });
     }
 };

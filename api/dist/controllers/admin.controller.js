@@ -33,35 +33,54 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStats = exports.unblockIP = exports.blockIP = exports.getBlockedIPs = exports.getThreats = exports.getTraffic = void 0;
+exports.getAnalytics = exports.getStats = exports.unblockIP = exports.blockIP = exports.getBlockedIPs = exports.getThreats = exports.getTraffic = void 0;
 const adminService = __importStar(require("../services/admin.service"));
 const zod_1 = require("zod");
+// Schema for validating pagination query parameters
 const paginationSchema = zod_1.z.object({
     page: zod_1.z.coerce.number().int().positive().default(1),
     limit: zod_1.z.coerce.number().int().positive().default(20),
 });
+/**
+ * Retrieves paginated traffic log data.
+ * @param {Request} req - The Express request object, containing pagination info in query params.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with traffic data and pagination details.
+ */
 const getTraffic = async (req, res) => {
     try {
         const { page, limit } = paginationSchema.parse(req.query);
-        const traffic = await adminService.getTraffic(page, limit);
-        res.json(traffic);
+        const { data, total } = await adminService.getTraffic(page, limit);
+        res.json({ data, total, page, limit });
     }
     catch (error) {
         res.status(500).json({ message: 'Error fetching traffic data', error });
     }
 };
 exports.getTraffic = getTraffic;
+/**
+ * Retrieves paginated security threat data.
+ * @param {Request} req - The Express request object, containing pagination info in query params.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with threat data and pagination details.
+ */
 const getThreats = async (req, res) => {
     try {
         const { page, limit } = paginationSchema.parse(req.query);
-        const threats = await adminService.getThreats(page, limit);
-        res.json(threats);
+        const { data, total } = await adminService.getThreats(page, limit);
+        res.json({ data, total, page, limit });
     }
     catch (error) {
         res.status(500).json({ message: 'Error fetching threat data', error });
     }
 };
 exports.getThreats = getThreats;
+/**
+ * Retrieves a list of all blocked IP addresses.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response containing the list of blocked IPs.
+ */
 const getBlockedIPs = async (req, res) => {
     try {
         const ips = await adminService.getBlockedIPs();
@@ -72,10 +91,17 @@ const getBlockedIPs = async (req, res) => {
     }
 };
 exports.getBlockedIPs = getBlockedIPs;
+// Schema for validating the body of a block IP request
 const blockIPSchema = zod_1.z.object({
     ip: zod_1.z.string(),
     reason: zod_1.z.string().optional(),
 });
+/**
+ * Blocks a new IP address.
+ * @param {Request} req - The Express request object, containing the IP and reason in the body.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with the newly created blocked IP record.
+ */
 const blockIP = async (req, res) => {
     try {
         const { ip, reason } = blockIPSchema.parse(req.body);
@@ -90,6 +116,12 @@ const blockIP = async (req, res) => {
     }
 };
 exports.blockIP = blockIP;
+/**
+ * Unblocks an IP address by its ID.
+ * @param {Request} req - The Express request object, containing the ID in the params.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A 204 No Content response on success.
+ */
 const unblockIP = async (req, res) => {
     try {
         const { id } = req.params;
@@ -101,6 +133,12 @@ const unblockIP = async (req, res) => {
     }
 };
 exports.unblockIP = unblockIP;
+/**
+ * Retrieves general statistics for the admin dashboard.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with various statistics.
+ */
 const getStats = async (req, res) => {
     try {
         const stats = await adminService.getStats();
@@ -111,3 +149,19 @@ const getStats = async (req, res) => {
     }
 };
 exports.getStats = getStats;
+/**
+ * Retrieves analytics data for the admin dashboard.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with analytics data.
+ */
+const getAnalytics = async (req, res) => {
+    try {
+        const stats = await adminService.getAnalytics();
+        res.json(stats);
+    }
+    catch (error) {
+        res.status(500).json({ message: 'Error fetching analytics', error });
+    }
+};
+exports.getAnalytics = getAnalytics;

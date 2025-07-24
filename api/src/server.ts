@@ -6,7 +6,6 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-
 import missionRoutes from './routes/mission.routes';
 import blogRoutes from './routes/blog.routes';
 import eventRoutes from './routes/event.routes';
@@ -35,7 +34,7 @@ app.set('trust proxy', true);
 app.use(cors());
 
 // Parser les corps de requête JSON (avec une limite de taille pour la sécurité)
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '50mb' }));
 
 // --- Middlewares de Journalisation ---
 app.use(loggingMiddleware);
@@ -116,4 +115,3 @@ app.listen(port, () => {
   console.log(`Le serveur fonctionne sur http://localhost:${port}`);
   console.log(`La documentation API est disponible sur http://localhost:${port}/api-docs`);
 });
-

@@ -36,12 +36,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // src/routes/report.routes.ts
 const express_1 = require("express");
 const reportController = __importStar(require("../controllers/report.controller"));
+const auth_1 = require("../middleware/auth");
 const router = (0, express_1.Router)();
-router.route('/reports')
-    .get(reportController.getReports)
-    .post(reportController.createReport);
-router.route('/reports/:id')
-    .get(reportController.getReportById)
-    .put(reportController.updateReport)
-    .delete(reportController.deleteReport);
+// Publicly accessible to get all visible reports
+router.get('/reports', reportController.getReports);
+// Protected routes for management
+router.post('/reports', auth_1.protect, reportController.createReport);
+router.get('/reports/:id', auth_1.protect, reportController.getReportById);
+router.put('/reports/:id', auth_1.protect, reportController.updateReport);
+router.delete('/reports/:id', auth_1.protect, reportController.deleteReport);
 exports.default = router;

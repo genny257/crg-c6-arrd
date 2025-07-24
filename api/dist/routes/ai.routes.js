@@ -33,17 +33,30 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-// src/routes/event.routes.ts
+// src/routes/ai.routes.ts
 const express_1 = require("express");
-const eventController = __importStar(require("../controllers/event.controller"));
-const auth_1 = require("../middleware/auth");
+const zod_1 = require("zod");
+const aiService = __importStar(require("../services/ai.service"));
+const flow_1 = require("@genkit-ai/flow");
 const router = (0, express_1.Router)();
-// Public routes
-router.get('/events/featured', eventController.getFeaturedEvents);
-router.get('/events', eventController.getEvents);
-router.get('/events/:id', eventController.getEventById);
-// Protected routes for management
-router.post('/events', auth_1.protect, eventController.createEvent);
-router.put('/events/:id', auth_1.protect, eventController.updateEvent);
-router.delete('/events/:id', auth_1.protect, eventController.deleteEvent);
+// Chatbot route (public)
+const chatSchema = zod_1.z.object({
+    messages: zod_1.z.array(zod_1.z.object({
+        role: zod_1.z.enum(['user', 'model']),
+        content: zod_1.z.string(),
+    })),
+});
+router.post('/chat', async (req, res) => {
+    try {
+        const { messages } = chatSchema.parse(req.body);
+        const response = await (0, flow_1.runFlow)(aiService.chatbotFlow, messages);
+        res.status(200).json({ response });
+    }
+    catch (error) {
+        if (error instanceof zod_1.z.ZodError) {
+            return res.status(400).json({ message: 'Validation failed', errors: error.flatten().fieldErrors });
+        }
+        res.status(500).json({ message: 'Error processing chat request', error });
+    }
+});
 exports.default = router;

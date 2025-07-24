@@ -4,13 +4,11 @@ exports.loggingMiddleware = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const THREAT_PATTERNS = [
-    /(\%27)|(\')|(\-\-)|(\%23)|(#)/i, // SQL Injection
-    /(<script>)|(&lt;script&gt;)/i, // XSS
-    /(\.\.\/)/i, // Path Traversal
+    /(\%27)|(\')|(\-\-)|(\%23)|(#)/, // SQL Injection
+    /(<script>)|(&lt;script&gt;)/, // XSS
+    /(\.\.\/)/, // Path Traversal
 ];
 function isPotentialThreat(text) {
-    if (typeof text !== 'string')
-        return false;
     return THREAT_PATTERNS.some(pattern => pattern.test(text));
 }
 const loggingMiddleware = async (req, res, next) => {
@@ -27,6 +25,7 @@ const loggingMiddleware = async (req, res, next) => {
         console.error("Error checking blocked IP:", error);
     }
     // 2. Request Logging
+    const originalSend = res.send;
     res.on('finish', async () => {
         try {
             const fullUrl = req.originalUrl || req.url;

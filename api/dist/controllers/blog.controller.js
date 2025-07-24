@@ -33,8 +33,17 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteBlogPost = exports.updateBlogPost = exports.getBlogPostBySlug = exports.getBlogPostById = exports.createBlogPost = exports.getFeaturedBlogPosts = exports.getBlogPosts = void 0;
+exports.generateBlogPost = exports.deleteBlogPost = exports.updateBlogPost = exports.getBlogPostBySlug = exports.getBlogPostById = exports.createBlogPost = exports.getFeaturedBlogPosts = exports.getBlogPosts = void 0;
 const blogService = __importStar(require("../services/blog.service"));
+const aiService = __importStar(require("../services/ai.service"));
+const zod_1 = require("zod");
+const flow_1 = require("@genkit-ai/flow");
+/**
+ * Retrieves all blog posts.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response containing a list of all blog posts.
+ */
 const getBlogPosts = async (req, res) => {
     try {
         const posts = await blogService.getAllBlogPosts();
@@ -45,6 +54,12 @@ const getBlogPosts = async (req, res) => {
     }
 };
 exports.getBlogPosts = getBlogPosts;
+/**
+ * Retrieves featured blog posts.
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response containing a list of featured blog posts.
+ */
 const getFeaturedBlogPosts = async (req, res) => {
     try {
         const posts = await blogService.getFeaturedBlogPosts();
@@ -55,6 +70,12 @@ const getFeaturedBlogPosts = async (req, res) => {
     }
 };
 exports.getFeaturedBlogPosts = getFeaturedBlogPosts;
+/**
+ * Creates a new blog post.
+ * @param {Request} req - The Express request object, containing post data in the body.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with the newly created blog post.
+ */
 const createBlogPost = async (req, res) => {
     try {
         const post = await blogService.createBlogPost(req.body);
@@ -65,6 +86,12 @@ const createBlogPost = async (req, res) => {
     }
 };
 exports.createBlogPost = createBlogPost;
+/**
+ * Retrieves a single blog post by its ID.
+ * @param {Request} req - The Express request object, containing the post ID in params.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with the blog post or a 404 error if not found.
+ */
 const getBlogPostById = async (req, res) => {
     try {
         const post = await blogService.getBlogPostById(req.params.id);
@@ -80,6 +107,12 @@ const getBlogPostById = async (req, res) => {
     }
 };
 exports.getBlogPostById = getBlogPostById;
+/**
+ * Retrieves a single blog post by its slug.
+ * @param {Request} req - The Express request object, containing the post slug in params.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with the blog post or a 404 error if not found.
+ */
 const getBlogPostBySlug = async (req, res) => {
     try {
         const post = await blogService.getBlogPostBySlug(req.params.slug);
@@ -95,6 +128,12 @@ const getBlogPostBySlug = async (req, res) => {
     }
 };
 exports.getBlogPostBySlug = getBlogPostBySlug;
+/**
+ * Updates an existing blog post.
+ * @param {Request} req - The Express request object, containing the ID in params and update data in the body.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with the updated blog post.
+ */
 const updateBlogPost = async (req, res) => {
     try {
         const post = await blogService.updateBlogPost(req.params.id, req.body);
@@ -105,6 +144,12 @@ const updateBlogPost = async (req, res) => {
     }
 };
 exports.updateBlogPost = updateBlogPost;
+/**
+ * Deletes a blog post by its ID.
+ * @param {Request} req - The Express request object, containing the post ID in params.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A 204 No Content response on success.
+ */
 const deleteBlogPost = async (req, res) => {
     try {
         await blogService.deleteBlogPost(req.params.id);
@@ -115,3 +160,27 @@ const deleteBlogPost = async (req, res) => {
     }
 };
 exports.deleteBlogPost = deleteBlogPost;
+// Schema for validating the topic for AI generation
+const generatePostSchema = zod_1.z.object({
+    topic: zod_1.z.string().min(1, 'Le sujet est requis.'),
+});
+/**
+ * Generates a new blog post using an AI flow based on a given topic.
+ * @param {Request} req - The Express request object, containing the topic in the body.
+ * @param {Response} res - The Express response object.
+ * @returns {Response} A JSON response with the AI-generated blog post content.
+ */
+const generateBlogPost = async (req, res) => {
+    try {
+        const { topic } = generatePostSchema.parse(req.body);
+        const blogPost = await (0, flow_1.runFlow)(aiService.generateBlogPostFlow, topic);
+        res.status(200).json(blogPost);
+    }
+    catch (error) {
+        if (error instanceof zod_1.z.ZodError) {
+            return res.status(400).json({ message: 'Validation failed', errors: error.flatten().fieldErrors });
+        }
+        res.status(500).json({ message: 'Error generating blog post', error });
+    }
+};
+exports.generateBlogPost = generateBlogPost;

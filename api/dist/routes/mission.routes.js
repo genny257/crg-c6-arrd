@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // src/routes/mission.routes.ts
 const express_1 = require("express");
 const missionController = __importStar(require("../controllers/mission.controller"));
+const auth_1 = require("../middleware/auth");
 const router = (0, express_1.Router)();
 /**
  * @swagger
@@ -142,7 +143,7 @@ const router = (0, express_1.Router)();
  */
 router.route('/missions')
     .get(missionController.getMissions)
-    .post(missionController.createMission);
+    .post(auth_1.protect, missionController.createMission);
 // --- Routes pour /missions/:id ---
 /**
  * @swagger
@@ -205,6 +206,9 @@ router.route('/missions')
  */
 router.route('/missions/:id')
     .get(missionController.getMissionById)
-    .put(missionController.updateMission)
-    .delete(missionController.deleteMission);
+    .put(auth_1.protect, missionController.updateMission)
+    .delete(auth_1.protect, missionController.deleteMission);
+// --- Routes IA ---
+router.post('/missions/:id/suggest-volunteers', auth_1.protect, missionController.suggestVolunteersForMission);
+router.post('/missions/:id/register', missionController.registerToMission);
 exports.default = router;

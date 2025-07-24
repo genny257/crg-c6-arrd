@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import * as blogService from '../services/blog.service';
 import * as aiService from '../services/ai.service';
 import { z } from 'zod';
-import { runFlow } from '@genkit-ai/flow';
+import { run } from 'genkit';
 
 /**
  * Retrieves all blog posts.
@@ -132,7 +132,7 @@ const generatePostSchema = z.object({
 export const generateBlogPost = async (req: Request, res: Response) => {
     try {
         const { topic } = generatePostSchema.parse(req.body);
-        const blogPost = await runFlow(aiService.generateBlogPostFlow, topic);
+        const blogPost = await run(aiService.generateBlogPostFlow, topic);
         res.status(200).json(blogPost);
     } catch (error) {
          if (error instanceof z.ZodError) {

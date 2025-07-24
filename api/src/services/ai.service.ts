@@ -1,19 +1,8 @@
-
 // src/services/ai.service.ts
-import { gemini15Pro, googleAI } from '@genkit-ai/googleai';
+import { ai } from '../../genkit.config.js';
 import { MissionStatus, User, Skill, Post } from '@prisma/client';
 import { z } from 'zod';
 import prisma from '../lib/prisma';
-import { generate, tool } from 'genkit';
-import { defineFlow, configureGenkit } from 'genkit';
-import { genkit } from 'genkit/tool';
-
-// Configure Genkit
-configureGenkit({
-  plugins: [googleAI()],
-  logLevel: 'debug',
-  enableTracingAndMetrics: true,
-});
 
 // Schemas
 const MessageSchema = z.object({
@@ -24,10 +13,12 @@ const MessageSchema = z.object({
 type Message = z.infer<typeof MessageSchema>;
 
 // Tools
-const getMissionsTool = tool(
+const getMissionsTool = ai.defineTool(
   {
     name: 'getAvailableMissions',
     description: 'Get a list of currently available missions that are planned or in progress.',
+    inputSchema: z.void(),
+    outputSchema: z.any(),
   },
   async () => {
     const missions = await prisma.mission.findMany({
@@ -50,10 +41,12 @@ const getMissionsTool = tool(
   }
 );
 
-const getVolunteerInfoTool = tool(
+const getVolunteerInfoTool = ai.defineTool(
     {
         name: 'getVolunteerRegistrationInfo',
         description: 'Get information about how to become a volunteer.',
+        inputSchema: z.void(),
+        outputSchema: z.any(),
     },
     async () => {
         return {
@@ -69,7 +62,7 @@ const getVolunteerInfoTool = tool(
 );
 
 // Flows
-export const chatbotFlow = defineFlow(
+export const chatbotFlow = ai.defineFlow(
     {
         name: 'chatbotFlow',
         inputSchema: z.array(MessageSchema),
@@ -81,8 +74,8 @@ export const chatbotFlow = defineFlow(
             content: [{text: msg.content}]
         }));
 
-        const llmResponse = await generate({
-            model: gemini15Pro,
+        const llmResponse = await ai.generate({
+            model: 'googleai/gemini-1.5-pro',
             history: history,
             tools: [getMissionsTool, getVolunteerInfoTool],
             prompt: `
@@ -99,7 +92,7 @@ export const chatbotFlow = defineFlow(
             },
         });
 
-        return llmResponse.text();
+        return llmResponse.text;
     }
 );
 
@@ -107,7 +100,7 @@ interface VolunteerWithSkills extends User {
     skills: Skill[];
 }
 
-export const missionAssignmentFlow = defineFlow({
+export const missionAssignmentFlow = ai.defineFlow({
     name: 'missionAssignmentFlow',
     inputSchema: z.string(),
     outputSchema: z.any(),
@@ -154,16 +147,18 @@ export const missionAssignmentFlow = defineFlow({
         }
     `;
 
-    const llmResponse = await generate({
-            model: gemini15Pro,
+    const llmResponse = await ai.generate({
+            model: 'googleai/gemini-1.5-pro',
             prompt,
             config: {
                 temperature: 0.2,
-                responseMimeType: 'application/json'
+            },
+            output: {
+                format: 'json',
             }
         });
     
-    const output = llmResponse.output();
+    const output = llmResponse.output;
     if (typeof output === 'string') {
         return JSON.parse(output);
     }
@@ -190,7 +185,7 @@ const blogPostSchema = z.object({
   imageHint: z.string(),
 });
 
-export const generateBlogPostFlow = defineFlow({
+export const generateBlogPostFlow = ai.defineFlow({
     name: "generateBlogPostFlow",
     inputSchema: z.string(),
     outputSchema: blogPostSchema,
@@ -209,16 +204,19 @@ export const generateBlogPostFlow = defineFlow({
         - "imageHint": Deux mots-clés en anglais pour trouver une image d'illustration (ex: "volunteer help").
     `;
 
-    const llmResponse = await generate({
-        model: gemini15Pro,
+    const llmResponse = await ai.generate({
+        model: 'googleai/gemini-1.5-pro',
         prompt: prompt,
         config: {
             temperature: 0.7,
-            responseMimeType: 'application/json'
         },
+        output: {
+            format: 'json',
+            schema: blogPostSchema,
+        }
     });
 
-    const output = llmResponse.output();
+    const output = llmResponse.output;
     let blogPost;
 
     if (typeof output === 'string') {
@@ -227,8 +225,11 @@ export const generateBlogPostFlow = defineFlow({
         blogPost = output;
     }
     
-    // Ensure slug is correctly formatted
-    blogPost.slug = slugify(blogPost.title);
-
-    return blogPost;
+    if (blogPost) {
+        // Ensure slug is correctly formatted
+        blogPost.slug = slugify(blogPost.title);
+        return blogPost;
+    }
+    
+    throw new Error('Could not generate blog post.');
 });

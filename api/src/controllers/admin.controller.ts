@@ -58,7 +58,7 @@ export const getBlockedIPs = async (req: Request, res: Response) => {
 
 // Schema for validating the body of a block IP request
 const blockIPSchema = z.object({
-    ip: z.string().ip({ message: "Adresse IP invalide" }),
+    ip: z.string(),
     reason: z.string().optional(),
 });
 

@@ -33,17 +33,15 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-// src/routes/event.routes.ts
-const express_1 = require("express");
-const eventController = __importStar(require("../controllers/event.controller"));
-const auth_1 = require("../middleware/auth");
-const router = (0, express_1.Router)();
-// Public routes
-router.get('/events/featured', eventController.getFeaturedEvents);
-router.get('/events', eventController.getEvents);
-router.get('/events/:id', eventController.getEventById);
-// Protected routes for management
-router.post('/events', auth_1.protect, eventController.createEvent);
-router.put('/events/:id', auth_1.protect, eventController.updateEvent);
-router.delete('/events/:id', auth_1.protect, eventController.deleteEvent);
-exports.default = router;
+exports.getTeamStructure = void 0;
+const teamService = __importStar(require("../services/team.service"));
+const getTeamStructure = async (req, res) => {
+    try {
+        const teamStructure = await teamService.getTeamStructure();
+        res.status(200).json(teamStructure);
+    }
+    catch (error) {
+        res.status(500).json({ message: 'Error fetching team structure', error });
+    }
+};
+exports.getTeamStructure = getTeamStructure;

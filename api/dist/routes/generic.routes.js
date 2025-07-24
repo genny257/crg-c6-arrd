@@ -17,7 +17,9 @@ const models = [
     'quartierVillage'
 ];
 models.forEach(model => {
-    router.get(`/${model}s`, async (req, res) => {
+    // Handle the irregular plural of 'nationality'
+    const routeName = model === 'nationality' ? 'nationalities' : `${model}s`;
+    router.get(`/${routeName}`, async (req, res) => {
         try {
             const items = await prisma[model].findMany({
                 orderBy: {

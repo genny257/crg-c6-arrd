@@ -73,8 +73,8 @@ export default function Home() {
       try {
         const [contentRes, eventsRes, blogsRes] = await Promise.all([
            Promise.resolve(initialContent), // Mocking content fetch
-           fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/featured`),
-           fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/featured`)
+           fetch(`http://localhost:3001/api/events/featured`),
+           fetch(`http://localhost:3001/api/blog/featured`)
         ]);
 
         setContent(contentRes);
@@ -106,8 +106,11 @@ export default function Home() {
 
         setCarouselItems(combinedItems);
 
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching home page content: ", error);
+        if (error.cause) {
+            console.error("Fetch error cause: ", error.cause);
+        }
         setContent(initialContent); // Fallback to initial content on error
       } finally {
         setLoading(false);

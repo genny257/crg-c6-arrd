@@ -314,7 +314,7 @@ export default function RegisterPage() {
                 skillsRes,
             ] = await Promise.all([
                 fetch(`${API_BASE_URL}/nationalities`),
-                fetch(`${API_BASE_URL}/educationlevels`),
+                fetch(`${API_BASE_URL}/educationLevels`),
                 fetch(`${API_BASE_URL}/professions`),
                 fetch(`${API_BASE_URL}/skills`),
             ]);

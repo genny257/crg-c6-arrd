@@ -36,7 +36,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateVolunteerStatus = exports.getVolunteerById = exports.createVolunteer = exports.getVolunteers = void 0;
 const volunteerService = __importStar(require("../services/volunteer.service"));
 const zod_1 = require("zod");
-const client_1 = require("@prisma/client");
 const getVolunteers = async (req, res) => {
     try {
         const volunteers = await volunteerService.getAllVolunteers();
@@ -74,7 +73,7 @@ const getVolunteerById = async (req, res) => {
 };
 exports.getVolunteerById = getVolunteerById;
 const statusUpdateSchema = zod_1.z.object({
-    status: zod_1.z.nativeEnum(client_1.UserStatus),
+    status: zod_1.z.enum(['ACTIVE', 'INACTIVE', 'REJECTED', 'PENDING']),
 });
 const updateVolunteerStatus = async (req, res) => {
     try {
@@ -85,7 +84,7 @@ const updateVolunteerStatus = async (req, res) => {
     }
     catch (error) {
         if (error instanceof zod_1.z.ZodError) {
-            return res.status(400).json({ message: 'Validation failed', errors: error.flatten().fieldErrors });
+            return res.status(400).json({ message: 'Validation failed', errors: error.issues });
         }
         res.status(500).json({ message: 'Error updating volunteer status', error });
     }

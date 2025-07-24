@@ -5,7 +5,9 @@ exports.deleteReport = exports.updateReport = exports.getReportById = exports.cr
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getAllReports = async () => {
-    return await prisma.report.findMany({ orderBy: { createdAt: 'desc' } });
+    return await prisma.report.findMany({
+        orderBy: { createdAt: 'desc' }
+    });
 };
 exports.getAllReports = getAllReports;
 const createReport = async (data) => {

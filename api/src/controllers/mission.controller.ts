@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import * as missionService from '../services/mission.service';
 import * as aiService from '../services/ai.service';
 import { z } from 'zod';
-import { runFlow } from '@genkit-ai/flow';
+import { run } from 'genkit';
 
 /**
  * Récupère toutes les missions.
@@ -76,7 +76,7 @@ export const deleteMission = async (req: Request, res: Response) => {
 export const suggestVolunteersForMission = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const recommendations = await runFlow(aiService.missionAssignmentFlow, id);
+        const recommendations = await run(aiService.missionAssignmentFlow, id);
         res.status(200).json(recommendations);
     } catch (error: any) {
         res.status(500).json({ message: 'Erreur lors de la suggestion des volontaires.', error: error.message });
@@ -100,7 +100,7 @@ export const registerToMission = async (req: Request, res: Response) => {
         res.status(200).json(result);
     } catch (error: any) {
          if (error instanceof z.ZodError) {
-            return res.status(400).json({ success: false, message: error.errors.map(e => e.message).join(', ') });
+            return res.status(400).json({ success: false, message: Object.values(error.flatten().fieldErrors).join(', ') });
         }
         res.status(500).json({ success: false, message: 'Erreur lors de l\'inscription à la mission.', error: error.message });
     }
