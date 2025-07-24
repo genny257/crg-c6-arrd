@@ -30,6 +30,13 @@ const port = process.env.PORT || 3001;
 // Trust proxy to get the real IP address of the request
 app.set('trust proxy', true);
 
+// --- Middlewares Généraux ---
+// Configuration CORS flexible pour le développement. DOIT être en premier.
+app.use(cors());
+
+// Parser les corps de requête JSON (avec une limite de taille pour la sécurité)
+app.use(express.json({ limit: '10kb' }));
+
 // --- Middlewares de Journalisation ---
 app.use(loggingMiddleware);
 
@@ -80,15 +87,6 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// --- Middlewares Généraux ---
-// Configuration CORS flexible pour le développement
-app.use(cors());
-
-
-// Parser les corps de requête JSON (avec une limite de taille pour la sécurité)
-app.use(express.json({ limit: '10kb' }));
-
-
 // --- Routes ---
 // Route pour la documentation de l'API
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
@@ -118,3 +116,4 @@ app.listen(port, () => {
   console.log(`Le serveur fonctionne sur http://localhost:${port}`);
   console.log(`La documentation API est disponible sur http://localhost:${port}/api-docs`);
 });
+
