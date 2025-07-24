@@ -70,6 +70,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { locations, cells as allCells } from '@/lib/locations';
 
 const totalSteps = 5;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 type FormValues = z.infer<typeof RegisterUserInputSchema>;
 
@@ -304,36 +305,24 @@ export default function RegisterPage() {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
       try {
-        const api_url = process.env.NEXT_PUBLIC_API_URL;
-        if (!api_url) {
-            throw new Error("API URL is not configured.");
-        }
-
-        const fetchWithTimeout = (url: string, options = {}, timeout = 8000) => {
-            return Promise.race([
-                fetch(url, options),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), timeout))
-            ]);
-        };
-        
         const [
             nationalitiesRes,
             educationLevelsRes,
             professionsRes,
             skillsRes,
         ] = await Promise.all([
-            fetchWithTimeout(`${api_url}/nationalities`),
-            fetchWithTimeout(`${api_url}/educationLevels`),
-            fetchWithTimeout(`${api_url}/professions`),
-            fetchWithTimeout(`${api_url}/skills`),
+            fetch(`${API_BASE_URL}/nationalities`),
+            fetch(`${API_BASE_URL}/educationLevels`),
+            fetch(`${API_BASE_URL}/professions`),
+            fetch(`${API_BASE_URL}/skills`),
         ]);
 
-        if (!nationalitiesRes.ok || !educationLevelsRes.ok || !professionsRes.ok || !skillsRes.ok) {
-            throw new Error("One or more API requests failed.");
-        }
-
+        if (!nationalitiesRes.ok) throw new Error(`Failed to fetch nationalities: ${nationalitiesRes.statusText}`);
+        if (!educationLevelsRes.ok) throw new Error(`Failed to fetch education levels: ${educationLevelsRes.statusText}`);
+        if (!professionsRes.ok) throw new Error(`Failed to fetch professions: ${professionsRes.statusText}`);
+        if (!skillsRes.ok) throw new Error(`Failed to fetch skills: ${skillsRes.statusText}`);
+        
         setNationalities(await nationalitiesRes.json());
         setEducationLevels(await educationLevelsRes.json());
         setProfessions(await professionsRes.json());
@@ -466,7 +455,7 @@ export default function RegisterPage() {
     const finalData = { ...data, causes: finalCauses };
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
+      const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(finalData),
