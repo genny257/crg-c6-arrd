@@ -305,39 +305,40 @@ export default function RegisterPage() {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      try {
-        const [
-            nationalitiesRes,
-            educationLevelsRes,
-            professionsRes,
-            skillsRes,
-        ] = await Promise.all([
-            fetch(`${API_BASE_URL}/nationalities`),
-            fetch(`${API_BASE_URL}/educationLevels`),
-            fetch(`${API_BASE_URL}/professions`),
-            fetch(`${API_BASE_URL}/skills`),
-        ]);
+        setIsLoading(true);
+        try {
+            const [
+                nationalitiesRes,
+                educationLevelsRes,
+                professionsRes,
+                skillsRes,
+            ] = await Promise.all([
+                fetch(`${API_BASE_URL}/nationalities`),
+                fetch(`${API_BASE_URL}/educationlevels`),
+                fetch(`${API_BASE_URL}/professions`),
+                fetch(`${API_BASE_URL}/skills`),
+            ]);
 
-        if (!nationalitiesRes.ok) throw new Error(`Failed to fetch nationalities: ${nationalitiesRes.statusText}`);
-        if (!educationLevelsRes.ok) throw new Error(`Failed to fetch education levels: ${educationLevelsRes.statusText}`);
-        if (!professionsRes.ok) throw new Error(`Failed to fetch professions: ${professionsRes.statusText}`);
-        if (!skillsRes.ok) throw new Error(`Failed to fetch skills: ${skillsRes.statusText}`);
-        
-        setNationalities(await nationalitiesRes.json());
-        setEducationLevels(await educationLevelsRes.json());
-        setProfessions(await professionsRes.json());
-        setSkills(await skillsRes.json());
+            if (!nationalitiesRes.ok) throw new Error(`Failed to fetch nationalities: ${nationalitiesRes.statusText}`);
+            if (!educationLevelsRes.ok) throw new Error(`Failed to fetch education levels: ${educationLevelsRes.statusText}`);
+            if (!professionsRes.ok) throw new Error(`Failed to fetch professions: ${professionsRes.statusText}`);
+            if (!skillsRes.ok) throw new Error(`Failed to fetch skills: ${skillsRes.statusText}`);
+            
+            setNationalities(await nationalitiesRes.json());
+            setEducationLevels(await educationLevelsRes.json());
+            setProfessions(await professionsRes.json());
+            setSkills(await skillsRes.json());
 
-      } catch (error) {
-        console.error("Failed to fetch dynamic lists", error);
-        toast({
-            title: "Erreur de chargement",
-            description: "Impossible de charger les listes de sélection. Assurez-vous que le serveur est bien démarré et accessible.",
-            variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
+        } catch (error) {
+            console.error("Failed to fetch dynamic lists", error);
+            toast({
+                title: "Erreur de chargement",
+                description: "Impossible de charger les listes de sélection. Assurez-vous que le serveur est bien démarré et accessible.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     fetchData();
