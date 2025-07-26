@@ -250,7 +250,7 @@ export default function MissionsPage() {
                         <CardTitle>Carte des Missions</CardTitle>
                         <CardDescription>Visualisation géographique des missions.</CardDescription>
                     </CardHeader>
-                    <CardContent className="h-[calc(100%-4rem)]">
+                    <CardContent className="h-[calc(100%-4rem)] p-0">
                          {loading ? <Skeleton className="h-full w-full" /> : <MapComponent missions={missions} />}
                     </CardContent>
                 </Card>
