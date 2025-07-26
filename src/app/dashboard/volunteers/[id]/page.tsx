@@ -17,20 +17,27 @@ import { useAuth } from "@/hooks/use-auth";
 
 const getStatusBadgeVariant = (status?: string) => {
     switch (status) {
-        case 'Actif': return 'default';
-        case 'En attente': return 'secondary';
-        case 'Inactif': return 'outline';
-        case 'Rejeté': return 'destructive';
+        case 'ACTIVE': return 'default';
+        case 'PENDING': return 'secondary';
+        case 'INACTIVE': return 'outline';
+        case 'REJECTED': return 'destructive';
         default: return 'secondary';
     }
 };
+
+const statusText: {[key: string]: string} = {
+    'ACTIVE': 'Actif',
+    'PENDING': 'En attente',
+    'INACTIVE': 'Inactif',
+    'REJECTED': 'Rejeté'
+}
 
 export default function VolunteerProfilePage() {
     const { id } = useParams();
     const router = useRouter();
     const { toast } = useToast();
     const { token } = useAuth();
-    const [volunteer, setVolunteer] = React.useState<Volunteer | null>(null);
+    const [volunteer, setVolunteer] = React.useState<any | null>(null);
     const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
@@ -135,8 +142,8 @@ export default function VolunteerProfilePage() {
                                 </AvatarFallback>
                             </Avatar>
                             <h2 className="text-xl font-bold font-headline">{volunteer.firstName} {volunteer.lastName}</h2>
-                            <p className="text-muted-foreground">{volunteer.profession || "Non spécifié"}</p>
-                            <Badge variant={getStatusBadgeVariant(volunteer.status)} className="mt-2">{volunteer.status}</Badge>
+                            <p className="text-muted-foreground">{volunteer.profession?.name || "Non spécifié"}</p>
+                            <Badge variant={getStatusBadgeVariant(volunteer.status)} className="mt-2">{statusText[volunteer.status]}</Badge>
                         </CardContent>
                     </Card>
                      <Card>
@@ -150,13 +157,13 @@ export default function VolunteerProfilePage() {
                                 <Calendar className="h-4 w-4 text-muted-foreground"/>
                                 <strong>Né(e) le :</strong> {volunteer.birthDate ? new Date(volunteer.birthDate).toLocaleDateString('fr-FR') : 'N/A'}
                             </div>
-                             <div className="flex items-center gap-2">
-                                <MapPin className="h-4 w-4 text-muted-foreground"/>
+                             <div className="flex items-start gap-2">
+                                <MapPin className="h-4 w-4 text-muted-foreground mt-0.5"/>
                                 <strong>À :</strong> {volunteer.birthPlace || 'N/A'}
                             </div>
-                             <div className="flex items-center gap-2">
-                                <FileText className="h-4 w-4 text-muted-foreground"/>
-                                <strong>Pièce :</strong> {volunteer.idCardNumber || 'N/A'}
+                             <div className="flex items-start gap-2">
+                                <FileText className="h-4 w-4 text-muted-foreground mt-0.5"/>
+                                <strong>Pièce :</strong> {volunteer.idType ? `${volunteer.idType} - ${volunteer.idNumber || 'N/A'}` : 'N/A'}
                             </div>
                         </CardContent>
                     </Card>
@@ -177,17 +184,17 @@ export default function VolunteerProfilePage() {
                         <CardContent className="grid md:grid-cols-2 gap-6">
                              <div>
                                 <h4 className="font-semibold mb-2 flex items-center gap-2"><GraduationCap className="h-4 w-4 text-muted-foreground"/> Niveau d&apos;études</h4>
-                                <p>{volunteer.educationLevel || "Non spécifié"}</p>
+                                <p>{volunteer.educationLevel?.name || "Non spécifié"}</p>
                             </div>
                             <div>
                                 <h4 className="font-semibold mb-2 flex items-center gap-2"><Briefcase className="h-4 w-4 text-muted-foreground"/> Profession</h4>
-                                <p>{volunteer.profession || "Non spécifié"}</p>
+                                <p>{volunteer.profession?.name || "Non spécifié"}</p>
                             </div>
                             <div className="md:col-span-2">
                                 <h4 className="font-semibold mb-2 flex items-center gap-2"><Heart className="h-4 w-4 text-muted-foreground"/> Domaines d&apos;intérêt</h4>
                                 {volunteer.causes?.length ? (
                                     <div className="flex flex-wrap gap-2">
-                                        {volunteer.causes.map(cause => <Badge key={cause} variant="secondary">{cause}</Badge>)}
+                                        {volunteer.causes.map((cause: string) => <Badge key={cause} variant="secondary">{cause}</Badge>)}
                                     </div>
                                 ) : <p>Non spécifié</p>}
                             </div>
@@ -204,7 +211,7 @@ export default function VolunteerProfilePage() {
                                 <h4 className="font-semibold mb-2">Compétences</h4>
                                 {volunteer.skills?.length ? (
                                     <div className="flex flex-wrap gap-2">
-                                        {volunteer.skills.map(skill => <Badge key={skill} variant="outline">{skill}</Badge>)}
+                                        {volunteer.skills.map((skill: any) => <Badge key={skill.id} variant="outline">{skill.name}</Badge>)}
                                     </div>
                                 ) : <p className="text-sm text-muted-foreground">Aucune compétence spécifiée</p>}
                             </div>
@@ -212,7 +219,7 @@ export default function VolunteerProfilePage() {
                                 <h4 className="font-semibold mb-2">Disponibilité</h4>
                                  {volunteer.availability?.length ? (
                                     <div className="flex flex-wrap gap-2">
-                                        {volunteer.availability.map(item => <Badge key={item} variant="outline">{item}</Badge>)}
+                                        {volunteer.availability.map((item: string) => <Badge key={item} variant="outline">{item}</Badge>)}
                                     </div>
                                 ) : <p className="text-sm text-muted-foreground">Aucune disponibilité spécifiée</p>}
                             </div>
