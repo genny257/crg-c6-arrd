@@ -1,7 +1,6 @@
 
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, ImageRun, AlignmentType, Table, TableCell, TableRow, WidthType, VerticalAlign, BorderStyle } from 'docx';
 import { saveAs } from 'file-saver';
-import type { Volunteer } from '@/types/volunteer';
 
 // Helper function to fetch image as buffer
 async function fetchImage(url: string): Promise<Buffer> {
@@ -30,17 +29,30 @@ const createStyledParagraph = (text: string, options: { bold?: boolean; size?: n
     });
 };
 
-const createLabelAndValue = (label: string, value?: string | null) => {
+const createLabelAndValue = (label: string, value?: string | null | any) => {
+    let displayValue = 'N/A';
+    if (value) {
+        if (typeof value === 'object' && value.name) {
+            displayValue = value.name;
+        } else if (Array.isArray(value)) {
+            displayValue = value.join(', ');
+        }
+        else {
+            displayValue = String(value);
+        }
+    }
+
+
     return new Paragraph({
         children: [
             new TextRun({ text: `${label} : `, bold: true, font: "Calibri", size: 22 }),
-            new TextRun({ text: value || 'N/A', font: "Calibri", size: 22 }),
+            new TextRun({ text: displayValue, font: "Calibri", size: 22 }),
         ],
         spacing: { after: 120 },
     });
 };
 
-export const generateDocx = async (volunteer: Volunteer) => {
+export const generateDocx = async (volunteer: any) => {
     try {
         let photoBuffer: Buffer | undefined;
         if (volunteer.photo) {
@@ -147,8 +159,10 @@ export const generateDocx = async (volunteer: Volunteer) => {
                     new Paragraph({ text: "", spacing: { after: 200 } }),
                     createStyledParagraph("ENGAGEMENT", { bold: true }),
                     createLabelAndValue("Cellule d'affectation souhaitée", volunteer.assignedCell),
-                    createLabelAndValue("Domaines d'intérêt", volunteer.causes?.join(', ')),
-                    createLabelAndValue("Disponibilités", volunteer.availability?.join(', ')),
+                    createLabelAndValue("Domaines d'intérêt", volunteer.causes),
+                    createLabelAndValue("Disponibilités", volunteer.availability),
+                    createLabelAndValue("Compétences", volunteer.skills?.map((s: any) => s.name).join(', ')),
+
 
                     new Paragraph({ text: "", spacing: { after: 400 } }),
 
