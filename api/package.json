@@ -15,7 +15,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@genkit-ai/dotprompt": "latest",
     "@genkit-ai/flow": "latest",
     "@genkit-ai/googleai": "^1.0.0",
     "bcryptjs": "^3.0.2",
