@@ -13,8 +13,44 @@ const getArg = (argName: string): string | undefined => {
   return undefined;
 };
 
+async function initializePaymentServices() {
+  console.log('Checking payment services...');
+  const existingDefault = await prisma.paymentService.findFirst({
+    where: { name: 'Pursa Exchange' },
+  });
+
+  if (!existingDefault) {
+    console.log('Initializing Pursa Exchange as default payment service...');
+    await prisma.paymentService.create({
+      data: {
+        name: 'Pursa Exchange',
+        isActive: true,
+        isDefault: true,
+      },
+    });
+    console.log('Pursa Exchange created successfully.');
+  }
+
+  const otherServices = ['Stripe', 'PayPal'];
+  for (const serviceName of otherServices) {
+    const service = await prisma.paymentService.findFirst({ where: { name: serviceName } });
+    if (!service) {
+      await prisma.paymentService.create({
+        data: {
+          name: serviceName,
+          isActive: false,
+          isDefault: false,
+        },
+      });
+       console.log(`${serviceName} payment service created.`);
+    }
+  }
+}
+
 async function main() {
   console.log('Start seeding...');
+
+  await initializePaymentServices();
 
   const email = getArg('--email');
   const password = getArg('--password');
@@ -48,15 +84,14 @@ async function main() {
 
   } else {
     // Fallback to original behavior: create SUPERADMIN from .env
-    console.log('No arguments provided. To create a user, run the script with --email, --password, and --role arguments.');
-    console.log('Example: npm run create-user -- --email user@example.com --password "your-password" --role ADMIN');
-    console.log('Attempting to create SUPERADMIN from .env file as a fallback...');
+    console.log('No user creation arguments provided. Checking for default superadmin...');
     
     const superAdminEmail = process.env.SUPERADMIN_EMAIL;
     const superAdminPassword = process.env.SUPERADMIN_PASSWORD;
 
     if (!superAdminEmail || !superAdminPassword) {
-      throw new Error('SUPERADMIN_EMAIL and SUPERADMIN_PASSWORD must be set in your .env file for default seeding.');
+      console.log('SUPERADMIN_EMAIL and SUPERADMIN_PASSWORD not set in .env. Skipping default superadmin creation.');
+      return;
     }
 
     const existingAdmin = await prisma.user.findUnique({ where: { email: superAdminEmail } });
