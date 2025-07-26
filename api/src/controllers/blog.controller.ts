@@ -3,6 +3,24 @@ import { Request, Response } from 'express';
 import * as blogService from '../services/blog.service';
 import * as aiService from '../services/ai.service';
 import { z } from 'zod';
+import type { User } from '@prisma/client';
+
+// Extends Request to include the user property from the auth middleware
+interface AuthRequest extends Request {
+  user?: User;
+}
+
+// Schema for validating blog post data for creation and updates
+const blogPostSchema = z.object({
+  title: z.string().min(3, "Le titre doit contenir au moins 3 caractères."),
+  slug: z.string().min(3, "Le slug doit contenir au moins 3 caractères.").regex(/^[a-z0-9-]+$/, "Le slug ne peut contenir que des lettres minuscules, des chiffres et des tirets."),
+  excerpt: z.string().min(10, "L'extrait doit contenir au moins 10 caractères."),
+  content: z.string().optional(),
+  image: z.string().url("L'URL de l'image n'est pas valide.").optional().or(z.literal('')),
+  imageHint: z.string().optional(),
+  visible: z.boolean().default(true),
+});
+
 
 /**
  * Retrieves all blog posts.
@@ -36,15 +54,27 @@ export const getFeaturedBlogPosts = async (req: Request, res: Response) => {
 
 /**
  * Creates a new blog post.
- * @param {Request} req - The Express request object, containing post data in the body.
+ * @param {AuthRequest} req - The Express request object, containing post data in the body and user in the request.
  * @param {Response} res - The Express response object.
  * @returns {Response} A JSON response with the newly created blog post.
  */
-export const createBlogPost = async (req: Request, res: Response) => {
+export const createBlogPost = async (req: AuthRequest, res: Response) => {
     try {
-        const post = await blogService.createBlogPost(req.body);
+        const validatedData = blogPostSchema.parse(req.body);
+        const authorId = req.user?.id;
+
+        if (!authorId) {
+            return res.status(403).json({ message: 'User not authenticated' });
+        }
+        
+        const postData = { ...validatedData, authorId };
+
+        const post = await blogService.createBlogPost(postData);
         res.status(201).json(post);
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({ message: 'Validation failed', errors: error.flatten().fieldErrors });
+        }
         res.status(500).json({ message: 'Error creating blog post', error });
     }
 };
@@ -95,9 +125,14 @@ export const getBlogPostBySlug = async (req: Request, res: Response) => {
  */
 export const updateBlogPost = async (req: Request, res: Response) => {
     try {
-        const post = await blogService.updateBlogPost(req.params.id, req.body);
+        // Use .partial() to allow partial updates
+        const validatedData = blogPostSchema.partial().parse(req.body);
+        const post = await blogService.updateBlogPost(req.params.id, validatedData);
         res.json(post);
     } catch (error) {
+         if (error instanceof z.ZodError) {
+            return res.status(400).json({ message: 'Validation failed', errors: error.flatten().fieldErrors });
+        }
         res.status(500).json({ message: 'Error updating blog post', error });
     }
 };

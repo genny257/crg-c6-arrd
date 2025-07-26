@@ -2,8 +2,17 @@
 import { Router } from 'express';
 import * as blogController from '../controllers/blog.controller';
 import { protect } from '../middleware/auth';
+import { UserRole } from '@prisma/client';
 
 const router = Router();
+
+// Custom middleware to check for Admin or SuperAdmin roles
+const isAdmin = (req: any, res: any, next: any) => {
+    if (!req.user || (req.user.role !== UserRole.ADMIN && req.user.role !== UserRole.SUPERADMIN)) {
+        return res.status(403).json({ message: 'Forbidden: Access denied' });
+    }
+    next();
+};
 
 /**
  * @swagger
@@ -54,7 +63,7 @@ router.get('/blog/featured', blogController.getFeaturedBlogPosts);
  *       500:
  *         description: Server error
  */
-router.post('/blog/generate', protect, blogController.generateBlogPost);
+router.post('/blog/generate', protect, isAdmin, blogController.generateBlogPost);
 
 /**
  * @swagger
@@ -86,7 +95,7 @@ router.post('/blog/generate', protect, blogController.generateBlogPost);
  */
 router.route('/blog')
     .get(blogController.getBlogPosts)
-    .post(protect, blogController.createBlogPost);
+    .post(protect, isAdmin, blogController.createBlogPost);
 
 /**
  * @swagger
@@ -148,8 +157,8 @@ router.route('/blog')
  */
 router.route('/blog/:id')
     .get(blogController.getBlogPostById)
-    .put(protect, blogController.updateBlogPost)
-    .delete(protect, blogController.deleteBlogPost);
+    .put(protect, isAdmin, blogController.updateBlogPost)
+    .delete(protect, isAdmin, blogController.deleteBlogPost);
 
 /**
  * @swagger
