@@ -11,7 +11,7 @@ const prisma = new PrismaClient();
  * @returns {Promise<User>} The newly created user object.
  */
 export const createUser = async (data: any): Promise<User> => {
-  const { skills, profession, educationLevel, nationality, residence, password, ...userData } = data;
+  const { skills, profession, educationLevel, nationality, residence, password, phone, ...userData } = data;
 
   // Generate a unique matricule
   const totalUsers = await prisma.user.count();
@@ -49,6 +49,7 @@ export const createUser = async (data: any): Promise<User> => {
   // Prepare the final user data object for Prisma
   const finalUserData = {
     ...userData,
+    phone,
     matricule,
     password: hashedPassword,
     residenceProvince: residence?.province,
