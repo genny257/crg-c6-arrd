@@ -75,7 +75,7 @@ export default function SecurityPage() {
 
             <Tabs defaultValue="overview">
                 <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="overview">Vue d&apos;ensemble</TabsTrigger>
+                    <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
                     <TabsTrigger value="traffic">Logs du Trafic</TabsTrigger>
                     <TabsTrigger value="threats">Menaces</TabsTrigger>
                     <TabsTrigger value="ip-management">Gestion des IP</TabsTrigger>
