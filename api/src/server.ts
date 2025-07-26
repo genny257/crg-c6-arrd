@@ -16,7 +16,6 @@ import userRoutes from './routes/user.routes';
 import sponsorshipRoutes from './routes/sponsorship.routes';
 import adminRoutes from './routes/admin.routes';
 import volunteerRoutes from './routes/volunteer.routes';
-import aiRoutes from './routes/ai.routes';
 import teamRoutes from './routes/team.routes';
 import genkitRoutes from './routes/genkit.routes';
 import { loggingMiddleware } from './middleware/logging';
@@ -116,3 +115,4 @@ app.listen(port, () => {
   console.log(`Le serveur fonctionne sur http://localhost:${port}`);
   console.log(`La documentation API est disponible sur http://localhost:${port}/api-docs`);
 });
+
