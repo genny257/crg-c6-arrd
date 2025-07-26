@@ -70,7 +70,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { locations, cells as allCells } from '@/lib/locations';
 
 const totalSteps = 5;
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 type FormValues = z.infer<typeof RegisterUserInputSchema>;
 
