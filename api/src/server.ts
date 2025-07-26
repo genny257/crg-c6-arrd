@@ -8,7 +8,6 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import missionRoutes from './routes/mission.routes';
 import blogRoutes from './routes/blog.routes';
-import eventRoutes from './routes/event.routes';
 import reportRoutes from './routes/report.routes';
 import genericRoutes from './routes/generic.routes';
 import donationRoutes from './routes/donation.routes';
@@ -94,7 +93,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 // Routes de l'API
 app.use('/api', missionRoutes);
 app.use('/api', blogRoutes);
-app.use('/api', eventRoutes);
 app.use('/api', reportRoutes);
 app.use('/api', genericRoutes);
 app.use('/api', donationRoutes);
