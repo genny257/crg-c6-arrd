@@ -154,7 +154,7 @@ export function AppNav() {
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
-      </SidebarFooter>
+      </SidebarContent>
       <SidebarFooter className="p-2">
         <SidebarMenu>
              {isSuperAdmin && (
