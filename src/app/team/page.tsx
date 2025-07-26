@@ -4,15 +4,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Network, Users, Search, ArrowDownUp } from "lucide-react";
+import { Network, Users } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { Volunteer } from "@/types/volunteer";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TeamMember, TeamStructure, Pool } from "@/types/team";
 import { allPoolIcons } from "@/lib/icons";
 
@@ -80,30 +76,8 @@ export default function TeamPage() {
     const [teamStructure, setTeamStructure] = useState<TeamStructure | null>(null);
     const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [cellFilter, setCellFilter] = useState<string | null>(null);
-    const [sortConfig, setSortConfig] = useState<{ key: 'name' | 'date'; direction: 'asc' | 'desc' }>({ key: 'date', direction: 'desc' });
-    const [skillFilter, setSkillFilter] = useState<string | null>(null);
-    const [professionFilter, setProfessionFilter] = useState<string | null>(null);
-
-    const [allSkills, setAllSkills] = useState<string[]>([]);
-    const [allProfessions, setAllProfessions] = useState<string[]>([]);
     
     useEffect(() => {
-        const fetchFilters = async () => {
-            try {
-                const [skillsRes, professionsRes] = await Promise.all([
-                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills`),
-                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/professions`),
-                ]);
-                setAllSkills(await skillsRes.json());
-                setAllProfessions(await professionsRes.json());
-            } catch (error) {
-                console.error("Failed to fetch filters", error);
-                toast({ title: "Erreur", description: "Impossible de charger les filtres.", variant: "destructive" });
-            }
-        };
-
         const fetchTeamData = async () => {
             setLoading(true);
             try {
@@ -126,50 +100,12 @@ export default function TeamPage() {
             }
         };
 
-        fetchFilters();
         fetchTeamData();
     }, [toast]);
 
-    const filteredAndSortedVolunteers = useMemo(() => {
-        let sortedVolunteers = [...volunteers];
-        
-        if (cellFilter) {
-            sortedVolunteers = sortedVolunteers.filter(v => v.assignedCell === cellFilter);
-        }
-
-        if (skillFilter) {
-            sortedVolunteers = sortedVolunteers.filter(v => v.skills?.includes(skillFilter));
-        }
-        
-        if (professionFilter) {
-            sortedVolunteers = sortedVolunteers.filter(v => v.profession === professionFilter);
-        }
-
-        if (searchTerm) {
-            sortedVolunteers = sortedVolunteers.filter(v =>
-                `${v.firstName} ${v.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-        }
-
-        sortedVolunteers.sort((a, b) => {
-            if (sortConfig.key === 'name') {
-                const nameA = `${a.lastName} ${a.firstName}`.toLowerCase();
-                const nameB = `${b.lastName} ${b.firstName}`.toLowerCase();
-                if (nameA < nameB) return sortConfig.direction === 'asc' ? -1 : 1;
-                if (nameA > nameB) return sortConfig.direction === 'asc' ? 1 : -1;
-                return 0;
-            } else { // sort by date
-                if (!a.createdAt || !b.createdAt) return 0;
-                const dateA = new Date(a.createdAt).getTime();
-                const dateB = new Date(b.createdAt).getTime();
-                return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA;
-            }
-        });
-
-        return sortedVolunteers;
-    }, [volunteers, searchTerm, sortConfig, cellFilter, skillFilter, professionFilter]);
-    
-    const allCells = teamStructure?.coordinators.map(c => c.role) || [];
+    const activeVolunteers = useMemo(() => {
+        return volunteers.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }, [volunteers]);
 
     if (loading || !teamStructure) {
         return (
@@ -254,64 +190,6 @@ export default function TeamPage() {
                         <Users className="w-6 h-6"/> Nos Volontaires Actifs
                     </CardTitle>
                     <CardDescription className="text-center">La force vive de notre comité.</CardDescription>
-                     <div className="pt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="relative lg:col-span-4">
-                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                            <Input 
-                                placeholder="Rechercher par nom..." 
-                                className="pl-8 w-full"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                         <Select onValueChange={(value) => setCellFilter(value === 'all' ? null : value)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Filtrer par cellule" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Toutes les cellules</SelectItem>
-                                {allCells.map(cell => (
-                                    <SelectItem key={cell} value={cell}>{cell}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <Select onValueChange={(value) => setSkillFilter(value === 'all' ? null : value)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Filtrer par compétence" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Toutes les compétences</SelectItem>
-                                {allSkills.map(skill => (
-                                    <SelectItem key={skill} value={skill}>{skill}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <Select onValueChange={(value) => setProfessionFilter(value === 'all' ? null : value)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Filtrer par profession" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Toutes les professions</SelectItem>
-                                {allProfessions.map(profession => (
-                                    <SelectItem key={profession} value={profession}>{profession}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="w-full">
-                                    <ArrowDownUp className="mr-2 h-4 w-4" />
-                                    Trier par
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'desc' })}>Plus récent</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setSortConfig({ key: 'date', direction: 'asc' })}>Plus ancien</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'asc' })}>Nom (A-Z)</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setSortConfig({ key: 'name', direction: 'desc' })}>Nom (Z-A)</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
                 </CardHeader>
                 <CardContent>
                     {loading ? (
@@ -325,14 +203,14 @@ export default function TeamPage() {
                         </div>
                     ) : (
                             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-x-4 gap-y-6">
-                            {filteredAndSortedVolunteers.map(volunteer => (
+                            {activeVolunteers.map(volunteer => (
                                 <VolunteerCard key={volunteer.id} volunteer={volunteer} />
                             ))}
                         </div>
                     )}
-                        {!loading && filteredAndSortedVolunteers.length === 0 && (
+                    {!loading && activeVolunteers.length === 0 && (
                         <p className="text-center text-muted-foreground py-8">
-                            {searchTerm || cellFilter || skillFilter || professionFilter ? "Aucun volontaire ne correspond à votre recherche." : "Aucun volontaire actif pour le moment."}
+                           Aucun volontaire actif pour le moment.
                         </p>
                     )}
                 </CardContent>
