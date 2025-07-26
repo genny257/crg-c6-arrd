@@ -70,10 +70,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { locations, cells as allCells } from '@/lib/locations';
 
 const totalSteps = 5;
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 type FormValues = z.infer<typeof RegisterUserInputSchema>;
-
 
 const allIdTypes = [
     "CNI",
@@ -89,6 +87,15 @@ const allIdTypes = [
 ];
 
 const foreignIdTypes = allIdTypes.filter(type => type.includes("PASSPORT") || type.includes("CARTE DE SÉJOURS") || type.includes("RECEPICE CARTE DE SEJOURS"));
+
+// Helper function to fetch data from a given endpoint
+async function fetchList(endpoint: string) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${endpoint}`);
+    if (!res.ok) {
+        throw new Error(`Failed to fetch ${endpoint}: ${res.statusText}`);
+    }
+    return res.json();
+}
 
 const ComboboxSelector = ({
   form,
@@ -303,30 +310,26 @@ export default function RegisterPage() {
   const [professions, setProfessions] = React.useState<string[]>([]);
   const [skills, setSkills] = React.useState<string[]>([]);
 
-   const fetchData = React.useCallback(async () => {
+   React.useEffect(() => {
+    const fetchInitialData = async () => {
         setIsLoading(true);
         try {
             const [
-                nationalitiesRes,
-                educationLevelsRes,
-                professionsRes,
-                skillsRes,
+                nationalitiesData,
+                educationLevelsData,
+                professionsData,
+                skillsData,
             ] = await Promise.all([
-                fetch(`${API_BASE_URL}/nationalities`),
-                fetch(`${API_BASE_URL}/educationLevels`),
-                fetch(`${API_BASE_URL}/professions`),
-                fetch(`${API_BASE_URL}/skills`),
+                fetchList('nationalities'),
+                fetchList('educationLevels'),
+                fetchList('professions'),
+                fetchList('skills'),
             ]);
-
-            if (!nationalitiesRes.ok) throw new Error(`Failed to fetch nationalities: ${nationalitiesRes.statusText}`);
-            if (!educationLevelsRes.ok) throw new Error(`Failed to fetch education levels: ${educationLevelsRes.statusText}`);
-            if (!professionsRes.ok) throw new Error(`Failed to fetch professions: ${professionsRes.statusText}`);
-            if (!skillsRes.ok) throw new Error(`Failed to fetch skills: ${skillsRes.statusText}`);
             
-            setNationalities(await nationalitiesRes.json());
-            setEducationLevels(await educationLevelsRes.json());
-            setProfessions(await professionsRes.json());
-            setSkills(await skillsRes.json());
+            setNationalities(nationalitiesData);
+            setEducationLevels(educationLevelsData);
+            setProfessions(professionsData);
+            setSkills(skillsData);
 
         } catch (error) {
             console.error("Failed to fetch dynamic lists", error);
@@ -338,12 +341,9 @@ export default function RegisterPage() {
         } finally {
             setIsLoading(false);
         }
-    }, [toast]);
-
-
-  React.useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    };
+    fetchInitialData();
+  }, [toast]);
 
 
   const form = useForm<FormValues>({
@@ -457,7 +457,7 @@ export default function RegisterPage() {
     const finalData = { ...data, causes: finalCauses };
 
     try {
-      const response = await fetch(`${API_BASE_URL}/register`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(finalData),
