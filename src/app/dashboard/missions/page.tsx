@@ -2,6 +2,7 @@
 "use client";
 
 import * as React from "react";
+import dynamic from 'next/dynamic';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -16,25 +17,13 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useAuth } from "@/hooks/use-auth";
 import 'leaflet/dist/leaflet.css';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import L from 'leaflet';
 import { geocodeLocation } from "@/lib/locations";
 
-// Fix for default icon issue with webpack
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-
-let DefaultIcon = L.icon({
-    iconUrl: icon.src,
-    shadowUrl: iconShadow.src,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
+// Dynamic import for the Map component
+const MapComponent = dynamic(() => import('@/components/map-component'), { 
+    ssr: false,
+    loading: () => <Skeleton className="h-full w-full" />
 });
-
-L.Marker.prototype.options.icon = DefaultIcon;
-
 
 const getStatusBadgeVariant = (status: MissionStatus) => {
     switch (status) {
@@ -51,32 +40,6 @@ const statusText: { [key in MissionStatus]: string } = {
     'IN_PROGRESS': 'En cours',
     'COMPLETED': 'Terminée',
     'CANCELLED': 'Annulée'
-}
-
-const MapComponent = ({ missions }: { missions: Mission[] }) => {
-    const missionsWithCoords = missions
-        .map(m => ({...m, coords: geocodeLocation(m.location)}))
-        .filter(m => m.coords);
-
-    return (
-        <MapContainer center={[0.3924, 9.4536]} zoom={6} style={{ height: '100%', width: '100%', borderRadius: 'inherit' }}>
-            <TileLayer
-                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            />
-            {missionsWithCoords.map(mission => (
-                 <Marker key={mission.id} position={mission.coords!}>
-                    <Popup>
-                        <div className="font-sans">
-                            <h4 className="font-bold">{mission.title}</h4>
-                            <p>{mission.location}</p>
-                            <Link href={`/dashboard/missions/${mission.id}`} className="text-blue-600 hover:underline">Voir détails</Link>
-                        </div>
-                    </Popup>
-                </Marker>
-            ))}
-        </MapContainer>
-    )
 }
 
 export default function MissionsPage() {
@@ -151,6 +114,14 @@ export default function MissionsPage() {
         fetchMissions();
     }, [fetchMissions]);
     
+    const missionsForMap = React.useMemo(() => missions.map(m => ({
+        id: m.id,
+        title: m.title,
+        location: m.location,
+        href: `/dashboard/missions/${m.id}`,
+        coords: geocodeLocation(m.location)
+    })), [missions]);
+
     return (
         <div className="flex flex-col gap-8">
             <div className="flex items-center justify-between">
@@ -251,10 +222,11 @@ export default function MissionsPage() {
                         <CardDescription>Visualisation géographique des missions.</CardDescription>
                     </CardHeader>
                     <CardContent className="h-[calc(100%-4rem)] p-0">
-                         {loading ? <Skeleton className="h-full w-full" /> : <MapComponent missions={missions} />}
+                         {loading ? <Skeleton className="h-full w-full" /> : <MapComponent items={missionsForMap} />}
                     </CardContent>
                 </Card>
             </div>
         </div>
     );
 }
+

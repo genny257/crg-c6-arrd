@@ -1,6 +1,7 @@
 
 "use client"
 import * as React from "react";
+import dynamic from 'next/dynamic';
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,28 +13,16 @@ import type { Event } from "@/types/event";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
 import { geocodeLocation } from "@/lib/locations";
 
-// Fix for default icon issue with webpack
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-
-let DefaultIcon = L.icon({
-    iconUrl: icon.src,
-    shadowUrl: iconShadow.src,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
+// Dynamic import for the Map component
+const MapComponent = dynamic(() => import('@/components/map-component'), { 
+    ssr: false,
+    loading: () => <Skeleton className="h-full w-full" />
 });
 
-L.Marker.prototype.options.icon = DefaultIcon;
-
-
-type CalendarEvent = {
+export type CalendarEvent = {
     date: Date;
     title: string;
     type: 'Mission' | 'Événement';
@@ -50,32 +39,6 @@ const getEventTypeClass = (type: CalendarEvent['type']) => {
         case 'Événement': return 'bg-green-500';
     }
 };
-
-const MapComponent = ({ events }: { events: CalendarEvent[] }) => {
-    const validEvents = events.filter(e => e.coords);
-
-    return (
-        <MapContainer center={[0.3924, 9.4536]} zoom={7} style={{ height: '100%', width: '100%', borderRadius: 'inherit' }}>
-            <TileLayer
-                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            />
-            {validEvents.map(event => (
-                 <Marker key={event.id} position={event.coords!}>
-                    <Popup>
-                        <div className="font-sans">
-                            <h4 className="font-bold">{event.title}</h4>
-                            <p>{format(event.date, "d MMM yyyy", { locale: fr })}</p>
-                            <p className="text-gray-600">{event.location}</p>
-                            <a href={event.href} className="text-blue-600 hover:underline">Voir détails</a>
-                        </div>
-                    </Popup>
-                </Marker>
-            ))}
-        </MapContainer>
-    )
-}
-
 
 export default function CalendarPage() {
     const { toast } = useToast();
@@ -100,7 +63,7 @@ export default function CalendarPage() {
               const missions: Mission[] = await missionsRes.json();
               const events: Event[] = await eventsRes.json();
 
-              const missionsData = missions.map(data => ({
+              const missionsData: CalendarEvent[] = missions.map(data => ({
                   id: data.id,
                   date: new Date(data.startDate),
                   title: data.title,
@@ -111,7 +74,7 @@ export default function CalendarPage() {
                   coords: geocodeLocation(data.location)
               }));
 
-              const eventsData = events.map(data => ({
+              const eventsData: CalendarEvent[] = events.map(data => ({
                   id: data.id,
                   date: new Date(data.date),
                   title: data.title,
@@ -244,7 +207,7 @@ export default function CalendarPage() {
                 <TabsContent value="map" className="mt-4">
                     <Card className="h-[70vh]">
                         <CardContent className="p-0 h-full w-full rounded-lg">
-                           {loading ? <Skeleton className="h-full w-full" /> : <MapComponent events={events} />}
+                           {loading ? <Skeleton className="h-full w-full" /> : <MapComponent items={events} />}
                         </CardContent>
                     </Card>
                 </TabsContent>
