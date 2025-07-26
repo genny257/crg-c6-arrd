@@ -87,12 +87,18 @@ export const createMission = async (req: Request, res: Response) => {
  */
 export const updateMission = async (req: Request, res: Response) => {
   try {
+    // We use .partial() to allow partial updates.
+    // The date conversion is handled inside the service.
     const validatedData = missionDataSchema.partial().parse(req.body);
-    const updatedData = {
-        ...validatedData,
-        ...(validatedData.startDate && { startDate: new Date(validatedData.startDate) }),
-        ...(validatedData.endDate && { endDate: new Date(validatedData.endDate) }),
-    };
+    
+    // Convert string dates to Date objects if they exist
+    const updatedData: any = { ...validatedData };
+    if (validatedData.startDate) {
+        updatedData.startDate = new Date(validatedData.startDate);
+    }
+    if (validatedData.endDate) {
+        updatedData.endDate = new Date(validatedData.endDate);
+    }
 
     const updatedMission = await missionService.updateMission(req.params.id, updatedData);
     res.status(200).json(updatedMission);

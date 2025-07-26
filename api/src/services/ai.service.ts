@@ -107,7 +107,7 @@ const chatbotFlow = ai.defineFlow(
             config: {
                 temperature: 0.5,
             },
-        } as GenerateOptions);
+        } as GenerateOptions<any>);
 
         return llmResponse.text;
     }
