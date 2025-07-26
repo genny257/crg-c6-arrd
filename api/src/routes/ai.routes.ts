@@ -70,7 +70,7 @@ router.post('/ai/chat', handleChat);
  *       500:
  *         description: Server error
  */
-router.post('/ai/missions/:id/suggest-volunteers', protect, isAdmin, suggestVolunteersForMission);
+router.post('/missions/:id/suggest-volunteers', protect, isAdmin, suggestVolunteersForMission);
 
 /**
  * @swagger
@@ -100,7 +100,7 @@ router.post('/ai/missions/:id/suggest-volunteers', protect, isAdmin, suggestVolu
  *       500:
  *         description: Server error
  */
-router.post('/ai/blog/generate', protect, isAdmin, generateBlogPost);
+router.post('/blog/generate', protect, isAdmin, generateBlogPost);
 
 
 export default router;

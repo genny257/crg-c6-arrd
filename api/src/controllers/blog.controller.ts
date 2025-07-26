@@ -172,6 +172,6 @@ export const generateBlogPost = async (req: Request, res: Response) => {
          if (error instanceof z.ZodError) {
             return res.status(400).json({ message: 'Validation failed', errors: error.flatten().fieldErrors });
         }
-        res.status(500).json({ message: 'Error generating blog post', error });
+        res.status(500).json({ message: 'Error generating blog post', error: (error as Error).message });
     }
 };

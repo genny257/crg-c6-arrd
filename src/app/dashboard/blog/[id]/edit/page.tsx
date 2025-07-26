@@ -79,7 +79,7 @@ export default function EditBlogPostPage() {
     }
     setIsGenerating(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/generate`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/blog/generate`, {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
@@ -190,7 +190,7 @@ export default function EditBlogPostPage() {
                 <div className="flex gap-2">
                   <Input
                     id="generation-topic"
-                    placeholder="Ex: L&apos;importance du secourisme en milieu scolaire"
+                    placeholder="Ex: L'importance du secourisme en milieu scolaire"
                     value={generationTopic}
                     onChange={(e) => setGenerationTopic(e.target.value)}
                     disabled={isGenerating}
