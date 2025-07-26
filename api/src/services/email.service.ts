@@ -4,6 +4,7 @@ interface MailOptions {
   to: string;
   subject: string;
   html: string;
+  replyTo?: string;
 }
 
 // We assume EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASS, and EMAIL_FROM are in .env
@@ -12,8 +13,8 @@ const transporter = nodemailer.createTransport({
   port: parseInt(process.env.EMAIL_PORT || '587', 10),
   secure: (process.env.EMAIL_PORT === '465'), // `secure:true` is recommended for port 465
   auth: {
-    user: process.env.EMAIL_USER, // Your Gmail address
-    pass: process.env.EMAIL_PASS, // Your App Password
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
@@ -21,7 +22,7 @@ export const EmailService = {
   async sendEmail(options: MailOptions): Promise<void> {
     try {
       const info = await transporter.sendMail({
-        from: `"Votre Organisation" <${process.env.EMAIL_FROM}>`,
+        from: `"Croix-Rouge Gabonaise" <${process.env.EMAIL_FROM}>`,
         ...options,
       });
       console.log('Message sent: %s', info.messageId);
@@ -35,7 +36,7 @@ export const EmailService = {
     const subject = "Confirmation de votre demande de partenariat";
     const html = `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-        <h2 style="color: #004a99; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+        <h2 style="color: #B71C1C; border-bottom: 2px solid #eee; padding-bottom: 10px;">
           Confirmation de votre demande de mécénat
         </h2>
         <p>Cher partenaire de <strong>${companyName}</strong>,</p>
@@ -44,10 +45,41 @@ export const EmailService = {
         <p>Nous sommes honorés de la confiance que vous nous accordez.</p>
         <br/>
         <p>Cordialement,</p>
-        <p><strong>L'équipe de [Nom de votre organisation]</strong></p>
+        <p><strong>L'équipe de la Croix-Rouge Gabonaise (Comité du 6ème Arr.)</strong></p>
       </div>
     `;
     
     await this.sendEmail({ to: partnerEmail, subject, html });
+  },
+
+  async sendContactFormEmail(name: string, fromEmail: string, subject: string, message: string): Promise<void> {
+    const to = process.env.ADMIN_EMAIL || process.env.EMAIL_FROM;
+    if (!to) {
+        console.error("No recipient email address configured for contact form.");
+        throw new Error("Server configuration error: recipient email missing.");
+    }
+    
+    const emailSubject = `Nouveau message de contact : ${subject}`;
+    const html = `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h2 style="color: #B71C1C; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+          Nouveau Message via le Formulaire de Contact
+        </h2>
+        <p>Vous avez reçu un nouveau message de :</p>
+        <ul>
+          <li><strong>Nom :</strong> ${name}</li>
+          <li><strong>Email :</strong> ${fromEmail}</li>
+          <li><strong>Sujet :</strong> ${subject}</li>
+        </ul>
+        <h3 style="color: #333; margin-top: 20px;">Message :</h3>
+        <div style="background-color: #f9f9f9; border: 1px solid #ddd; padding: 15px; border-radius: 5px;">
+          <p style="white-space: pre-wrap;">${message}</p>
+        </div>
+        <br/>
+        <p>Vous pouvez répondre directement à cette personne à l'adresse <a href="mailto:${fromEmail}">${fromEmail}</a>.</p>
+      </div>
+    `;
+    
+    await this.sendEmail({ to, subject: emailSubject, html, replyTo: fromEmail });
   }
 };

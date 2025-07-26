@@ -37,13 +37,30 @@ export default function ContactPage() {
   });
 
   const onSubmit = async (data: ContactFormValues) => {
-    // TODO: Implement API call to a new /api/contact endpoint
-    console.log("Form data submitted:", data);
-    toast({
-      title: "Message envoyé !",
-      description: "Nous avons bien reçu votre message et nous vous répondrons bientôt.",
-    });
-    form.reset();
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Le serveur a rencontré une erreur.");
+      }
+
+      toast({
+        title: "Message envoyé !",
+        description: "Nous avons bien reçu votre message et nous vous répondrons bientôt.",
+      });
+      form.reset();
+    } catch (error) {
+      console.error("Contact form error:", error);
+      toast({
+        title: "Erreur d'envoi",
+        description: "Votre message n'a pas pu être envoyé. Veuillez réessayer plus tard.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
