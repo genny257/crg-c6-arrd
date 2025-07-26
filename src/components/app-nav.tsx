@@ -83,9 +83,7 @@ export function AppNav() {
     <>
       <SidebarHeader>
         <Link href="/" className="flex items-center gap-2 p-2">
-            <div className="relative h-10 w-10">
-                <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" fill style={{ objectFit: 'contain' }}/>
-            </div>
+            <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={40} height={40} style={{ objectFit: 'contain' }}/>
             <span className="font-headline text-lg group-data-[collapsible=icon]:hidden">
                 CRG-6-Arrond.
             </span>
