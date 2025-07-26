@@ -1,21 +1,27 @@
 {
-    "name": "Croix-Rouge Gabonaise (Comité 6e Arr.)",
-    "short_name": "CRG-6eArr",
-    "description": "Plateforme de gestion de la Croix-Rouge Gabonaise pour le comité du 6ème arrondissement.",
-    "icons": [
-        {
-            "src": "/logo.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "/logo.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        }
-    ],
-    "theme_color": "#B71C1C",
-    "background_color": "#EEEEEE",
-    "display": "standalone",
-    "start_url": "/"
+  "name": "CRG - Comité 6e Arr.",
+  "short_name": "CRG-C6",
+  "description": "Plateforme de gestion pour la Croix-Rouge Gabonaise, Comité du 6e Arrondissement.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#EEEEEE",
+  "theme_color": "#B71C1C",
+  "icons": [
+    {
+      "src": "/logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo-maskable.png",
+      "sizes": "196x196",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
 }
