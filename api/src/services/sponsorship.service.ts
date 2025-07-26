@@ -3,7 +3,9 @@ import { PrismaClient, CorporateSponsorship } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const createSponsorship = async (data: Omit<CorporateSponsorship, 'id' | 'createdAt' | 'updatedAt' | 'status'>): Promise<CorporateSponsorship> => {
+type CreateSponsorshipData = Omit<CorporateSponsorship, 'id' | 'createdAt' | 'updatedAt' | 'status'>;
+
+export const createSponsorship = async (data: CreateSponsorshipData): Promise<CorporateSponsorship> => {
     return await prisma.corporateSponsorship.create({ data });
 };
 

@@ -3,18 +3,28 @@ import { Request, Response } from 'express';
 import Stripe from 'stripe';
 import * as donationService from '../services/donation.service';
 import { DonationStatus } from '@prisma/client';
+import { z } from 'zod';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-06-20' as any,
 });
 
+const donationSchema = z.object({
+  amount: z.number().positive("Le montant doit être positif."),
+  name: z.string().min(2, "Le nom est requis."),
+  email: z.string().email("L'adresse e-mail est invalide."),
+  method: z.nativeEnum(['Mobile Money', 'Carte_Bancaire']),
+  type: z.nativeEnum(['Ponctuel', 'Mensuel']),
+});
+
 export const createDonation = async (req: Request, res: Response) => {
   try {
-    const { amount, name, email, method, type } = req.body;
+    const validatedData = donationSchema.parse(req.body);
+    const { amount, name, email, method, type } = validatedData;
 
     // 1. Save the donation to your database with status 'PENDING'
     const donation = await donationService.createDonation({
-      ...req.body,
+      ...validatedData,
       status: DonationStatus.PENDING,
     });
 
@@ -37,6 +47,9 @@ export const createDonation = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ message: 'Validation failed', errors: error.flatten().fieldErrors });
+    }
     res.status(500).json({ message: 'Error creating donation', error: (error as Error).message });
   }
 };
