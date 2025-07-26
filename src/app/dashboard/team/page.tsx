@@ -199,9 +199,9 @@ export default function TeamPage() {
              <div className="space-y-2">
                 <h1 className="text-3xl font-headline font-bold flex items-center gap-2">
                     <Network className="w-8 h-8 text-primary"/>
-                    Notre Équipe
+                    Gestion de l'Équipe
                 </h1>
-                <p className="text-muted-foreground">Découvrez l&apos;organisation et les membres du Comité du Sixième Arrondissement.</p>
+                <p className="text-muted-foreground">Visualisez l'organigramme et gérez les volontaires actifs.</p>
             </div>
 
             <Card className="w-full">
