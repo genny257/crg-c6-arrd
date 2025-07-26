@@ -2,8 +2,18 @@
 import { Router } from 'express';
 import * as adminController from '../controllers/admin.controller';
 import { protect, isSuperAdmin } from '../middleware/auth';
+import { UserRole } from '@prisma/client';
 
 const router = Router();
+
+// Custom middleware to check for Admin or SuperAdmin roles
+const isAdmin = (req: any, res: any, next: any) => {
+    if (!req.user || (req.user.role !== UserRole.ADMIN && req.user.role !== UserRole.SUPERADMIN)) {
+        return res.status(403).json({ message: 'Forbidden: Access denied' });
+    }
+    next();
+};
+
 
 /**
  * @swagger
@@ -11,9 +21,6 @@ const router = Router();
  *   name: Admin
  *   description: Administration and analytics endpoints (SuperAdmin access required)
  */
-
-// Protect all routes in this file and ensure user is a SUPERADMIN
-router.use(protect, isSuperAdmin);
 
 /**
  * @swagger
@@ -44,7 +51,7 @@ router.use(protect, isSuperAdmin);
  *       403:
  *         description: Forbidden
  */
-router.get('/stats', adminController.getStats);
+router.get('/stats', protect, isAdmin, adminController.getStats);
 
 /**
  * @swagger
@@ -62,7 +69,10 @@ router.get('/stats', adminController.getStats);
  *       403:
  *         description: Forbidden
  */
-router.get('/analytics', adminController.getAnalytics);
+router.get('/analytics', protect, isAdmin, adminController.getAnalytics);
+
+// Protect all following routes in this file and ensure user is a SUPERADMIN
+router.use(protect, isSuperAdmin);
 
 /**
  * @swagger

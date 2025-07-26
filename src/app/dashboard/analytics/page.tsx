@@ -11,15 +11,23 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
 
 
 export default function AnalyticsPage() {
-    const { token } = useAuth();
+    const { token, user, loading: authLoading } = useAuth();
+    const router = useRouter();
     const [stats, setStats] = React.useState<StatsData | null>(null);
     const [loading, setLoading] = React.useState(true);
     const { toast } = useToast();
 
     React.useEffect(() => {
+        if (!authLoading && (!user || (user.role !== 'ADMIN' && user.role !== 'SUPERADMIN'))) {
+            toast({ title: "Accès non autorisé", description: "Vous n'avez pas les droits pour voir cette page.", variant: "destructive" });
+            router.push('/dashboard');
+            return;
+        }
+
         const fetchData = async () => {
             if (!token) {
                 setLoading(false);
@@ -43,10 +51,13 @@ export default function AnalyticsPage() {
                 setLoading(false);
             }
         };
-        fetchData();
-    }, [toast, token]);
 
-    if (loading || !stats) {
+        if (token && user) {
+            fetchData();
+        }
+    }, [toast, token, user, authLoading, router]);
+
+    if (loading || authLoading || !stats) {
         return <AnalyticsSkeleton />
     }
 
