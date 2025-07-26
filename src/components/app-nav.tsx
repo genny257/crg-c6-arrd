@@ -58,7 +58,7 @@ const reportsNavItems = [
 export function AppNav() {
   const pathname = usePathname()
   const { user, logout } = useAuth();
-  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin' || user?.role === 'SUPERADMIN' || user?.role === 'ADMIN';
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin' || user?.role === 'ADMIN' || user?.role === 'SUPERADMIN';
   const isSuperAdmin = user?.role === 'SUPERADMIN';
   const [isMediaOpen, setIsMediaOpen] = React.useState(false);
 

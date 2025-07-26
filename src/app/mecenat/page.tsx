@@ -75,7 +75,7 @@ export default function MecenatPage() {
     <div className="space-y-16">
       <section className="text-center">
         <Building className="mx-auto h-16 w-16 text-primary mb-4" />
-        <h1 className="text-4xl font-headline font-bold text-primary mb-2">Mécénat d&apos;Entreprise</h1>
+        <h1 className="text-4xl font-headline font-bold text-primary mb-2">Mécénat d'Entreprise</h1>
         <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
           Engagez votre entreprise aux côtés de la Croix-Rouge Gabonaise et devenez un acteur clé du changement social et humanitaire dans notre communauté.
         </p>
@@ -95,15 +95,15 @@ export default function MecenatPage() {
              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 mb-4">
                 <Building className="h-6 w-6 text-primary" />
              </div>
-             <h3 className="text-xl font-bold font-headline mb-2">Valeurs et Image d&apos;Entreprise</h3>
-             <p className="text-muted-foreground">Associez votre marque aux principes d&apos;humanité, d&apos;impartialité et de solidarité de la Croix-Rouge.</p>
+             <h3 className="text-xl font-bold font-headline mb-2">Valeurs et Image d'Entreprise</h3>
+             <p className="text-muted-foreground">Associez votre marque aux principes d'humanité, d'impartialité et de solidarité de la Croix-Rouge.</p>
           </div>
            <div className="flex flex-col items-center">
              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 mb-4">
                 <CheckCircle2 className="h-6 w-6 text-primary" />
              </div>
              <h3 className="text-xl font-bold font-headline mb-2">Engagement des Collaborateurs</h3>
-             <p className="text-muted-foreground">Fédérez vos équipes autour d&apos;un projet porteur de sens et renforcez la cohésion interne.</p>
+             <p className="text-muted-foreground">Fédérez vos équipes autour d'un projet porteur de sens et renforcez la cohésion interne.</p>
           </div>
         </div>
       </section>
@@ -118,7 +118,7 @@ export default function MecenatPage() {
                 </li>
                  <li className="flex items-start gap-3">
                     <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
-                    <span><strong>Mécénat de compétences :</strong> Mettez l&apos;expertise de vos collaborateurs au service de nos projets (logistique, communication, IT, etc.).</span>
+                    <span><strong>Mécénat de compétences :</strong> Mettez l'expertise de vos collaborateurs au service de nos projets (logistique, communication, IT, etc.).</span>
                 </li>
                  <li className="flex items-start gap-3">
                     <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
@@ -141,7 +141,7 @@ export default function MecenatPage() {
             <Card>
                 <CardHeader>
                     <CardTitle className="font-headline text-2xl">Contactez notre équipe Partenariats</CardTitle>
-                    <CardDescription>Discutons ensemble d&apos;un partenariat sur mesure. Laissez-nous vos coordonnées et nous vous recontacterons rapidement.</CardDescription>
+                    <CardDescription>Discutons ensemble d'un partenariat sur mesure. Laissez-nous vos coordonnées et nous vous recontacterons rapidement.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>
@@ -151,7 +151,7 @@ export default function MecenatPage() {
                                     <FormItem><FormLabel>Nom du contact</FormLabel><FormControl><Input placeholder="Prénom et Nom" {...field} /></FormControl><FormMessage /></FormItem>
                                 )} />
                                 <FormField control={form.control} name="companyName" render={({ field }) => (
-                                    <FormItem><FormLabel>Nom de l&apos;entreprise</FormLabel><FormControl><Input placeholder="Votre entreprise" {...field} /></FormControl><FormMessage /></FormItem>
+                                    <FormItem><FormLabel>Nom de l'entreprise</FormLabel><FormControl><Input placeholder="Votre entreprise" {...field} /></FormControl><FormMessage /></FormItem>
                                 )} />
                             </div>
                             <FormField control={form.control} name="email" render={({ field }) => (
