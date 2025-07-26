@@ -16,7 +16,10 @@ const sponsorshipSchema = z.object({
 export const createSponsorship = async (req: Request, res: Response) => {
     try {
         const data = sponsorshipSchema.parse(req.body);
-        const sponsorship = await sponsorshipService.createSponsorship(data);
+        const sponsorship = await sponsorshipService.createSponsorship({
+            ...data,
+            phone: data.phone || null,
+        });
         
         // Send confirmation email
         await EmailService.sendSponsorshipConfirmation(data.email, data.companyName);

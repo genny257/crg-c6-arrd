@@ -3,7 +3,7 @@ import { ai } from '../../genkit.config';
 import { MissionStatus, User, Post, Skill } from '@prisma/client';
 import { z } from 'zod';
 import prisma from '../lib/prisma';
-import { GenerateRequest } from '@genkit-ai/googleai';
+import type { GenerateOptions } from '@genkit-ai/googleai';
 
 // Schemas
 const MessageSchema = z.object({
@@ -107,7 +107,7 @@ const chatbotFlow = ai.defineFlow(
             config: {
                 temperature: 0.5,
             },
-        } as GenerateRequest);
+        } as GenerateOptions);
 
         return llmResponse.text;
     }
