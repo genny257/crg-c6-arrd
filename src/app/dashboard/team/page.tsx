@@ -4,7 +4,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Network, Users, Search, ArrowDownUp } from "lucide-react";
+import { Network, Users, Search, ArrowDownUp, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { TeamMember, TeamStructure, Pool } from "@/types/team";
 import { allPoolIcons } from "@/lib/icons";
+import Link from "next/link";
 
 const MemberCard = ({ member, size = 'default' }: { member: TeamMember, size?: 'default' | 'small' }) => (
     <div className="flex flex-col items-center text-center">
@@ -92,6 +93,7 @@ export default function TeamPage() {
 
     const [allSkills, setAllSkills] = useState<string[]>([]);
     const [allProfessions, setAllProfessions] = useState<string[]>([]);
+    const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -196,12 +198,19 @@ export default function TeamPage() {
 
     return (
         <div className="flex flex-col gap-12">
-             <div className="space-y-2">
+             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-headline font-bold flex items-center gap-2">
                     <Network className="w-8 h-8 text-primary"/>
                     Gestion de l'Équipe
                 </h1>
-                <p className="text-muted-foreground">Visualisez l'organigramme et gérez les volontaires actifs.</p>
+                {isAdmin && (
+                    <Button asChild>
+                        <Link href="/dashboard/team/manage">
+                            <Settings className="mr-2 h-4 w-4" />
+                            Gérer l'équipe
+                        </Link>
+                    </Button>
+                )}
             </div>
 
             <Card className="w-full">
