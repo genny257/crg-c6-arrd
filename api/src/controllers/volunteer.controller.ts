@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import * as volunteerService from '../services/volunteer.service';
 import * as userService from '../services/user.service';
 import { z } from 'zod';
+import { UserStatus } from '@prisma/client';
 
 const volunteerSchema = z.object({
   firstName: z.string().min(2),
@@ -53,7 +54,7 @@ export const getVolunteerById = async (req: Request, res: Response) => {
 };
 
 const statusUpdateSchema = z.object({
-  status: z.enum(['ACTIVE', 'INACTIVE', 'REJECTED', 'PENDING']),
+  status: z.nativeEnum(UserStatus),
 });
 
 export const updateVolunteerStatus = async (req: Request, res: Response) => {
