@@ -28,10 +28,10 @@ export const getVolunteerById = async (id: string): Promise<User | null> => {
     const user = await prisma.user.findUnique({
         where: { id },
     });
-    if (user && user.role === UserRole.VOLUNTEER) {
-        return user;
-    }
-    return null;
+    // Removed the role check to allow fetching any user by ID,
+    // which might be needed for profile pages of admins, etc.
+    // The route protection should handle access control.
+    return user;
 };
 
 export const getVolunteerByMatricule = async (matricule: string): Promise<User | null> => {

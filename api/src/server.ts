@@ -1,4 +1,4 @@
-
+// api/src/server.ts
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -113,4 +113,3 @@ app.listen(port, () => {
   console.log(`Le serveur fonctionne sur http://localhost:${port}`);
   console.log(`La documentation API est disponible sur http://localhost:${port}/api-docs`);
 });
-

@@ -9,7 +9,7 @@ const MessageSchema = z.object({
     role: z.enum(['user', 'model']),
     content: z.string(),
 });
-type Message = z.infer<typeof MessageSchema>;
+export type Message = z.infer<typeof MessageSchema>;
 
 const BlogPostSchema = z.object({
   title: z.string().describe("The engaging title of the blog post."),
@@ -17,6 +17,7 @@ const BlogPostSchema = z.object({
   excerpt: z.string().describe("A short, compelling summary of the article (1-2 sentences)."),
   content: z.string().describe("The full content of the article in Markdown format."),
 });
+export type BlogPost = z.infer<typeof BlogPostSchema>;
 
 const VolunteerSuggestionSchema = z.object({
     recommendations: z.array(z.object({
@@ -90,7 +91,7 @@ const chatbotFlow = ai.defineFlow(
         }));
 
         const llmResponse = await ai.generate({
-            model: 'gemini-1.5-pro',
+            model: 'googleai/gemini-1.5-pro',
             history: history,
             tools: [getMissionsTool, getVolunteerInfoTool],
             prompt: `
@@ -120,7 +121,7 @@ const generateBlogPostFlow = ai.defineFlow(
     },
     async (topic) => {
         const llmResponse = await ai.generate({
-            model: 'gemini-1.5-pro',
+            model: 'googleai/gemini-1.5-pro',
             prompt: `Rédige un article de blog engageant et informatif sur le sujet suivant : "${topic}". L'article doit être adapté pour l'organisation de la Croix-Rouge Gabonaise. Adopte un ton à la fois professionnel, humain et inspirant. L'article doit être structuré avec des titres et des paragraphes clairs, en utilisant le format Markdown.`,
             config: {
                 temperature: 0.7,
@@ -161,7 +162,7 @@ const missionAssignmentFlow = ai.defineFlow(
         `;
 
         const llmResponse = await ai.generate({
-            model: 'gemini-1.5-pro',
+            model: 'googleai/gemini-1.5-pro',
             prompt,
             output: {
                 schema: VolunteerSuggestionSchema,

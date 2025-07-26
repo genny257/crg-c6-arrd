@@ -1,4 +1,3 @@
-
 // src/controllers/mission.controller.ts
 import { Request, Response } from 'express';
 import * as missionService from '../services/mission.service';
