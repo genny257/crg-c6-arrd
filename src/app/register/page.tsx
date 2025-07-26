@@ -5,7 +5,7 @@ import { RegisterClientPage } from "./client-page";
 // Helper function to fetch data from a given endpoint on the server side
 async function fetchList(endpoint: string): Promise<string[]> {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${endpoint}`, { cache: 'no-store' });
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${endpoint}`);
         if (!res.ok) {
             console.error(`Failed to fetch ${endpoint}: ${res.statusText}`);
             return [];
