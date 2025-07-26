@@ -2,7 +2,7 @@
 import prisma from '../lib/prisma';
 import { TeamStructure, TeamMember, Pool } from '../types/team';
 import { UserRole }from '@prisma/client';
-import { allPoolIcons } from '@/lib/icons';
+import { allPoolIcons } from '../lib/icons';
 
 
 const userToTeamMember = (user: any): TeamMember => ({

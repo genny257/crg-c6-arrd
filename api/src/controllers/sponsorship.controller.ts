@@ -9,7 +9,7 @@ const sponsorshipSchema = z.object({
   companyName: z.string().min(1, "Le nom de l'entreprise est requis"),
   contactName: z.string().min(1, "Le nom du contact est requis"),
   email: z.string().email("L'adresse e-mail est invalide"),
-  phone: z.string().optional().nullable(),
+  phone: z.string().optional(),
   message: z.string().min(1, "Le message ne peut pas être vide"),
 });
 

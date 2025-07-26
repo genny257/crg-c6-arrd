@@ -17,7 +17,7 @@ const missionSchema = z.object({
     message: "Date de fin invalide",
   }),
   status: z.nativeEnum(MissionStatus).optional().default(MissionStatus.PLANNED),
-  requiredSkills: z.array(z.string()).optional(),
+  requiredSkills: z.array(z.string()).optional().default([]),
   maxParticipants: z.number().int().positive().optional().nullable(),
 }).refine(data => new Date(data.endDate) >= new Date(data.startDate), {
     message: "La date de fin ne peut pas être antérieure à la date de début.",

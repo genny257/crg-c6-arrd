@@ -8,7 +8,7 @@ const eventSchema = z.object({
   title: z.string().min(1, "Le titre est requis."),
   description: z.string().min(1, "La description est requise."),
   location: z.string().min(1, "Le lieu est requis."),
-  date: z.string().datetime("La date de l'événement est invalide."),
+  date: z.string().datetime("La date de l'événement est invalide.").transform((str) => new Date(str)),
   image: z.string().url("L'URL de l'image n'est pas valide.").optional().or(z.literal('')),
   imageHint: z.string().optional(),
   status: z.nativeEnum(EventStatus).default(EventStatus.UPCOMING),
