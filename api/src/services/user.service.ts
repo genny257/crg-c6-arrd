@@ -1,5 +1,5 @@
 // src/services/user.service.ts
-import { PrismaClient, User } from '@prisma/client';
+import { PrismaClient, User, UserStatus } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -52,6 +52,7 @@ export const createUser = async (data: any): Promise<User> => {
     phone,
     matricule,
     password: hashedPassword,
+    status: UserStatus.PENDING, // Default status for new registrations
     residenceProvince: residence?.province,
     residenceDepartement: residence?.departement,
     residenceCommuneCanton: residence?.communeCanton,
