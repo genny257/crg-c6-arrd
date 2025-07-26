@@ -4,20 +4,8 @@ import { SidebarNav } from "./sidebar-nav"
 
 const sidebarNavItems = [
   {
-    title: "Général",
-    href: "/dashboard/settings",
-  },
-  {
     title: "Paiements",
     href: "/dashboard/settings/payments",
-  },
-  {
-    title: "Apparence",
-    href: "/dashboard/settings/appearance",
-  },
-  {
-    title: "Notifications",
-    href: "/dashboard/settings/notifications",
   },
 ]
 
@@ -31,7 +19,7 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
       <div className="space-y-0.5">
         <h2 className="text-2xl font-bold tracking-tight">Paramètres</h2>
         <p className="text-muted-foreground">
-          Gérez les paramètres de votre compte et du site.
+          Gérez les paramètres de votre site.
         </p>
       </div>
       <Separator className="my-6" />
