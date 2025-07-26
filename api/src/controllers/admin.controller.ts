@@ -126,6 +126,6 @@ export const getAnalytics = async (req: Request, res: Response) => {
         const stats = await adminService.getAnalytics();
         res.json(stats);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching analytics', error });
+        res.status(500).json({ message: 'Error fetching analytics', error: (error as Error).message });
     }
 }

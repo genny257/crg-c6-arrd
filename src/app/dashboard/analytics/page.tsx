@@ -140,7 +140,7 @@ export default function AnalyticsPage() {
                     <BarChart data={charts.donationsHistory}>
                          <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" />
-                        <YAxis tickFormatter={(value) => `${(value as number) / 1000000}M`} />
+                        <YAxis tickFormatter={(value) => `${(value as number) / 1000}K`} />
                         <Tooltip formatter={(value: number) => new Intl.NumberFormat('fr-FR').format(value) + ' FCFA'} />
                         <Bar dataKey="total" fill="hsl(var(--primary))" name="Dons" />
                     </BarChart>

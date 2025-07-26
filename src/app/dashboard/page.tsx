@@ -22,7 +22,10 @@ export default function DashboardPage() {
     const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
-        if (!token) return;
+        if (!token) {
+            setLoading(false);
+            return;
+        }
 
         const fetchData = async () => {
             setLoading(true);

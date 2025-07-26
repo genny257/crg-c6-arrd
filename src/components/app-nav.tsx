@@ -52,7 +52,7 @@ const mainNavItems = [
 const reportsNavItems = [
     { href: "/dashboard/donations", icon: HeartHandshake, label: "Dons" },
     { href: "/dashboard/sponsorships", icon: Building, label: "Mécénat", adminOnly: true },
-    { href: "/dashboard/analytics", icon: LineChart, label: "Statistiques" },
+    { href: "/dashboard/analytics", icon: LineChart, label: "Statistiques", adminOnly: true },
 ]
 
 export function AppNav() {
@@ -126,7 +126,7 @@ export function AppNav() {
                     <Link href="/dashboard/reports" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/reports') || pathname.includes('/dashboard/reports')) && 'bg-sidebar-accent')}>
                         Rapports
                     </Link>
-                    <Link href="/dashboard/events" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/events') || pathname.includes('/dashboard/events')) && 'bg-sidebar-accent')}>
+                    <Link href="/events" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/events') || pathname.includes('/dashboard/events')) && 'bg-sidebar-accent')}>
                         Évènements
                     </Link>
                 </CollapsibleContent>
