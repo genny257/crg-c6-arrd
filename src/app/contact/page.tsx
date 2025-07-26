@@ -6,10 +6,46 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, Loader2 } from "lucide-react";
 import Image from "next/image";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useToast } from "@/hooks/use-toast";
+import * as React from "react";
+
+const contactSchema = z.object({
+  name: z.string().min(1, "Le nom est requis."),
+  email: z.string().email("L'adresse e-mail est invalide."),
+  subject: z.string().min(1, "Le sujet est requis."),
+  message: z.string().min(10, "Le message doit contenir au moins 10 caractères."),
+});
+
+type ContactFormValues = z.infer<typeof contactSchema>;
 
 export default function ContactPage() {
+  const { toast } = useToast();
+  const form = useForm<ContactFormValues>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    },
+  });
+
+  const onSubmit = async (data: ContactFormValues) => {
+    // TODO: Implement API call to a new /api/contact endpoint
+    console.log("Form data submitted:", data);
+    toast({
+      title: "Message envoyé !",
+      description: "Nous avons bien reçu votre message et nous vous répondrons bientôt.",
+    });
+    form.reset();
+  };
+
   return (
     <div className="grid md:grid-cols-2 gap-12">
       <div className="space-y-8">
@@ -21,27 +57,68 @@ export default function ContactPage() {
         </div>
         <Card>
             <CardContent className="p-6">
-                 <form className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Nom complet</Label>
-                            <Input id="name" placeholder="Votre nom complet" />
+                 <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                             <FormField
+                                control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Nom complet</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Votre nom complet" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Adresse e-mail</FormLabel>
+                                    <FormControl>
+                                        <Input type="email" placeholder="nom@exemple.com" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Adresse e-mail</Label>
-                            <Input id="email" type="email" placeholder="nom@exemple.com" />
-                        </div>
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="subject">Sujet</Label>
-                        <Input id="subject" placeholder="Sujet de votre message" />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="message">Message</Label>
-                        <Textarea id="message" placeholder="Écrivez votre message ici..." rows={5} />
-                    </div>
-                    <Button type="submit" className="w-full">Envoyer le message</Button>
-                </form>
+                        <FormField
+                            control={form.control}
+                            name="subject"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Sujet</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Sujet de votre message" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="message"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Message</FormLabel>
+                                <FormControl>
+                                    <Textarea placeholder="Écrivez votre message ici..." rows={5} {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                            {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Envoyer le message
+                        </Button>
+                    </form>
+                </Form>
             </CardContent>
         </Card>
       </div>
