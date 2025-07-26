@@ -20,6 +20,12 @@ const alegreya = Alegreya({
 export const metadata: Metadata = {
   title: 'Comité-6-Arrondissement',
   description: 'Application de la Croix-Rouge Gabonaise pour la gestion des volontaires, missions et dons.',
+  manifest: '/site.webmanifest',
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
 };
 
 export default function RootLayout({
