@@ -1,4 +1,6 @@
 
+export type EventStatus = 'UPCOMING' | 'PAST' | 'CANCELLED';
+
 export interface Event {
   id: string;
   title: string;
@@ -7,6 +9,8 @@ export interface Event {
   description: string;
   image?: string;
   imageHint?: string;
-  status: 'À venir' | 'Terminé' | 'Annulé';
+  status: EventStatus;
   href?: string;
+  createdAt: string;
+  updatedAt: string;
 }

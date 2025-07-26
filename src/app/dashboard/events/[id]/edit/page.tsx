@@ -23,7 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
-import type { Event } from "@/types/event";
+import type { Event, EventStatus } from "@/types/event";
 
 const eventSchema = z.object({
   title: z.string().min(1, "Le titre est requis."),
@@ -32,17 +32,23 @@ const eventSchema = z.object({
   date: z.date({ required_error: "La date de l'événement est requise." }),
   image: z.string().url("L'URL de l'image n'est pas valide.").optional().or(z.literal('')),
   imageHint: z.string().optional(),
-  status: z.enum(['À venir', 'Terminé', 'Annulé']),
+  status: z.enum(['UPCOMING', 'PAST', 'CANCELLED']),
 });
 
 type EventFormValues = z.infer<typeof eventSchema>;
+
+const statusText: Record<EventStatus, string> = {
+  UPCOMING: "À venir",
+  PAST: "Terminé",
+  CANCELLED: "Annulé",
+};
 
 export default function EditEventPage() {
   const router = useRouter();
   const params = useParams();
   const { id } = params;
   const { toast } = useToast();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, token } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [pageLoading, setPageLoading] = React.useState(true);
 
@@ -51,7 +57,7 @@ export default function EditEventPage() {
   });
 
   React.useEffect(() => {
-    if (typeof id !== 'string') return;
+    if (typeof id !== 'string' || !token) return;
     const fetchEvent = async () => {
         setPageLoading(true);
         try {
@@ -69,16 +75,21 @@ export default function EditEventPage() {
             setPageLoading(false);
         }
     };
-    fetchEvent();
-  }, [id, form, router, toast]);
+    if (token) {
+        fetchEvent();
+    }
+  }, [id, form, router, toast, token]);
 
   const onSubmit = async (data: EventFormValues) => {
-    if(typeof id !== 'string') return;
+    if(typeof id !== 'string' || !token) return;
     setIsSubmitting(true);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
         body: JSON.stringify(data),
       });
       if (!response.ok) throw new Error("La mise à jour a échoué.");
@@ -138,13 +149,13 @@ export default function EditEventPage() {
                     <ArrowLeft className="h-4 w-4" />
                 </Link>
             </Button>
-            <h1 className="text-3xl font-headline font-bold">Modifier l&apos;Événement</h1>
+            <h1 className="text-3xl font-headline font-bold">Modifier l'Événement</h1>
         </div>
       
         <Card>
             <CardHeader>
-                <CardTitle>Informations de l&apos;événement</CardTitle>
-                <CardDescription>Mettez à jour les détails de l&apos;événement ci-dessous.</CardDescription>
+                <CardTitle>Informations de l'événement</CardTitle>
+                <CardDescription>Mettez à jour les détails de l'événement ci-dessous.</CardDescription>
             </CardHeader>
             <CardContent>
             <Form {...form}>
@@ -154,7 +165,7 @@ export default function EditEventPage() {
                         name="title"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Titre de l&apos;événement</FormLabel>
+                            <FormLabel>Titre de l'événement</FormLabel>
                             <FormControl>
                             <Input placeholder="Ex: Grande Collecte de Sang" {...field} />
                             </FormControl>
@@ -180,7 +191,7 @@ export default function EditEventPage() {
                         name="date"
                         render={({ field }) => (
                             <FormItem className="flex flex-col">
-                            <FormLabel>Date de l&apos;événement</FormLabel>
+                            <FormLabel>Date de l'événement</FormLabel>
                             <Popover>
                                 <PopoverTrigger asChild>
                                 <FormControl>
@@ -232,7 +243,7 @@ export default function EditEventPage() {
                         name="status"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Statut de l&apos;événement</FormLabel>
+                                <FormLabel>Statut de l'événement</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                         <SelectTrigger>
@@ -240,9 +251,9 @@ export default function EditEventPage() {
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        <SelectItem value="À venir">À venir</SelectItem>
-                                        <SelectItem value="Terminé">Terminé</SelectItem>
-                                        <SelectItem value="Annulé">Annulé</SelectItem>
+                                      {Object.entries(statusText).map(([key, value]) => (
+                                        <SelectItem key={key} value={key}>{value}</SelectItem>
+                                      ))}
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -254,7 +265,7 @@ export default function EditEventPage() {
                         name="image"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>URL de l&apos;image de couverture</FormLabel>
+                            <FormLabel>URL de l'image de couverture</FormLabel>
                             <FormControl>
                             <Input type="url" placeholder="https://exemple.com/image.png" {...field} />
                             </FormControl>
@@ -267,7 +278,7 @@ export default function EditEventPage() {
                         name="imageHint"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Indice pour l&apos;image (IA)</FormLabel>
+                            <FormLabel>Indice pour l'image (IA)</FormLabel>
                             <FormControl>
                             <Input placeholder="Ex: 'aide humanitaire'" {...field} />
                             </FormControl>

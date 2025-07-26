@@ -10,13 +10,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import type { Event } from "@/types/event";
+import type { Event, EventStatus } from "@/types/event";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
+const statusText: Record<EventStatus, string> = {
+  UPCOMING: "À venir",
+  PAST: "Terminé",
+  CANCELLED: "Annulé",
+};
+
 export default function EventsPage() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin' || user?.role === 'ADMIN' || user?.role === 'SUPERADMIN';
   const [events, setEvents] = React.useState<Event[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -33,7 +39,7 @@ export default function EventsPage() {
             
             // On the public page, only admins see cancelled events
             if (!isAdmin) {
-                eventsData = eventsData.filter(e => e.status !== 'Annulé');
+                eventsData = eventsData.filter(e => e.status !== 'CANCELLED');
             }
             setEvents(eventsData);
         } catch (error) {
@@ -53,13 +59,16 @@ export default function EventsPage() {
   }, [fetchEvents]);
 
   const handleDelete = async (id: string) => {
-    if (!id) return;
+    if (!id || !token) return;
 
     const originalEvents = [...events];
     setEvents(events.filter(e => e.id !== id));
 
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${id}`, { method: 'DELETE' });
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${id}`, { 
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
         if (!response.ok) throw new Error("La suppression a échoué.");
         toast({ title: "Succès", description: "L'événement a été supprimé." });
     } catch(error) {
@@ -68,9 +77,9 @@ export default function EventsPage() {
     }
   };
 
-  const toggleStatus = async (id: string, currentStatus: Event['status']) => {
-    if (!id) return;
-    const newStatus = currentStatus === 'Annulé' ? 'À venir' : 'Annulé';
+  const toggleStatus = async (id: string, currentStatus: EventStatus) => {
+    if (!id || !token) return;
+    const newStatus: EventStatus = currentStatus === 'CANCELLED' ? 'UPCOMING' : 'CANCELLED';
     
     const originalEvents = [...events];
     setEvents(events.map(e => e.id === id ? { ...e, status: newStatus } : e));
@@ -78,11 +87,14 @@ export default function EventsPage() {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}` 
+            },
             body: JSON.stringify({ status: newStatus }),
         });
         if (!response.ok) throw new Error("La mise à jour a échoué.");
-        toast({ title: "Succès", description: `L'événement est maintenant marqué comme ${newStatus.toLowerCase()}.` });
+        toast({ title: "Succès", description: `L'événement est maintenant marqué comme ${statusText[newStatus].toLowerCase()}.` });
         fetchEvents();
     } catch (error) {
         toast({ title: "Erreur", description: "La mise à jour a échoué.", variant: "destructive" });
@@ -142,7 +154,7 @@ export default function EventsPage() {
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => toggleStatus(event.id, event.status)}>
-                      {event.status !== 'Annulé' ? (
+                      {event.status !== 'CANCELLED' ? (
                         <>
                           <XCircle className="mr-2 h-4 w-4" />
                           <span>Annuler</span>
@@ -185,9 +197,9 @@ export default function EventsPage() {
                 <CardDescription>{event.description}</CardDescription>
               </CardContent>
               <CardFooter className="p-6 pt-0 flex justify-between items-center">
-                <Button disabled={event.status === 'Annulé' || event.status === 'Terminé'}>S&apos;inscrire</Button>
-                {event.status === 'Annulé' && <span className="text-xs font-semibold text-destructive">Annulé</span>}
-                {event.status === 'Terminé' && <span className="text-xs font-semibold text-gray-500">Terminé</span>}
+                <Button disabled={event.status === 'CANCELLED' || event.status === 'PAST'}>S'inscrire</Button>
+                {event.status === 'CANCELLED' && <span className="text-xs font-semibold text-destructive">{statusText[event.status]}</span>}
+                {event.status === 'PAST' && <span className="text-xs font-semibold text-gray-500">{statusText[event.status]}</span>}
               </CardFooter>
             </Card>
           ))

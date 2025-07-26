@@ -1,18 +1,20 @@
 // src/services/event.service.ts
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Event, EventStatus } from '@prisma/client';
 const prisma = new PrismaClient();
 
-export const getAllEvents = async () => {
+type EventData = Omit<Event, 'id' | 'createdAt' | 'updatedAt'>;
+
+export const getAllEvents = async (): Promise<Event[]> => {
     return await prisma.event.findMany({ orderBy: { date: 'desc' } });
 };
 
-export const getFeaturedEvents = async () => {
+export const getFeaturedEvents = async (): Promise<Event[]> => {
     return await prisma.event.findMany({
         where: {
             image: {
                 not: null,
             },
-            status: 'UPCOMING',
+            status: EventStatus.UPCOMING,
         },
         orderBy: {
             date: 'asc',
@@ -21,18 +23,18 @@ export const getFeaturedEvents = async () => {
     });
 };
 
-export const createEvent = async (data: any) => {
+export const createEvent = async (data: EventData): Promise<Event> => {
     return await prisma.event.create({ data });
 };
 
-export const getEventById = async (id: string) => {
+export const getEventById = async (id: string): Promise<Event | null> => {
     return await prisma.event.findUnique({ where: { id } });
 };
 
-export const updateEvent = async (id: string, data: any) => {
+export const updateEvent = async (id: string, data: Partial<EventData>): Promise<Event> => {
     return await prisma.event.update({ where: { id }, data });
 };
 
-export const deleteEvent = async (id: string) => {
+export const deleteEvent = async (id: string): Promise<Event> => {
     return await prisma.event.delete({ where: { id } });
 };
