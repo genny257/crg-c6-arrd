@@ -2,7 +2,7 @@
 import { ai } from '../../genkit.config';
 import { MissionStatus, User, Post, Skill } from '@prisma/client';
 import { z } from 'zod';
-import prisma from '@/lib/prisma';
+import prisma from '../lib/prisma';
 
 // Schemas
 const MessageSchema = z.object({
