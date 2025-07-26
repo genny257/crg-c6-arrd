@@ -1,11 +1,12 @@
 // src/services/ai.service.ts
 import { ai } from '../../genkit.config';
-import { MissionStatus, User, Post, Skill } from '@prisma/client';
+import { MissionStatus } from '@prisma/client';
 import { z } from 'zod';
 import prisma from '../lib/prisma';
+import type { GenerateOptions } from 'genkit';
 
 // Schemas
-const MessageSchema = z.object({
+export const MessageSchema = z.object({
     role: z.enum(['user', 'model']),
     content: z.string(),
 });
@@ -106,7 +107,7 @@ const chatbotFlow = ai.defineFlow(
             config: {
                 temperature: 0.5,
             },
-        });
+        } as GenerateOptions<any>);
 
         return llmResponse.text;
     }
@@ -123,11 +124,11 @@ const generateBlogPostFlow = ai.defineFlow(
         const llmResponse = await ai.generate({
             model: 'googleai/gemini-1.5-pro',
             prompt: `Rédige un article de blog engageant et informatif sur le sujet suivant : "${topic}". L'article doit être adapté pour l'organisation de la Croix-Rouge Gabonaise. Adopte un ton à la fois professionnel, humain et inspirant. L'article doit être structuré avec des titres et des paragraphes clairs, en utilisant le format Markdown.`,
-            config: {
-                temperature: 0.7,
-            },
             output: {
                 schema: BlogPostSchema,
+            },
+            config: {
+                temperature: 0.7,
             },
         });
         return llmResponse.output!;
@@ -158,7 +159,7 @@ const missionAssignmentFlow = ai.defineFlow(
             Voici une liste de volontaires disponibles avec leurs compétences:
             ${allVolunteers.map(v => `- ${v.firstName} ${v.lastName}: ${v.skills.map(s => s.name).join(', ')}`).join('\n')}
 
-            En te basant sur la description et les compétences requises, suggère les 3 meilleurs volontaires pour cette mission.
+            En te basant sur la description et les compétences requises, suggère les 3 meilleurs volontaires pour cette mission. Pour chaque volontaire, fournis son nom complet, une brève justification d'une phrase et un score de pertinence entre 0 et 1.
         `;
 
         const llmResponse = await ai.generate({

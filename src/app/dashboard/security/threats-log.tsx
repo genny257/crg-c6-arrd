@@ -27,7 +27,7 @@ const columns: ColumnDef<ThreatLog>[] = [
     },
     { accessorKey: "ip", header: "IP" },
     { accessorKey: "method", header: "Méthode" },
-    { accessorKey: "path", header: "Chemin" },
+    { accessorKey: "path", header: "Chemin", cell: ({ row }) => <div className="max-w-[300px] truncate">{decodeURIComponent(row.original.path)}</div> },
     { 
         accessorKey: "statusCode", 
         header: "Statut",

@@ -17,6 +17,8 @@ import sponsorshipRoutes from './routes/sponsorship.routes';
 import adminRoutes from './routes/admin.routes';
 import volunteerRoutes from './routes/volunteer.routes';
 import teamRoutes from './routes/team.routes';
+import contactRoutes from './routes/contact.routes';
+import aiRoutes from './routes/ai.routes';
 import { loggingMiddleware } from './middleware/logging';
 
 // Charger les variables d'environnement
@@ -66,7 +68,7 @@ const swaggerOptions = {
         bearerAuth: []
     }]
   },
-  apis: ['./src/routes/*.ts'],
+  apis: ['./src/routes/*.ts', './src/controllers/*.ts'],
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
@@ -101,6 +103,8 @@ app.use('/api', sponsorshipRoutes);
 app.use('/api', teamRoutes);
 app.use('/api', adminRoutes);
 app.use('/api', volunteerRoutes);
+app.use('/api', contactRoutes);
+app.use('/api', aiRoutes);
 
 // Route de base pour vérifier que le serveur fonctionne
 app.get('/', (req, res) => {

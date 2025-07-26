@@ -40,7 +40,7 @@ const columns: ColumnDef<TrafficLog>[] = [
         accessorKey: "statusCode", 
         header: "Statut",
         cell: ({ row }) => (
-            <Badge className={`${getStatusColor(row.original.statusCode)} text-white`}>{row.original.statusCode}</Badge>
+            <Badge className={`${getStatusColor(row.original.statusCode)} text-white hover:${getStatusColor(row.original.statusCode)}`}>{row.original.statusCode}</Badge>
         )
     },
 ];

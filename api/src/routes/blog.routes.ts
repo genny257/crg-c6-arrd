@@ -37,36 +37,6 @@ router.get('/blog/featured', blogController.getFeaturedBlogPosts);
 
 /**
  * @swagger
- * /blog/generate:
- *   post:
- *     summary: Generate a blog post from a topic using AI
- *     tags: [Blog]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - topic
- *             properties:
- *               topic:
- *                 type: string
- *                 description: The topic for the AI to write about.
- *     responses:
- *       200:
- *         description: The generated blog post content.
- *       400:
- *         description: Validation failed.
- *       500:
- *         description: Server error
- */
-router.post('/blog/generate', protect, isAdmin, blogController.generateBlogPost);
-
-/**
- * @swagger
  * /blog:
  *   get:
  *     summary: Get all blog posts

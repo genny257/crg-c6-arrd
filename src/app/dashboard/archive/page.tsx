@@ -43,16 +43,6 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 
-// Mock data
-const mockArchive: ArchiveItem[] = [
-    { id: '1', name: 'Rapports Annuels', type: 'folder', parentId: null, createdAt: '2024-01-01T10:00:00Z' },
-    { id: '2', name: 'Photos Missions', type: 'folder', parentId: null, createdAt: '2024-02-01T10:00:00Z' },
-    { id: '3', name: 'Budget 2024.xlsx', type: 'spreadsheet', parentId: null, createdAt: '2024-03-01T10:00:00Z' },
-    { id: '4', name: 'Rapport 2023.pdf', type: 'pdf', parentId: '1', createdAt: '2024-01-05T10:00:00Z' },
-    { id: '5', name: 'Mission Yumbi - Mai 2024', type: 'folder', parentId: '2', createdAt: '2024-05-01T10:00:00Z' },
-];
-
-
 export default function ArchivePage() {
   const [items, setItems] = React.useState<ArchiveItem[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -63,26 +53,32 @@ export default function ArchivePage() {
   const [isCreateFolderDialogOpen, setIsCreateFolderDialogOpen] = React.useState(false);
   
   const { toast } = useToast();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, token } = useAuth();
   const router = useRouter();
 
   const fetchItems = React.useCallback(async (folderId: string | null) => {
     setLoading(true);
+    // TODO: This should be an API call in the future
+    // For now, we simulate an empty result as the backend doesn't exist yet.
     try {
-      // TODO: Replace with API call to /api/archive?parentId={folderId}
-      const itemsData = mockArchive.filter(item => item.parentId === folderId);
-      setItems(itemsData);
+        if (!token) return;
+        // const response = await fetch(`/api/archive?parentId=${folderId}`, { headers: { 'Authorization': `Bearer ${token}` }});
+        // const data = await response.json();
+        // setItems(data);
+        setItems([]);
     } catch (error) {
       console.error("Error fetching archive items:", error);
       toast({ title: "Erreur", description: "Impossible de charger les archives.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, token]);
   
   React.useEffect(() => {
-    fetchItems(currentFolderId);
-  }, [currentFolderId, fetchItems]);
+    if (token) {
+        fetchItems(currentFolderId);
+    }
+  }, [currentFolderId, fetchItems, token]);
 
   const handleCreateFolder = async () => {
     if (!newFolderName.trim()) {
@@ -91,8 +87,9 @@ export default function ArchivePage() {
     }
     try {
       // TODO: Replace with API call to POST /api/archive
-      toast({ title: "Succès", description: "Dossier créé avec succès (simulation)." });
-      fetchItems(currentFolderId); // Refresh list
+      toast({ title: "Fonctionnalité à venir", description: "La création de dossiers sera bientôt disponible." });
+      // After API call is successful:
+      // fetchItems(currentFolderId); // Refresh list
     } catch (error) {
         console.error("Error creating folder:", error);
         toast({ title: "Erreur", description: "La création du dossier a échoué.", variant: "destructive" });

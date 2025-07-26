@@ -14,38 +14,42 @@ import { useToast } from "@/hooks/use-toast";
 import type { Volunteer } from "@/types/volunteer";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Mock Data
-const mockProfile: Volunteer = {
-    id: 'user1',
-    firstName: "Jean",
-    lastName: "Volontaire",
-    email: "user@example.com",
-    phone: "061234567",
-    skills: ["Secourisme", "Logistique"],
-    availability: ["Week-end"],
-    status: 'Actif',
-    profession: 'Comptable',
-    address: '123 Rue de la Paix',
-    birthDate: '1990-01-15T00:00:00Z',
-    createdAt: '2023-01-10T00:00:00Z',
-    termsAccepted: true,
-};
-
 export default function ProfilePage() {
-    const { user, loading: authLoading } = useAuth();
+    const { user, loading: authLoading, token } = useAuth();
     const { toast } = useToast();
-    const [profile, setProfile] = React.useState<Volunteer | null>(null);
+    const [profile, setProfile] = React.useState<any | null>(null);
     const [loading, setLoading] = React.useState(true);
     const [isSaving, setIsSaving] = React.useState(false);
     const [newSkill, setNewSkill] = React.useState("");
 
     React.useEffect(() => {
         const fetchProfile = async () => {
-            if (user?.email) {
-                 // TODO: Replace with API call to /api/volunteers/me or /api/volunteers?email={user.email}
-                 setProfile(mockProfile);
+            if (user?.id && token) {
+                 setLoading(true);
+                 try {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch profile");
+                    }
+                    const data = await response.json();
+                    
+                    const transformedData = {
+                        ...data,
+                        skills: data.skills.map((s: any) => s.name)
+                    };
+                    setProfile(transformedData);
+
+                 } catch (error) {
+                     console.error("Error fetching profile:", error);
+                     toast({ title: "Erreur", description: "Impossible de charger votre profil.", variant: "destructive" });
+                 } finally {
+                    setLoading(false);
+                 }
             }
-            setLoading(false);
         };
 
         if (!authLoading && user) {
@@ -53,7 +57,7 @@ export default function ProfilePage() {
         } else if (!authLoading && !user) {
             setLoading(false);
         }
-    }, [user, authLoading]);
+    }, [user, authLoading, token, toast]);
 
     const handleFieldChange = (field: keyof Volunteer, value: any) => {
         if (profile) {
@@ -71,7 +75,7 @@ export default function ProfilePage() {
 
     const handleRemoveSkill = (skillToRemove: string) => {
         if (profile) {
-            const updatedSkills = profile.skills?.filter(skill => skill !== skillToRemove);
+            const updatedSkills = profile.skills?.filter((skill: string) => skill !== skillToRemove);
             handleFieldChange('skills', updatedSkills);
         }
     };
@@ -81,20 +85,37 @@ export default function ProfilePage() {
             const currentAvailability = profile.availability || [];
             const newAvailability = checked
                 ? [...currentAvailability, day]
-                : currentAvailability.filter(d => d !== day);
+                : currentAvailability.filter((d: string) => d !== day);
             handleFieldChange('availability', newAvailability);
         }
     };
 
     const handleSaveChanges = async () => {
-        if (!profile?.id) return;
+        if (!profile?.id || !token) return;
         setIsSaving(true);
         try {
-            // TODO: Replace with API call to PUT /api/volunteers/{id}
-            console.log("Saving profile data:", profile);
+            const payload = {
+                phone: profile.phone,
+                skills: profile.skills,
+                availability: profile.availability,
+            }
+
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to update profile");
+            }
+            
             toast({
                 title: "Succès",
-                description: "Votre profil a été mis à jour (simulation).",
+                description: "Votre profil a été mis à jour.",
             });
         } catch (error) {
             console.error("Error updating profile:", error);
@@ -170,7 +191,7 @@ export default function ProfilePage() {
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="phone">Téléphone</Label>
-                                <Input id="phone" type="tel" value={profile.phone} onChange={e => handleFieldChange('phone', e.target.value)} />
+                                <Input id="phone" type="tel" value={profile.phone || ''} onChange={e => handleFieldChange('phone', e.target.value)} />
                             </div>
                         </CardContent>
                     </Card>
@@ -185,7 +206,7 @@ export default function ProfilePage() {
                             <div className="grid gap-2">
                                 <Label>Compétences</Label>
                                 <div className="flex flex-wrap gap-2">
-                                    {profile.skills?.map(skill => (
+                                    {profile.skills?.map((skill: string) => (
                                         <Badge key={skill} variant="secondary" className="flex items-center gap-1">
                                             {skill}
                                             <button className="rounded-full hover:bg-muted-foreground/20 p-0.5" onClick={() => handleRemoveSkill(skill)}>

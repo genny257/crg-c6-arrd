@@ -61,8 +61,8 @@ const MapComponent = ({ missions }: { missions: Mission[] }) => {
     return (
         <MapContainer center={[0.3924, 9.4536]} zoom={6} style={{ height: '100%', width: '100%', borderRadius: 'inherit' }}>
             <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             />
             {missionsWithCoords.map(mission => (
                  <Marker key={mission.id} position={mission.coords!}>
@@ -250,7 +250,7 @@ export default function MissionsPage() {
                         <CardTitle>Carte des Missions</CardTitle>
                         <CardDescription>Visualisation géographique des missions.</CardDescription>
                     </CardHeader>
-                    <CardContent className="h-[calc(100%-4rem)]">
+                    <CardContent className="h-[calc(100%-4rem)] p-0">
                          {loading ? <Skeleton className="h-full w-full" /> : <MapComponent missions={missions} />}
                     </CardContent>
                 </Card>

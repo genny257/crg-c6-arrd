@@ -223,7 +223,7 @@ const VolunteerSuggestions = ({ missionId }: { missionId: string }) => {
         setLoading(true);
         setSuggestions([]);
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions/${missionId}/suggest-volunteers`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/missions/${missionId}/suggest-volunteers`, {
                 method: 'POST',
                 headers: { 
                     'Authorization': `Bearer ${token}`,

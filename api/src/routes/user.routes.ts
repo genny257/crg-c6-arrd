@@ -1,6 +1,7 @@
 // src/routes/user.routes.ts
 import { Router } from 'express';
-import { register, login, getUsers } from '../controllers/user.controller';
+import { register, login, getUsers, getMyProfile, updateMyProfile } from '../controllers/user.controller';
+import { protect } from '../middleware/auth';
 
 const router = Router();
 
@@ -94,6 +95,55 @@ router.post('/login', login);
 
 /**
  * @swagger
+ * /users/me:
+ *   get:
+ *     summary: Get the profile of the currently logged-in user
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: The user's profile data.
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *   put:
+ *     summary: Update the profile of the currently logged-in user
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               phone:
+ *                 type: string
+ *               skills:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               availability:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: The updated user profile.
+ *       400:
+ *         description: Invalid data provided.
+ *       401:
+ *         description: Unauthorized
+ */
+router.route('/users/me')
+    .get(protect, getMyProfile)
+    .put(protect, updateMyProfile);
+
+/**
+ * @swagger
  * /users:
  *   get:
  *     summary: Retrieve a list of all users
@@ -124,5 +174,6 @@ router.post('/login', login);
  *         description: Error fetching users
  */
 router.get('/users', getUsers);
+
 
 export default router;

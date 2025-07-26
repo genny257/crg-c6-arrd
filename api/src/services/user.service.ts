@@ -94,4 +94,46 @@ export const getAllUsers = async (): Promise<Partial<User>[]> => {
             createdAt: true,
         }
     });
-}
+};
+
+/**
+ * Retrieves a full user profile by ID.
+ * @param {string} userId - The ID of the user.
+ * @returns {Promise<any | null>} The full user profile with related data.
+ */
+export const getUserProfile = async (userId: string) => {
+    return await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+            skills: true,
+            profession: true,
+            educationLevel: true,
+        }
+    });
+};
+
+/**
+ * Updates a user's profile information.
+ * @param {string} userId - The ID of the user to update.
+ * @param {any} data - The data to update.
+ * @returns {Promise<User>} The updated user object.
+ */
+export const updateUserProfile = async (userId: string, data: any): Promise<User> => {
+    const { skills, ...restData } = data;
+    
+    return await prisma.user.update({
+        where: { id: userId },
+        data: {
+            ...restData,
+            ...(skills && {
+                skills: {
+                    set: [], // Disconnect all existing skills first
+                    connectOrCreate: skills.map((name: string) => ({
+                        where: { name },
+                        create: { name },
+                    })),
+                },
+            }),
+        },
+    });
+};

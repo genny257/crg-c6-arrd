@@ -71,6 +71,7 @@ export default function ReportsPage() {
 
   const toggleVisibility = async (id: string, currentVisibility: boolean) => {
     if (!id || !token) return;
+    
     const originalReports = [...reports];
     setReports(reports.map(r => r.id === id ? { ...r, visible: !r.visible } : r));
 
@@ -83,7 +84,11 @@ export default function ReportsPage() {
           },
           body: JSON.stringify({ visible: !currentVisibility })
       });
-      if (!response.ok) throw new Error("La mise à jour a échoué.");
+      if (!response.ok) {
+        const errorBody = await response.text();
+        console.error("Error body:", errorBody);
+        throw new Error("La mise à jour a échoué.");
+      }
       toast({ title: "Succès", description: `Le rapport est maintenant ${!currentVisibility ? 'visible' : 'masqué'}.` });
     } catch (error) {
         setReports(originalReports);

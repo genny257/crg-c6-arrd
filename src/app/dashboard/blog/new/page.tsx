@@ -63,7 +63,7 @@ export default function NewBlogPostPage() {
     }
     setIsGenerating(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/generate`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/blog/generate`, {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',

@@ -17,10 +17,7 @@ import {
   Network,
   ChevronDown,
   Newspaper,
-  CalendarClock,
-  CalendarDays,
   Archive,
-  FileText,
   Building,
   Shield,
 } from "lucide-react"
@@ -55,13 +52,13 @@ const mainNavItems = [
 const reportsNavItems = [
     { href: "/dashboard/donations", icon: HeartHandshake, label: "Dons" },
     { href: "/dashboard/sponsorships", icon: Building, label: "Mécénat", adminOnly: true },
-    { href: "/dashboard/analytics", icon: LineChart, label: "Statistiques" },
+    { href: "/dashboard/analytics", icon: LineChart, label: "Statistiques", adminOnly: true },
 ]
 
 export function AppNav() {
   const pathname = usePathname()
   const { user, logout } = useAuth();
-  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin' || user?.role === 'SUPERADMIN' || user?.role === 'ADMIN';
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin' || user?.role === 'ADMIN' || user?.role === 'SUPERADMIN';
   const isSuperAdmin = user?.role === 'SUPERADMIN';
   const [isMediaOpen, setIsMediaOpen] = React.useState(false);
 
@@ -86,9 +83,7 @@ export function AppNav() {
     <>
       <SidebarHeader>
         <Link href="/" className="flex items-center gap-2 p-2">
-            <div className="relative h-10 w-10">
-                <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" fill style={{ objectFit: 'contain' }}/>
-            </div>
+            <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={40} height={40} style={{ objectFit: 'contain' }}/>
             <span className="font-headline text-lg group-data-[collapsible=icon]:hidden">
                 CRG-6-Arrond.
             </span>
@@ -100,7 +95,7 @@ export function AppNav() {
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild
-                isActive={pathname.startsWith(item.href)}
+                isActive={pathname.startsWith(item.href) && item.href !== '/dashboard' || pathname === '/dashboard' && item.href === '/dashboard'}
                 tooltip={item.label}
               >
                 <Link href={item.href}>
@@ -131,7 +126,7 @@ export function AppNav() {
                     <Link href="/dashboard/reports" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/reports') || pathname.includes('/dashboard/reports')) && 'bg-sidebar-accent')}>
                         Rapports
                     </Link>
-                    <Link href="/dashboard/events" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/events') || pathname.includes('/dashboard/events')) && 'bg-sidebar-accent')}>
+                    <Link href="/events" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", (pathname.includes('/events') || pathname.includes('/dashboard/events')) && 'bg-sidebar-accent')}>
                         Évènements
                     </Link>
                 </CollapsibleContent>

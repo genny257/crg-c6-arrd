@@ -18,18 +18,13 @@ const models = [
 ];
 
 models.forEach(model => {
-    // Handle the irregular plural of 'nationality' and force lowercase
-    let routeName;
-    if (model === 'nationality') {
-        routeName = 'nationalities';
-    } else {
-        // Force lowercase and add 's' for pluralization
-        routeName = `${model.toLowerCase()}s`;
-    }
+    // Handle the irregular plural of 'nationality'
+    const routeName = model === 'nationality' ? 'nationalities' : `${model}s`;
     
     router.get(`/${routeName}`, async (req: Request, res: Response) => {
         try {
-            const items = await (prisma as any)[model].findMany({
+            // @ts-ignore
+            const items = await prisma[model].findMany({
                 orderBy: {
                     name: 'asc'
                 }

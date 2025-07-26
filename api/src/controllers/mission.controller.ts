@@ -5,8 +5,8 @@ import * as aiService from '../services/ai.service';
 import { z } from 'zod';
 import { MissionStatus } from '@prisma/client';
 
-// Schéma de validation Zod pour les données de mission
-const missionSchema = z.object({
+// Base schema for mission data
+const missionDataSchema = z.object({
   title: z.string().min(3, "Le titre doit contenir au moins 3 caractères."),
   description: z.string().min(10, "La description est requise."),
   location: z.string().min(3, "Le lieu est requis."),
@@ -17,9 +17,17 @@ const missionSchema = z.object({
     message: "Date de fin invalide",
   }),
   status: z.nativeEnum(MissionStatus).optional().default(MissionStatus.PLANNED),
-  requiredSkills: z.array(z.string()).optional(),
+  requiredSkills: z.array(z.string()).optional().default([]),
   maxParticipants: z.number().int().positive().optional().nullable(),
-}).refine(data => new Date(data.endDate) >= new Date(data.startDate), {
+});
+
+// Schema for creation and updates with date refinement
+const missionSchema = missionDataSchema.refine(data => {
+    if (data.startDate && data.endDate) {
+        return new Date(data.endDate) >= new Date(data.startDate);
+    }
+    return true;
+}, {
     message: "La date de fin ne peut pas être antérieure à la date de début.",
     path: ["endDate"],
 });
@@ -63,6 +71,7 @@ export const createMission = async (req: Request, res: Response) => {
       ...validatedData,
       startDate: new Date(validatedData.startDate),
       endDate: new Date(validatedData.endDate),
+      maxParticipants: validatedData.maxParticipants ?? null,
     });
     res.status(201).json(newMission);
   } catch (error) {
@@ -78,12 +87,18 @@ export const createMission = async (req: Request, res: Response) => {
  */
 export const updateMission = async (req: Request, res: Response) => {
   try {
-    const validatedData = missionSchema.partial().parse(req.body);
-    const updatedData = {
-        ...validatedData,
-        ...(validatedData.startDate && { startDate: new Date(validatedData.startDate) }),
-        ...(validatedData.endDate && { endDate: new Date(validatedData.endDate) }),
-    };
+    // We use .partial() to allow partial updates.
+    // The date conversion is handled inside the service.
+    const validatedData = missionDataSchema.partial().parse(req.body);
+    
+    // Convert string dates to Date objects if they exist
+    const updatedData: any = { ...validatedData };
+    if (validatedData.startDate) {
+        updatedData.startDate = new Date(validatedData.startDate);
+    }
+    if (validatedData.endDate) {
+        updatedData.endDate = new Date(validatedData.endDate);
+    }
 
     const updatedMission = await missionService.updateMission(req.params.id, updatedData);
     res.status(200).json(updatedMission);

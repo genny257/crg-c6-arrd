@@ -15,6 +15,7 @@ import { fr } from "date-fns/locale";
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { geocodeLocation } from "@/lib/locations";
 
 // Fix for default icon issue with webpack
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -50,37 +51,14 @@ const getEventTypeClass = (type: CalendarEvent['type']) => {
     }
 };
 
-// Mock geocoding function
-const geocodeLocation = (location: string): [number, number] | undefined => {
-    const locations: { [key: string]: [number, number] } = {
-        "Libreville": [0.3924, 9.4536],
-        "Siège du Comité, Libreville": [0.416, 9.46],
-        "Hôtel de ville": [0.390, 9.455],
-        "Port-Gentil": [-0.7193, 8.7815],
-        "Franceville": [-1.6333, 13.5833],
-        "Oyem": [1.5996, 11.5794],
-        "Moanda": [-1.565, 13.196],
-        "Lycée X": [0.45, 9.50],
-        "École Publique d'Ondogo": [0.5, 9.4]
-    };
-    const lowerCaseLocation = location.toLowerCase();
-    for (const key in locations) {
-        if (lowerCaseLocation.includes(key.toLowerCase())) {
-            return locations[key];
-        }
-    }
-    return undefined; // Default or undefined if not found
-};
-
-
 const MapComponent = ({ events }: { events: CalendarEvent[] }) => {
     const validEvents = events.filter(e => e.coords);
 
     return (
         <MapContainer center={[0.3924, 9.4536]} zoom={7} style={{ height: '100%', width: '100%', borderRadius: 'inherit' }}>
             <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             />
             {validEvents.map(event => (
                  <Marker key={event.id} position={event.coords!}>

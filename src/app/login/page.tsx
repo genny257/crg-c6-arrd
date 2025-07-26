@@ -43,14 +43,12 @@ export default function LoginPage() {
       <Card className="mx-auto max-w-sm w-full relative">
         <Link href="/" className="absolute top-4 left-4 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-5 w-5" />
-            <span className="sr-only">Retour à l&apos;accueil</span>
+            <span className="sr-only">Retour à l'accueil</span>
         </Link>
         <CardHeader>
           <div className="flex flex-col items-center justify-center mb-4 pt-8">
             <Link href="/" className="flex items-center justify-center gap-2">
-              <div className="relative h-12 w-12">
-                <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" fill style={{objectFit: 'contain'}} />
-              </div>
+               <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={48} height={48} style={{objectFit: 'contain'}} />
               <span className="mt-2 font-bold text-center">Croix-Rouge Gabonaise</span>
             </Link>
           </div>
@@ -100,7 +98,7 @@ export default function LoginPage() {
           <div className="mt-4 text-center text-sm">
             Pas encore de compte ?{" "}
             <Link href="/register" className="underline">
-              S&apos;inscrire
+              S'inscrire
             </Link>
           </div>
         </CardContent>

@@ -27,7 +27,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
 
 
 const donationAmounts = [
-    { amount: 2000, label: "2 000 FCFA", description: "Fournit un kit d&apos;hygiène de base." },
+    { amount: 2000, label: "2 000 FCFA", description: "Fournit un kit d'hygiène de base." },
     { amount: 5000, label: "5 000 FCFA", description: "Permet un soin de santé essentiel pour un enfant." },
     { amount: 10000, label: "10 000 FCFA", description: "Nourrit une famille pendant une semaine." },
 ];
@@ -50,7 +50,7 @@ export default function DonationPage() {
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Button asChild>
-                                    <Link href="/">Retour à l&apos;accueil</Link>
+                                    <Link href="/">Retour à l'accueil</Link>
                                 </Button>
                                 <Button variant="secondary" onClick={() => setIsSuccess(false)}>Faire un autre don</Button>
                             </div>
@@ -100,7 +100,7 @@ export default function DonationPage() {
                                 <CardTitle className="font-headline text-xl">À quoi serviront vos dons ?</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <p>Grâce à votre générosité, nous pouvons fournir une aide vitale : soins médicaux, nourriture pour les familles, abris d&apos;urgence et soutien psychosocial aux plus vulnérables.</p>
+                                <p>Grâce à votre générosité, nous pouvons fournir une aide vitale : soins médicaux, nourriture pour les familles, abris d'urgence et soutien psychosocial aux plus vulnérables.</p>
                                 <div className="space-y-2">
                                     {donationAmounts.map(item => (
                                          <p key={item.amount} className="text-sm">
@@ -130,7 +130,7 @@ export default function DonationPage() {
                                 <Link href="/mecenat" className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted">
                                     <Building className="h-6 w-6 text-primary"/>
                                     <div>
-                                        <p className="font-semibold">Mécénat d&apos;entreprise</p>
+                                        <p className="font-semibold">Mécénat d'entreprise</p>
                                         <p className="text-sm text-muted-foreground">Engagez votre entreprise à nos côtés.</p>
                                     </div>
                                 </Link>

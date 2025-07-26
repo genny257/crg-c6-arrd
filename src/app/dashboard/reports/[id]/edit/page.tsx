@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -58,7 +58,9 @@ export default function EditReportPage() {
             setPageLoading(false);
         }
     };
-    fetchReport();
+    if (token) {
+        fetchReport();
+    }
   }, [id, form, router, toast, token]);
 
   const onSubmit = async (data: ReportFormValues) => {
@@ -193,6 +195,7 @@ export default function EditReportPage() {
                 />
                     
                     <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {isSubmitting ? "Enregistrement..." : "Enregistrer les modifications"}
                     </Button>
                 </form>

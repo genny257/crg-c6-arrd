@@ -2,7 +2,7 @@
 import { Request, Response } from 'express';
 import Stripe from 'stripe';
 import * as donationService from '../services/donation.service';
-import { DonationStatus } from '@prisma/client';
+import { DonationStatus, DonationMethod, DonationType } from '@prisma/client';
 import { z } from 'zod';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
@@ -13,8 +13,8 @@ const donationSchema = z.object({
   amount: z.number().positive("Le montant doit être positif."),
   name: z.string().min(2, "Le nom est requis."),
   email: z.string().email("L'adresse e-mail est invalide."),
-  method: z.nativeEnum(['Mobile Money', 'Carte_Bancaire']),
-  type: z.nativeEnum(['Ponctuel', 'Mensuel']),
+  method: z.enum(['Mobile_Money', 'Carte_Bancaire']),
+  type: z.enum(['Ponctuel', 'Mensuel']),
 });
 
 export const createDonation = async (req: Request, res: Response) => {
@@ -24,7 +24,11 @@ export const createDonation = async (req: Request, res: Response) => {
 
     // 1. Save the donation to your database with status 'PENDING'
     const donation = await donationService.createDonation({
-      ...validatedData,
+      name,
+      email,
+      amount,
+      type: type as DonationType,
+      method: method as DonationMethod,
       status: DonationStatus.PENDING,
     });
 

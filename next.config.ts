@@ -1,4 +1,39 @@
+
 import type {NextConfig} from 'next';
+
+const ContentSecurityPolicy = `
+  default-src 'self';
+  script-src 'self' 'unsafe-eval' 'unsafe-inline';
+  child-src 'self';
+  style-src 'self' 'unsafe-inline';
+  img-src * blob: data:;
+  media-src 'self';
+  connect-src *;
+  font-src 'self';
+`;
+
+const securityHeaders = [
+  {
+    key: 'Content-Security-Policy',
+    value: ContentSecurityPolicy.replace(/\s{2,}/g, ' ').trim()
+  },
+  {
+    key: 'X-Frame-Options',
+    value: 'SAMEORIGIN'
+  },
+  {
+    key: 'X-Content-Type-Options',
+    value: 'nosniff'
+  },
+  {
+    key: 'Referrer-Policy',
+    value: 'origin-when-cross-origin'
+  },
+   {
+    key: 'Permissions-Policy',
+    value: "camera=(), microphone=(), geolocation=(), payment=()"
+  }
+];
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -8,6 +43,15 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  async headers() {
+    return [
+      {
+        // Apply these headers to all routes in your application.
+        source: '/:path*',
+        headers: securityHeaders,
+      },
+    ]
+  },
   images: {
     remotePatterns: [
       {
@@ -16,9 +60,9 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-      {
+       {
         protocol: 'https',
-        hostname: 'firebasestudio.ai',
+        hostname: 'images.weserv.nl',
         port: '',
         pathname: '/**',
       },
@@ -32,4 +76,12 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const withPWA = require("@ducanh2912/next-pwa").default({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
+  register: true,
+  skipWaiting: true,
+});
+
+
+export default withPWA(nextConfig);

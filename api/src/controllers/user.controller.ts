@@ -5,6 +5,13 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 
+// Extends Request to include the user property from the auth middleware
+interface AuthRequest extends Request {
+    user?: {
+        id: string;
+    };
+}
+
 const registerSchema = z.object({
   firstName: z.string().min(2, "Le prénom est requis."),
   lastName: z.string().min(2, "Le nom de famille est requis."),
@@ -17,6 +24,12 @@ const registerSchema = z.object({
 const loginSchema = z.object({
   email: z.string().email("L'adresse e-mail est invalide."),
   password: z.string().min(1, "Le mot de passe est requis."),
+});
+
+const profileUpdateSchema = z.object({
+    phone: z.string().optional(),
+    skills: z.array(z.string()).optional(),
+    availability: z.array(z.string()).optional(),
 });
 
 
@@ -50,6 +63,10 @@ export const register = async (req: Request, res: Response) => {
  */
 export const login = async (req: Request, res: Response) => {
     try {
+        if (!process.env.JWT_SECRET) {
+            throw new Error('JWT_SECRET is not defined in the environment variables.');
+        }
+
         const { email, password } = loginSchema.parse(req.body);
         const user = await userService.findUserByEmail(email);
 
@@ -65,7 +82,7 @@ export const login = async (req: Request, res: Response) => {
 
         const token = jwt.sign(
             { id: user.id, email: user.email, role: user.role },
-            process.env.JWT_SECRET || 'your_default_secret',
+            process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 
@@ -94,4 +111,45 @@ export const getUsers = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({ message: 'Error fetching users', error });
     }
-}
+};
+
+/**
+ * Retrieves the profile of the currently authenticated user.
+ * @param {AuthRequest} req - The Express request object, with user ID from JWT.
+ * @param {Response} res - The Express response object.
+ */
+export const getMyProfile = async (req: AuthRequest, res: Response) => {
+    try {
+        if (!req.user?.id) {
+            return res.status(401).json({ message: 'Not authenticated' });
+        }
+        const userProfile = await userService.getUserProfile(req.user.id);
+        if (!userProfile) {
+            return res.status(404).json({ message: 'User profile not found' });
+        }
+        res.json(userProfile);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching profile', error: (error as Error).message });
+    }
+};
+
+/**
+ * Updates the profile of the currently authenticated user.
+ * @param {AuthRequest} req - The Express request object, with user ID and update data.
+ * @param {Response} res - The Express response object.
+ */
+export const updateMyProfile = async (req: AuthRequest, res: Response) => {
+    try {
+        if (!req.user?.id) {
+            return res.status(401).json({ message: 'Not authenticated' });
+        }
+        const validatedData = profileUpdateSchema.parse(req.body);
+        const updatedUser = await userService.updateUserProfile(req.user.id, validatedData);
+        res.json(updatedUser);
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({ message: 'Validation failed', errors: error.flatten().fieldErrors });
+        }
+        res.status(500).json({ message: 'Error updating profile', error: (error as Error).message });
+    }
+};

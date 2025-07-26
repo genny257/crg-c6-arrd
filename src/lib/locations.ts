@@ -560,14 +560,16 @@ export const cells = [
 export const geocodeLocation = (location: string): [number, number] | undefined => {
     const locations: { [key: string]: [number, number] } = {
         "Libreville": [0.3924, 9.4536],
-        "Siège du Comité, Libreville": [0.416, 9.46],
+        "Siège du Comité": [0.416, 9.46],
         "Hôtel de ville": [0.390, 9.455],
         "Port-Gentil": [-0.7193, 8.7815],
         "Franceville": [-1.6333, 13.5833],
         "Oyem": [1.5996, 11.5794],
         "Moanda": [-1.565, 13.196],
-        "Lycée X": [0.45, 9.50],
-        "École Publique d'Ondogo": [0.5, 9.4]
+        "Lycée Djoué Dabany": [0.45, 9.50],
+        "École Publique d'Ondogo": [0.5, 9.4],
+        "Ondogo": [0.5, 9.4],
+        "Nzeng-Ayong": [0.418, 9.492]
     };
     const lowerCaseLocation = location.toLowerCase();
     for (const key in locations) {
@@ -579,6 +581,7 @@ export const geocodeLocation = (location: string): [number, number] | undefined 
     const pkMatch = lowerCaseLocation.match(/pk(\d+)/);
     if (pkMatch) {
         const pkNumber = parseInt(pkMatch[1], 10);
+        // Simple linear interpolation for PK points outside Libreville center
         return [0.4 + pkNumber * 0.01, 9.45 + pkNumber * 0.01];
     }
     return undefined;

@@ -21,6 +21,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { EventStatus } from "@/types/event";
 
 const eventSchema = z.object({
   title: z.string().min(1, "Le titre est requis."),
@@ -29,7 +30,7 @@ const eventSchema = z.object({
   date: z.date({ required_error: "La date de l'événement est requise." }),
   image: z.string().url("L'URL de l'image n'est pas valide.").optional().or(z.literal('')),
   imageHint: z.string().optional(),
-  status: z.enum(['À venir', 'Terminé', 'Annulé']).default('À venir'),
+  status: z.nativeEnum(EventStatus).default(EventStatus.UPCOMING),
 });
 
 type EventFormValues = z.infer<typeof eventSchema>;
@@ -37,7 +38,7 @@ type EventFormValues = z.infer<typeof eventSchema>;
 export default function NewEventPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const { user, loading } = useAuth();
+  const { user, loading, token } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<EventFormValues>({
@@ -48,16 +49,17 @@ export default function NewEventPage() {
       location: "",
       image: "",
       imageHint: "",
-      status: "À venir",
+      status: "UPCOMING",
     },
   });
 
   const onSubmit = async (data: EventFormValues) => {
+    if (!token) return;
     setIsSubmitting(true);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(data),
       });
 
@@ -114,7 +116,7 @@ export default function NewEventPage() {
                         name="title"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Titre de l&apos;événement</FormLabel>
+                            <FormLabel>Titre de l'événement</FormLabel>
                             <FormControl>
                             <Input placeholder="Ex: Grande Collecte de Sang" {...field} />
                             </FormControl>
@@ -140,7 +142,7 @@ export default function NewEventPage() {
                         name="date"
                         render={({ field }) => (
                             <FormItem className="flex flex-col">
-                            <FormLabel>Date de l&apos;événement</FormLabel>
+                            <FormLabel>Date de l'événement</FormLabel>
                             <Popover>
                                 <PopoverTrigger asChild>
                                 <FormControl>

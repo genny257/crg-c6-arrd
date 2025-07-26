@@ -8,9 +8,9 @@ const eventSchema = z.object({
   title: z.string().min(1, "Le titre est requis."),
   description: z.string().min(1, "La description est requise."),
   location: z.string().min(1, "Le lieu est requis."),
-  date: z.string().datetime("La date de l'événement est invalide.").transform((str) => new Date(str)),
-  image: z.string().url("L'URL de l'image n'est pas valide.").optional(),
-  imageHint: z.string().optional(),
+  date: z.coerce.date({ required_error: "La date de l'événement est requise." }),
+  image: z.string().url("L'URL de l'image n'est pas valide.").optional().nullable(),
+  imageHint: z.string().optional().nullable(),
   status: z.nativeEnum(EventStatus).default(EventStatus.UPCOMING),
 });
 
@@ -36,12 +36,7 @@ export const getFeaturedEvents = async (req: Request, res: Response) => {
 export const createEvent = async (req: Request, res: Response) => {
     try {
         const validatedData = eventSchema.parse(req.body);
-        const eventData = {
-          ...validatedData,
-          image: validatedData.image || null,
-          imageHint: validatedData.imageHint || null,
-        }
-        const event = await eventService.createEvent(eventData);
+        const event = await eventService.createEvent(validatedData);
         res.status(201).json(event);
     } catch (error) {
          if (error instanceof z.ZodError) {

@@ -181,7 +181,6 @@ router.route('/missions/:id')
   .delete(protect, missionController.deleteMission);
 
 // --- Routes IA ---
-router.post('/missions/:id/suggest-volunteers', protect, missionController.suggestVolunteersForMission);
 router.post('/missions/:id/register', missionController.registerToMission);
 
 
