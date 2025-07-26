@@ -11,4 +11,8 @@ router.post('/sponsorships', sponsorshipController.createSponsorship);
 // Protected route for viewing requests
 router.get('/sponsorships', protect, sponsorshipController.getSponsorships);
 
+// Protected route for updating status
+router.patch('/sponsorships/:id/status', protect, sponsorshipController.updateSponsorshipStatus);
+
+
 export default router;

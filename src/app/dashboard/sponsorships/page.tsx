@@ -30,6 +30,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
+type SponsorshipStatus = 'PENDING' | 'CONTACTED' | 'IN_DISCUSSION' | 'CONFIRMED' | 'REJECTED';
+
 type SponsorshipRequest = {
   id: string;
   companyName: string;
@@ -37,32 +39,32 @@ type SponsorshipRequest = {
   email: string;
   phone?: string | null;
   message: string;
-  status: 'En_attente' | 'Contacté' | 'En_discussion' | 'Confirmé' | 'Annulé';
+  status: SponsorshipStatus;
   createdAt: string;
 };
 
 const getStatusBadgeVariant = (status: SponsorshipRequest['status']) => {
   switch (status) {
-    case 'Confirmé': return 'default';
-    case 'En_discussion': return 'secondary';
-    case 'Contacté': return 'outline';
-    case 'En_attente': return 'secondary';
-    case 'Annulé': return 'destructive';
+    case 'CONFIRMED': return 'default';
+    case 'IN_DISCUSSION': return 'secondary';
+    case 'CONTACTED': return 'outline';
+    case 'PENDING': return 'secondary';
+    case 'REJECTED': return 'destructive';
     default: return 'outline';
   }
 };
 
 const statusText = {
-    'En_attente': 'En attente',
-    'Contacté': 'Contacté',
-    'En_discussion': 'En discussion',
-    'Confirmé': 'Confirmé',
-    'Annulé': 'Annulé'
+    'PENDING': 'En attente',
+    'CONTACTED': 'Contacté',
+    'IN_DISCUSSION': 'En discussion',
+    'CONFIRMED': 'Confirmé',
+    'REJECTED': 'Rejeté'
 }
 
 
 export default function SponsorshipsPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, token } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [requests, setRequests] = React.useState<SponsorshipRequest[]>([]);
@@ -77,9 +79,15 @@ export default function SponsorshipsPage() {
     }
 
     const fetchSponsorships = async () => {
+      if (!token) {
+          setLoading(false);
+          return;
+      }
       setLoading(true);
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/sponsorships`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/sponsorships`, {
+             headers: { 'Authorization': `Bearer ${token}` }
+        });
         if (!response.ok) throw new Error("Failed to fetch sponsorships");
         const data = await response.json();
         setRequests(data);
@@ -91,15 +99,30 @@ export default function SponsorshipsPage() {
       }
     };
     
-    if (user) {
-        fetchSponsorships();
-    }
-  }, [user, authLoading, router, toast]);
+    fetchSponsorships();
+  }, [user, authLoading, router, toast, token]);
   
-  const handleUpdateStatus = (id: string, status: SponsorshipRequest['status']) => {
-      // TODO: Implement API call to update status
+  const handleUpdateStatus = async (id: string, status: SponsorshipRequest['status']) => {
+      if (!token) return;
+      
+      const originalRequests = [...requests];
       setRequests(reqs => reqs.map(r => r.id === id ? {...r, status} : r));
-      toast({title: "Statut mis à jour (simulation)"})
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/sponsorships/${id}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ status })
+        });
+        if (!response.ok) throw new Error("Failed to update status");
+        toast({title: "Statut mis à jour", description: `La demande est maintenant marquée comme "${statusText[status]}".`})
+      } catch (error) {
+        setRequests(originalRequests);
+        toast({title: "Erreur", description: "La mise à jour du statut a échoué.", variant: "destructive"});
+      }
   }
 
   if (authLoading || loading) {
@@ -187,10 +210,10 @@ export default function SponsorshipsPage() {
                                 </a>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => handleUpdateStatus(request.id, 'Contacté')}>Marquer comme contacté</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleUpdateStatus(request.id, 'En_discussion')}>Marquer comme en discussion</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleUpdateStatus(request.id, 'Confirmé')}>Marquer comme confirmé</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive" onClick={() => handleUpdateStatus(request.id, 'Annulé')}>Marquer comme annulé</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleUpdateStatus(request.id, 'CONTACTED')}>Marquer comme contacté</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleUpdateStatus(request.id, 'IN_DISCUSSION')}>Marquer comme en discussion</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleUpdateStatus(request.id, 'CONFIRMED')}>Marquer comme confirmé</DropdownMenuItem>
+                            <DropdownMenuItem className="text-destructive" onClick={() => handleUpdateStatus(request.id, 'REJECTED')}>Marquer comme rejeté</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -205,4 +228,3 @@ export default function SponsorshipsPage() {
     </div>
   );
 }
-

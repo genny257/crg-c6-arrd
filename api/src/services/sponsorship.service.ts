@@ -1,5 +1,5 @@
 // src/services/sponsorship.service.ts
-import { PrismaClient, CorporateSponsorship } from '@prisma/client';
+import { PrismaClient, CorporateSponsorship, SponsorshipStatus } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -14,5 +14,12 @@ export const getAllSponsorships = async (): Promise<CorporateSponsorship[]> => {
         orderBy: {
             createdAt: 'desc',
         },
+    });
+};
+
+export const updateSponsorshipStatus = async (id: string, status: SponsorshipStatus): Promise<CorporateSponsorship> => {
+    return await prisma.corporateSponsorship.update({
+        where: { id },
+        data: { status },
     });
 };
