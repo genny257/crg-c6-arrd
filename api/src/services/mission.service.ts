@@ -3,6 +3,11 @@
 import { PrismaClient, Mission, MissionStatus, UserStatus } from '@prisma/client';
 const prisma = new PrismaClient();
 
+// Définir un type pour les données de création validées
+type CreateMissionData = Omit<Mission, 'id' | 'createdAt' | 'updatedAt'> & {
+    requiredSkills?: string[];
+};
+
 /**
  * Récupère toutes les missions de la base de données.
  * @returns Une promesse qui se résout en un tableau de toutes les missions.
@@ -37,9 +42,12 @@ export const getMissionById = async (id: string): Promise<Mission | null> => {
  * @param data - Les données de la mission à créer.
  * @returns Une promesse qui se résout en la nouvelle mission créée.
  */
-export const createMission = async (data: Omit<Mission, 'id' | 'createdAt' | 'updatedAt'>): Promise<Mission> => {
+export const createMission = async (data: CreateMissionData): Promise<Mission> => {
   return await prisma.mission.create({
-    data,
+    data: {
+      ...data,
+      requiredSkills: { set: data.requiredSkills || [] },
+    },
   });
 };
 
@@ -49,10 +57,14 @@ export const createMission = async (data: Omit<Mission, 'id' | 'createdAt' | 'up
  * @param data - Les données à mettre à jour.
  * @returns Une promesse qui se résout en la mission mise à jour.
  */
-export const updateMission = async (id: string, data: Partial<Mission>): Promise<Mission> => {
+export const updateMission = async (id: string, data: Partial<CreateMissionData>): Promise<Mission> => {
+  const { requiredSkills, ...restOfData } = data;
   return await prisma.mission.update({
     where: { id },
-    data,
+    data: {
+        ...restOfData,
+        ...(requiredSkills && { requiredSkills: { set: requiredSkills } }),
+    },
   });
 };
 

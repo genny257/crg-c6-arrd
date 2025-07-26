@@ -3,6 +3,27 @@ import { Request, Response } from 'express';
 import * as missionService from '../services/mission.service';
 import * as aiService from '../services/ai.service';
 import { z } from 'zod';
+import { MissionStatus } from '@prisma/client';
+
+// Schéma de validation Zod pour les données de mission
+const missionSchema = z.object({
+  title: z.string().min(3, "Le titre doit contenir au moins 3 caractères."),
+  description: z.string().min(10, "La description est requise."),
+  location: z.string().min(3, "Le lieu est requis."),
+  startDate: z.string().refine((date) => !isNaN(new Date(date).getTime()), {
+    message: "Date de début invalide",
+  }),
+  endDate: z.string().refine((date) => !isNaN(new Date(date).getTime()), {
+    message: "Date de fin invalide",
+  }),
+  status: z.nativeEnum(MissionStatus).optional().default(MissionStatus.PLANNED),
+  requiredSkills: z.array(z.string()).optional(),
+  maxParticipants: z.number().int().positive().optional().nullable(),
+}).refine(data => new Date(data.endDate) >= new Date(data.startDate), {
+    message: "La date de fin ne peut pas être antérieure à la date de début.",
+    path: ["endDate"],
+});
+
 
 /**
  * Récupère toutes les missions.
@@ -37,9 +58,17 @@ export const getMissionById = async (req: Request, res: Response) => {
  */
 export const createMission = async (req: Request, res: Response) => {
   try {
-    const newMission = await missionService.createMission(req.body);
+    const validatedData = missionSchema.parse(req.body);
+    const newMission = await missionService.createMission({
+      ...validatedData,
+      startDate: new Date(validatedData.startDate),
+      endDate: new Date(validatedData.endDate),
+    });
     res.status(201).json(newMission);
   } catch (error) {
+     if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Validation invalide', errors: error.flatten().fieldErrors });
+    }
     res.status(500).json({ message: 'Erreur lors de la création de la mission.', error });
   }
 };
@@ -49,9 +78,19 @@ export const createMission = async (req: Request, res: Response) => {
  */
 export const updateMission = async (req: Request, res: Response) => {
   try {
-    const updatedMission = await missionService.updateMission(req.params.id, req.body);
+    const validatedData = missionSchema.partial().parse(req.body);
+    const updatedData = {
+        ...validatedData,
+        ...(validatedData.startDate && { startDate: new Date(validatedData.startDate) }),
+        ...(validatedData.endDate && { endDate: new Date(validatedData.endDate) }),
+    };
+
+    const updatedMission = await missionService.updateMission(req.params.id, updatedData);
     res.status(200).json(updatedMission);
   } catch (error) {
+    if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Validation invalide', errors: error.flatten().fieldErrors });
+    }
     res.status(500).json({ message: 'Erreur lors de la mise à jour de la mission.', error });
   }
 };
