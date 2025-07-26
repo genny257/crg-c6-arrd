@@ -18,9 +18,14 @@ export const protect = (req: AuthRequest, res: Response, next: NextFunction) => 
         return res.status(401).json({ message: 'Unauthorized: No token provided' });
     }
 
+    if (!process.env.JWT_SECRET) {
+        console.error('JWT_SECRET is not defined in environment variables.');
+        return res.status(500).json({ message: 'Server configuration error.' });
+    }
+
     const token = bearer.split(' ')[1].trim();
     try {
-        const user = jwt.verify(token, process.env.JWT_SECRET || 'your_default_secret');
+        const user = jwt.verify(token, process.env.JWT_SECRET);
         req.user = user as any;
         next();
     } catch (error) {

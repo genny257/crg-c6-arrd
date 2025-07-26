@@ -63,6 +63,10 @@ export const register = async (req: Request, res: Response) => {
  */
 export const login = async (req: Request, res: Response) => {
     try {
+        if (!process.env.JWT_SECRET) {
+            throw new Error('JWT_SECRET is not defined in the environment variables.');
+        }
+
         const { email, password } = loginSchema.parse(req.body);
         const user = await userService.findUserByEmail(email);
 
@@ -78,7 +82,7 @@ export const login = async (req: Request, res: Response) => {
 
         const token = jwt.sign(
             { id: user.id, email: user.email, role: user.role },
-            process.env.JWT_SECRET || 'your_default_secret',
+            process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 

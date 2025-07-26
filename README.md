@@ -13,6 +13,7 @@ Bienvenue sur la plateforme de gestion de la Croix-Rouge Gabonaise pour le comit
 -   **Backend**: Serveur Node.js avec Express, Prisma et une base de données PostgreSQL.
 -   **IA & Logique Métier**: [Genkit (Firebase GenAI)](https://firebase.google.com/docs/genkit)
 -   **Authentification**: JWT avec un fournisseur de informations d'identification personnalisé.
+-   **PWA**: L'application est une Progressive Web App et peut être installée sur les appareils mobiles pour un accès hors ligne.
 
 ---
 
@@ -53,6 +54,7 @@ Deux fichiers `.env` doivent être configurés : un à la racine pour le fronten
     ```env
     NEXT_PUBLIC_API_URL=http://localhost:3001/api
     NEXTAUTH_URL=http://localhost:9003
+    # !! IMPORTANT !! Générez une clé secrète forte avec `openssl rand -base64 32`
     NEXTAUTH_SECRET=[GENERER_UNE_CLE_SECRETE]
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=[VOTRE_CLE_PUBLIQUE_STRIPE]
     NODE_ENV=development
@@ -61,7 +63,12 @@ Deux fichiers `.env` doivent être configurés : un à la racine pour le fronten
 -   **Backend (`./api/.env`)** :
     ```env
     DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
+    
+    # !! TRÈS IMPORTANT !! Générez une clé secrète forte pour les JWT
+    # Utilisez par exemple `openssl rand -base64 32` dans votre terminal
     JWT_SECRET=[GENERER_UNE_CLE_SECRETE_POUR_JWT]
+
+    # Utilisateur Super-administrateur par défaut (créé via `npm run create-user`)
     SUPERADMIN_EMAIL=admin@example.com
     SUPERADMIN_PASSWORD=supersecretpassword
     
@@ -89,9 +96,11 @@ Exécutez les migrations Prisma pour créer les tables et lancez le script de se
 ```bash
 cd api
 npx prisma migrate dev --name init
-npm run create-user
+# Crée le superadmin par défaut à partir du .env
+npm run create-user 
 cd ..
 ```
+Pour créer d'autres utilisateurs, consultez `docs/GESTION_UTILISATEURS.md`.
 
 ### 5. Lancer les Serveurs en Développement
 
@@ -136,8 +145,7 @@ Pour le déploiement, vous devez builder les deux parties de l'application et le
     *   **Frontend avec Next.js** :
         ```bash
         # Depuis la racine du projet
-        npm run start # Lance le serveur Next.js en production
+        npm start # Lance le serveur Next.js en production
         ```
 
 N'oubliez pas de configurer votre serveur web (Nginx, Apache) pour rediriger les requêtes vers les bons ports.
-```
