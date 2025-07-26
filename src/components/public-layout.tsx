@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { ReactNode } from "react";
@@ -14,6 +13,7 @@ import {
 import { ChevronDown, Menu, X, LayoutDashboard, Building } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import Image from "next/image";
+import { PwaInstallButton } from "./pwa-install-button";
 
 const publicNavLinks = [
   { href: "/#actions", label: "Nos Actions" },
@@ -113,7 +113,8 @@ export function PublicLayout({ children }: { children: ReactNode }) {
       
        <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t bg-card">
         <p className="text-xs text-muted-foreground">&copy; 2024 Croix-Rouge Gabonaise. Tous droits réservés.</p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
+        <nav className="sm:ml-auto flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+          <PwaInstallButton />
           <Link href="/mecenat" className="text-xs hover:underline underline-offset-4" prefetch={false}>
             Mécénat
           </Link>
