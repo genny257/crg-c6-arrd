@@ -20,6 +20,7 @@ import {
   Archive,
   Building,
   Shield,
+  Banknote,
 } from "lucide-react"
 
 import {
@@ -61,10 +62,14 @@ export function AppNav() {
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin' || user?.role === 'ADMIN' || user?.role === 'SUPERADMIN';
   const isSuperAdmin = user?.role === 'SUPERADMIN';
   const [isMediaOpen, setIsMediaOpen] = React.useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (pathname.includes('/blog') || pathname.includes('/reports') || pathname.includes('/events') || pathname.includes('/dashboard/events') || pathname.includes('/dashboard/blog') || pathname.includes('/dashboard/reports')) {
       setIsMediaOpen(true);
+    }
+     if (pathname.includes('/settings')) {
+      setIsSettingsOpen(true);
     }
   }, [pathname]);
 
@@ -175,14 +180,28 @@ export function AppNav() {
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
+            {isSuperAdmin && (
             <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Paramètres" asChild>
-                    <Link href="#">
-                        <Settings className="h-4 w-4" />
-                        <span>Paramètres</span>
+                <Collapsible open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+                <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                    className="w-full justify-start"
+                    isActive={isSettingsOpen}
+                    tooltip="Paramètres"
+                    >
+                    <Settings className="h-4 w-4" />
+                    <span>Paramètres</span>
+                    <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", isSettingsOpen && "rotate-180")} />
+                    </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pl-8 py-1 space-y-1">
+                     <Link href="/dashboard/settings/payments" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", pathname.includes('/settings/payments') && 'bg-sidebar-accent')}>
+                        Paiements
                     </Link>
-                </SidebarMenuButton>
+                </CollapsibleContent>
+                </Collapsible>
             </SidebarMenuItem>
+            )}
             <SidebarSeparator />
             <SidebarMenuItem>
                 <SidebarMenuButton tooltip="Déconnexion" asChild onClick={logout}>

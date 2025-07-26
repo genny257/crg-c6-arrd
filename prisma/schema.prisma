@@ -1,0 +1,268 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                      String    @id @default(cuid())
+  email                   String    @unique
+  password                String
+  firstName               String
+  lastName                String
+  matricule               String?   @unique
+  phone                   String?
+  birthDate               DateTime? @db.Date
+  birthPlace              String?
+  sex                     String?
+  maritalStatus           String?
+  idCardType              String?
+  idCardNumber            String?
+  address                 String?
+  residenceProvince       String?
+  residenceDepartement    String?
+  residenceCommuneCanton  String?
+  residenceArrondissement String?
+  residenceQuartierVillage String?
+  photo                   String?
+  idCardFront             String?
+  idCardBack              String?
+  volunteerExperience     String?
+  availability            String[]
+  causes                  String[]
+  assignedCell            String?
+  status                  UserStatus @default(PENDING)
+  role                    UserRole  @default(VOLUNTEER)
+  
+  posts       Post[]
+  missions    Mission[] @relation("MissionParticipants")
+  
+  // Relations for profile details
+  nationality   Nationality? @relation(fields: [nationalityId], references: [id])
+  nationalityId String?
+  educationLevel EducationLevel? @relation(fields: [educationLevelId], references: [id])
+  educationLevelId String?
+  profession    Profession? @relation(fields: [professionId], references: [id])
+  professionId  String?
+  skills        Skill[] @relation("UserSkills")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  excerpt   String
+  content   String?
+  image     String?
+  imageHint String?
+  visible   Boolean  @default(true)
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Mission {
+  id              String        @id @default(cuid())
+  title           String
+  description     String
+  location        String
+  startDate       DateTime
+  endDate         DateTime
+  status          MissionStatus @default(PLANNED)
+  requiredSkills  String[]
+  maxParticipants Int?
+  participants    User[]        @relation("MissionParticipants")
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Event {
+    id        String      @id @default(cuid())
+    title     String
+    description String
+    location  String
+    date      DateTime
+    image     String?
+    imageHint String?
+    status    EventStatus @default(UPCOMING)
+    createdAt DateTime    @default(now())
+    updatedAt DateTime    @updatedAt
+}
+
+model Donation {
+    id        String      @id @default(cuid())
+    name      String
+    email     String
+    amount    Float
+    type      DonationType
+    method    DonationMethod
+    status    DonationStatus @default(PENDING)
+    createdAt DateTime    @default(now())
+    updatedAt DateTime    @updatedAt
+}
+
+model Report {
+    id        String   @id @default(cuid())
+    title     String
+    fileUrl   String
+    visible   Boolean  @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model CorporateSponsorship {
+  id        String   @id @default(cuid())
+  companyName String
+  contactName String
+  email     String
+  phone     String?
+  message   String
+  status    SponsorshipStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+// --- Generic Data Models ---
+model Skill {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[] @relation("UserSkills")
+}
+
+model Profession {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[]
+}
+
+model EducationLevel {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[]
+}
+
+model Nationality {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[]
+}
+
+// --- Location Data ---
+model Province {
+  id   String @id @default(cuid())
+  name String @unique
+}
+model Departement {
+  id   String @id @default(cuid())
+  name String @unique
+}
+model CommuneCanton {
+  id   String @id @default(cuid())
+  name String @unique
+}
+model Arrondissement {
+  id   String @id @default(cuid())
+  name String @unique
+}
+model QuartierVillage {
+  id   String @id @default(cuid())
+  name String @unique
+}
+
+// --- Security Models ---
+model RequestLog {
+  id        String   @id @default(cuid())
+  ip        String
+  method    String
+  path      String
+  statusCode Int
+  userAgent String?
+  isThreat  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model BlockedIP {
+  id        String   @id @default(cuid())
+  ip        String   @unique
+  reason    String?
+  createdAt DateTime @default(now())
+}
+
+model PaymentService {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  isActive  Boolean  @default(false)
+  isDefault Boolean  @default(false)
+  apiKeys   Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([isDefault], name: "unique_default_service")
+}
+
+
+// --- ENUMS ---
+enum UserRole {
+  VOLUNTEER
+  ADMIN
+  SUPERADMIN
+  PRESIDENT
+  VICE_PRESIDENT
+  FOCAL_POINT
+  COORDINATOR
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+  REJECTED
+}
+
+enum MissionStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum EventStatus {
+    UPCOMING
+    PAST
+    CANCELLED
+}
+
+enum DonationType {
+  Ponctuel
+  Mensuel
+}
+
+enum DonationMethod {
+  Mobile_Money
+  Carte_Bancaire
+}
+
+enum DonationStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+enum SponsorshipStatus {
+  PENDING
+  CONTACTED
+  IN_DISCUSSION
+  CONFIRMED
+  REJECTED
+}
