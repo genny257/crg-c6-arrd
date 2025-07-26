@@ -4,7 +4,7 @@
   "description": "Backend server for the application",
   "main": "dist/server.js",
   "scripts": {
-    "start": "pm2 start dist/server.js --name api",
+    "start": "pm2 start dist/server.js --name api --no-daemon",
     "stop": "pm2 stop api",
     "restart": "pm2 restart api",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",

@@ -5,9 +5,15 @@ import * as donationService from '../services/donation.service';
 import { DonationStatus, DonationMethod, DonationType } from '@prisma/client';
 import { z } from 'zod';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-06-20' as any,
-});
+let stripe: Stripe | null = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2024-06-20' as any,
+  });
+} else {
+    console.error("STRIPE_SECRET_KEY is not set. Donation functionality will be disabled.");
+}
+
 
 const donationSchema = z.object({
   amount: z.number().positive("Le montant doit être positif."),
@@ -18,6 +24,10 @@ const donationSchema = z.object({
 });
 
 export const createDonation = async (req: Request, res: Response) => {
+  if (!stripe) {
+    return res.status(503).json({ message: 'Donation service is currently unavailable.' });
+  }
+
   try {
     const validatedData = donationSchema.parse(req.body);
     const { amount, name, email, method, type } = validatedData;

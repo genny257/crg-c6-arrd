@@ -11,7 +11,7 @@ Il existe deux types de rôles que vous pouvez assigner :
 
 ## Prérequis
 
--   Avoir accès à l'environnement de développement.
+-   Avoir accès à l'environnement de développement ou de production.
 -   Le service de l'API doit être configuré avec la base de données.
 
 ## Comment créer un utilisateur
