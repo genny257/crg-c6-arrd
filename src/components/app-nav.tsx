@@ -17,10 +17,7 @@ import {
   Network,
   ChevronDown,
   Newspaper,
-  CalendarClock,
-  CalendarDays,
   Archive,
-  FileText,
   Building,
   Shield,
 } from "lucide-react"
@@ -100,7 +97,7 @@ export function AppNav() {
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild
-                isActive={pathname.startsWith(item.href)}
+                isActive={pathname.startsWith(item.href) && item.href !== '/dashboard' || pathname === '/dashboard' && item.href === '/dashboard'}
                 tooltip={item.label}
               >
                 <Link href={item.href}>
@@ -159,7 +156,7 @@ export function AppNav() {
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
-      </SidebarContent>
+      </SidebarFooter>
       <SidebarFooter className="p-2">
         <SidebarMenu>
              {isSuperAdmin && (
