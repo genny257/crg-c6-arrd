@@ -303,8 +303,7 @@ export default function RegisterPage() {
   const [professions, setProfessions] = React.useState<string[]>([]);
   const [skills, setSkills] = React.useState<string[]>([]);
 
-  React.useEffect(() => {
-    const fetchData = async () => {
+   const fetchData = React.useCallback(async () => {
         setIsLoading(true);
         try {
             const [
@@ -339,10 +338,12 @@ export default function RegisterPage() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [toast]);
 
+
+  React.useEffect(() => {
     fetchData();
-  }, [toast]);
+  }, [fetchData]);
 
 
   const form = useForm<FormValues>({
