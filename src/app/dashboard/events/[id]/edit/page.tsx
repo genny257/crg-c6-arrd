@@ -23,7 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
-import type { Event, EventStatus } from "@/types/event";
+import { EventStatus, type Event } from "@/types/event";
 
 const eventSchema = z.object({
   title: z.string().min(1, "Le titre est requis."),
@@ -32,7 +32,7 @@ const eventSchema = z.object({
   date: z.date({ required_error: "La date de l'événement est requise." }),
   image: z.string().url("L'URL de l'image n'est pas valide.").optional().or(z.literal('')),
   imageHint: z.string().optional(),
-  status: z.enum(['UPCOMING', 'PAST', 'CANCELLED']),
+  status: z.nativeEnum(EventStatus),
 });
 
 type EventFormValues = z.infer<typeof eventSchema>;
@@ -267,7 +267,7 @@ export default function EditEventPage() {
                         <FormItem>
                             <FormLabel>URL de l'image de couverture</FormLabel>
                             <FormControl>
-                            <Input type="url" placeholder="https://exemple.com/image.png" {...field} />
+                            <Input type="url" placeholder="https://exemple.com/image.png" {...field} value={field.value || ''} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -280,7 +280,7 @@ export default function EditEventPage() {
                         <FormItem>
                             <FormLabel>Indice pour l'image (IA)</FormLabel>
                             <FormControl>
-                            <Input placeholder="Ex: 'aide humanitaire'" {...field} />
+                            <Input placeholder="Ex: 'aide humanitaire'" {...field} value={field.value || ''} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>

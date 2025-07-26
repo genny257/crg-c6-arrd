@@ -10,7 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import type { Event, EventStatus } from "@/types/event";
+import { type Event, EventStatus } from "@/types/event";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -178,7 +178,7 @@ export default function EventsPage() {
                 <Image
                   src={event.image || "https://placehold.co/600x400.png"}
                   alt={event.title}
-                  data-ai-hint={event.imageHint}
+                  data-ai-hint={event.imageHint ?? undefined}
                   width={600}
                   height={400}
                   className="rounded-t-lg object-cover aspect-video"
