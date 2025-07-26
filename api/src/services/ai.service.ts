@@ -3,7 +3,7 @@ import { ai } from '../../genkit.config';
 import { MissionStatus } from '@prisma/client';
 import { z } from 'zod';
 import prisma from '../lib/prisma';
-import type { GenerateOptions } from 'genkit/generate';
+import type { GenerateOptions } from 'genkit';
 
 // Schemas
 export const MessageSchema = z.object({
