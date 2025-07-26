@@ -1,12 +1,12 @@
 // src/services/ai.service.ts
 import { ai } from '../../genkit.config';
-import { MissionStatus, User, Post, Skill } from '@prisma/client';
+import { MissionStatus } from '@prisma/client';
 import { z } from 'zod';
 import prisma from '../lib/prisma';
-import type { GenerateOptions } from '@genkit-ai/googleai';
+import type { GenerateOptions } from 'genkit/generate';
 
 // Schemas
-const MessageSchema = z.object({
+export const MessageSchema = z.object({
     role: z.enum(['user', 'model']),
     content: z.string(),
 });
