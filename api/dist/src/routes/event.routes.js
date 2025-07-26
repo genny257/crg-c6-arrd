@@ -33,10 +33,17 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-// src/routes/ai.routes.ts
+// src/routes/event.routes.ts
 const express_1 = require("express");
-const aiController = __importStar(require("../controllers/ai.controller"));
+const eventController = __importStar(require("../controllers/event.controller"));
+const auth_1 = require("../middleware/auth");
 const router = (0, express_1.Router)();
-// Chatbot route (public)
-router.post('/chat', aiController.chat);
+// Public routes
+router.get('/events/featured', eventController.getFeaturedEvents);
+router.get('/events', eventController.getEvents);
+router.get('/events/:id', eventController.getEventById);
+// Protected routes for management
+router.post('/events', auth_1.protect, eventController.createEvent);
+router.put('/events/:id', auth_1.protect, eventController.updateEvent);
+router.delete('/events/:id', auth_1.protect, eventController.deleteEvent);
 exports.default = router;

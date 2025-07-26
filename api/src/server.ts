@@ -18,6 +18,7 @@ import adminRoutes from './routes/admin.routes';
 import volunteerRoutes from './routes/volunteer.routes';
 import aiRoutes from './routes/ai.routes';
 import teamRoutes from './routes/team.routes';
+import genkitRoutes from './routes/genkit.routes';
 import { loggingMiddleware } from './middleware/logging';
 
 // Charger les variables d'environnement
@@ -102,7 +103,7 @@ app.use('/api', sponsorshipRoutes);
 app.use('/api', teamRoutes);
 app.use('/api', adminRoutes);
 app.use('/api', volunteerRoutes);
-app.use('/api/ai', aiRoutes);
+app.use('/api/genkit', genkitRoutes);
 
 // Route de base pour vérifier que le serveur fonctionne
 app.get('/', (req, res) => {

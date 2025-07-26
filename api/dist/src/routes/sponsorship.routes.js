@@ -33,10 +33,13 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-// src/routes/ai.routes.ts
+// src/routes/sponsorship.routes.ts
 const express_1 = require("express");
-const aiController = __importStar(require("../controllers/ai.controller"));
+const sponsorshipController = __importStar(require("../controllers/sponsorship.controller"));
+const auth_1 = require("../middleware/auth");
 const router = (0, express_1.Router)();
-// Chatbot route (public)
-router.post('/chat', aiController.chat);
+// Public route for creating a request
+router.post('/sponsorships', sponsorshipController.createSponsorship);
+// Protected route for viewing requests
+router.get('/sponsorships', auth_1.protect, sponsorshipController.getSponsorships);
 exports.default = router;

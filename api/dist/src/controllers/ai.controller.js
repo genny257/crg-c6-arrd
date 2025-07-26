@@ -33,10 +33,28 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-// src/routes/ai.routes.ts
-const express_1 = require("express");
-const aiController = __importStar(require("../controllers/ai.controller"));
-const router = (0, express_1.Router)();
+exports.chat = void 0;
+const zod_1 = require("zod");
+const aiService = __importStar(require("../services/ai.service"));
+const flow_1 = require("@genkit-ai/flow");
 // Chatbot route (public)
-router.post('/chat', aiController.chat);
-exports.default = router;
+const chatSchema = zod_1.z.object({
+    messages: zod_1.z.array(zod_1.z.object({
+        role: zod_1.z.enum(['user', 'model']),
+        content: zod_1.z.string(),
+    })),
+});
+const chat = async (req, res) => {
+    try {
+        const { messages } = chatSchema.parse(req.body);
+        const response = await (0, flow_1.runFlow)(aiService.chatbotFlow, messages);
+        res.status(200).json({ response });
+    }
+    catch (error) {
+        if (error instanceof zod_1.z.ZodError) {
+            return res.status(400).json({ message: 'Validation failed', errors: error.flatten().fieldErrors });
+        }
+        res.status(500).json({ message: 'Error processing chat request', error });
+    }
+};
+exports.chat = chat;

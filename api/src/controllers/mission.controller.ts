@@ -4,7 +4,6 @@ import { Request, Response } from 'express';
 import * as missionService from '../services/mission.service';
 import * as aiService from '../services/ai.service';
 import { z } from 'zod';
-import { run } from 'genkit';
 
 /**
  * Récupère toutes les missions.
@@ -76,7 +75,7 @@ export const deleteMission = async (req: Request, res: Response) => {
 export const suggestVolunteersForMission = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const recommendations = await run(aiService.missionAssignmentFlow, id);
+        const recommendations = await aiService.suggestVolunteers(id);
         res.status(200).json(recommendations);
     } catch (error: any) {
         res.status(500).json({ message: 'Erreur lors de la suggestion des volontaires.', error: error.message });

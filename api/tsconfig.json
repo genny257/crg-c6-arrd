@@ -3,21 +3,21 @@
     "target": "es2018",
     "module": "commonjs",
     "moduleResolution": "node",
-    "module": "commonjs",
     "lib": ["es2018"],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
     "resolveJsonModule": true,
-    "baseUrl": "../",
+    "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     }
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "genkit.config.js", "src/types/genkit.config.d.ts"],
   "exclude": ["node_modules"]
 }

@@ -1,5 +1,5 @@
 // src/services/team.service.ts
-import { TeamStructure } from '@/types/team';
+import { TeamStructure } from '../types/team';
 
 // In a real application, this data would come from a database.
 // For this example, we'll keep it as a static object.

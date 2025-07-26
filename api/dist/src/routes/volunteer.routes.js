@@ -33,10 +33,15 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-// src/routes/ai.routes.ts
+// src/routes/volunteer.routes.ts
 const express_1 = require("express");
-const aiController = __importStar(require("../controllers/ai.controller"));
+const volunteerController = __importStar(require("../controllers/volunteer.controller"));
+const auth_1 = require("../middleware/auth");
 const router = (0, express_1.Router)();
-// Chatbot route (public)
-router.post('/chat', aiController.chat);
+// Public route for creation
+router.post('/volunteers', volunteerController.createVolunteer);
+// Protected routes for management
+router.get('/volunteers', auth_1.protect, volunteerController.getVolunteers);
+router.get('/volunteers/:id', auth_1.protect, volunteerController.getVolunteerById);
+router.patch('/volunteers/:id/status', auth_1.protect, volunteerController.updateVolunteerStatus);
 exports.default = router;

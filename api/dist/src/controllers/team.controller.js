@@ -33,10 +33,15 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-// src/routes/ai.routes.ts
-const express_1 = require("express");
-const aiController = __importStar(require("../controllers/ai.controller"));
-const router = (0, express_1.Router)();
-// Chatbot route (public)
-router.post('/chat', aiController.chat);
-exports.default = router;
+exports.getTeamStructure = void 0;
+const teamService = __importStar(require("../services/team.service"));
+const getTeamStructure = async (req, res) => {
+    try {
+        const teamStructure = await teamService.getTeamStructure();
+        res.status(200).json(teamStructure);
+    }
+    catch (error) {
+        res.status(500).json({ message: 'Error fetching team structure', error });
+    }
+};
+exports.getTeamStructure = getTeamStructure;

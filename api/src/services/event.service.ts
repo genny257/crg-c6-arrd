@@ -12,7 +12,7 @@ export const getFeaturedEvents = async () => {
             image: {
                 not: null,
             },
-            status: 'À venir',
+            status: 'UPCOMING',
         },
         orderBy: {
             date: 'asc',

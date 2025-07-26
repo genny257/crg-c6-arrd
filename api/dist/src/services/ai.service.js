@@ -66,7 +66,7 @@ exports.chatbotFlow = genkit_config_1.ai.defineFlow({
         content: [{ text: msg.content }]
     }));
     const llmResponse = await genkit_config_1.ai.generate({
-        model: 'googleai/gemini-1.5-pro',
+        model: 'gemini-1.5-pro',
         history: history,
         tools: [getMissionsTool, getVolunteerInfoTool],
         prompt: `
@@ -82,7 +82,7 @@ exports.chatbotFlow = genkit_config_1.ai.defineFlow({
             temperature: 0.5,
         },
     });
-    return llmResponse.text;
+    return llmResponse.text();
 });
 exports.missionAssignmentFlow = genkit_config_1.ai.defineFlow({
     name: 'missionAssignmentFlow',
@@ -127,7 +127,7 @@ exports.missionAssignmentFlow = genkit_config_1.ai.defineFlow({
         }
     `;
     const llmResponse = await genkit_config_1.ai.generate({
-        model: 'googleai/gemini-1.5-pro',
+        model: 'gemini-1.5-pro',
         prompt,
         config: {
             temperature: 0.2,
@@ -136,7 +136,7 @@ exports.missionAssignmentFlow = genkit_config_1.ai.defineFlow({
             format: 'json',
         }
     });
-    const output = llmResponse.output;
+    const output = llmResponse.output();
     if (typeof output === 'string') {
         return JSON.parse(output);
     }
@@ -179,7 +179,7 @@ exports.generateBlogPostFlow = genkit_config_1.ai.defineFlow({
         - "imageHint": Deux mots-clés en anglais pour trouver une image d'illustration (ex: "volunteer help").
     `;
     const llmResponse = await genkit_config_1.ai.generate({
-        model: 'googleai/gemini-1.5-pro',
+        model: 'gemini-1.5-pro',
         prompt: prompt,
         config: {
             temperature: 0.7,
@@ -189,7 +189,7 @@ exports.generateBlogPostFlow = genkit_config_1.ai.defineFlow({
             schema: blogPostSchema,
         }
     });
-    const output = llmResponse.output;
+    const output = llmResponse.output();
     let blogPost;
     if (typeof output === 'string') {
         blogPost = JSON.parse(output);
