@@ -176,7 +176,7 @@ export default function TeamPage() {
 
         fetchFilters();
         fetchVolunteers();
-    }, [toast]);
+    }, []);
 
     const filteredAndSortedVolunteers = useMemo(() => {
         let sortedVolunteers = [...volunteers];
