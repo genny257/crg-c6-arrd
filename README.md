@@ -56,7 +56,6 @@ Deux fichiers `.env` doivent être configurés : un à la racine pour le fronten
     NEXTAUTH_URL=http://localhost:9003
     # !! IMPORTANT !! Générez une clé secrète forte avec `openssl rand -base64 32`
     NEXTAUTH_SECRET=[GENERER_UNE_CLE_SECRETE]
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=[VOTRE_CLE_PUBLIQUE_STRIPE]
     NODE_ENV=development
     ```
 
@@ -72,9 +71,6 @@ Deux fichiers `.env` doivent être configurés : un à la racine pour le fronten
     SUPERADMIN_EMAIL=admin@example.com
     SUPERADMIN_PASSWORD=supersecretpassword
     
-    # Clés Stripe
-    STRIPE_SECRET_KEY=[VOTRE_CLE_SECRETE_STRIPE]
-
     # Configuration du serveur mail (pour l'envoi d'e-mails)
     EMAIL_HOST=smtp.example.com
     EMAIL_PORT=587

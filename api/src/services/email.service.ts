@@ -96,7 +96,7 @@ export const EmailService = {
           <h3 style="color: #333; margin-top: 0;">Paiement par Mobile Money</h3>
           <p>
             Veuillez effectuer votre virement au numéro suivant :<br>
-            <strong>(+241) XX XX XX XX</strong> <em>(Remplacez par votre vrai numéro)</em>
+            <strong>(Insérez votre numéro Mobile Money ici)</strong>
           </p>
           <p>
             <strong>Nom du bénéficiaire :</strong> Croix-Rouge Gabonaise - Comité 6e Arr.
