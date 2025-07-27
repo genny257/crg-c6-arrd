@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 
 type TeamPool = {
     id: string;
@@ -85,7 +86,6 @@ export function PoolManagementTab() {
     
     const PoolForm = ({ pool, onSave, onCancel }: { pool: TeamPool | Omit<TeamPool, 'id'>, onSave: (p: TeamPool) => void, onCancel: () => void }) => {
         const [formData, setFormData] = React.useState(pool);
-        const Icon = allPoolIcons[formData.iconKey || ''] || Network;
         
         return (
              <div className="flex flex-col sm:flex-row gap-4 items-start p-4 border rounded-lg bg-muted/50 my-2">
@@ -141,7 +141,7 @@ export function PoolManagementTab() {
                         )
                     ))}
                     {isCreating && (
-                        <PoolForm pool={{name: '', description: '', type: 'OPERATIONAL'}} onSave={handleSave} onCancel={() => setIsCreating(false)}/>
+                        <PoolForm pool={{name: '', description: '', type: 'OPERATIONAL', iconKey: 'Network'}} onSave={handleSave} onCancel={() => setIsCreating(false)}/>
                     )}
                 </div>
                  <Button className="mt-4" variant="outline" onClick={() => setIsCreating(true)} disabled={isCreating}>
