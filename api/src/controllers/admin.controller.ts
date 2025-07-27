@@ -77,7 +77,7 @@ export const blockIP = async (req: Request, res: Response) => {
          if (error instanceof z.ZodError) {
             return res.status(400).json({ message: 'Validation failed', errors: error.flatten().fieldErrors });
         }
-        if (error instanceof Error && error.message.includes("already blocked")) {
+        if (error instanceof Error && error.message.includes("déjà bloquée")) {
             return res.status(409).json({ message: error.message });
         }
         res.status(500).json({ message: 'Error blocking IP', error });

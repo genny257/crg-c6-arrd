@@ -62,7 +62,7 @@ export const blockIP = async (ip: string, reason?: string) => {
     // Check if IP is already blocked
     const existing = await prisma.blockedIP.findUnique({ where: { ip } });
     if (existing) {
-        throw new Error("IP address is already blocked.");
+        throw new Error("Cette adresse IP est déjà bloquée.");
     }
     return await prisma.blockedIP.create({
         data: { ip, reason },
