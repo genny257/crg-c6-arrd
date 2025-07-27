@@ -58,14 +58,26 @@ export default function ArchivePage() {
 
   const fetchItems = React.useCallback(async (folderId: string | null) => {
     setLoading(true);
-    // TODO: This should be an API call in the future
-    // For now, we simulate an empty result as the backend doesn't exist yet.
+    if (!token) {
+        setLoading(false);
+        return;
+    };
     try {
-        if (!token) return;
-        // const response = await fetch(`/api/archive?parentId=${folderId}`, { headers: { 'Authorization': `Bearer ${token}` }});
-        // const data = await response.json();
-        // setItems(data);
-        setItems([]);
+        const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/archive`);
+        if (folderId) {
+            url.searchParams.append('parentId', folderId);
+        }
+        
+        const response = await fetch(url.toString(), { 
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) {
+            throw new Error("Erreur lors de la récupération des fichiers.");
+        }
+
+        const data = await response.json();
+        setItems(data);
     } catch (error) {
       console.error("Error fetching archive items:", error);
       toast({ title: "Erreur", description: "Impossible de charger les archives.", variant: "destructive" });
@@ -81,18 +93,33 @@ export default function ArchivePage() {
   }, [currentFolderId, fetchItems, token]);
 
   const handleCreateFolder = async () => {
-    if (!newFolderName.trim()) {
+    if (!newFolderName.trim() || !token) {
       toast({ title: "Erreur", description: "Le nom du dossier ne peut pas être vide.", variant: "destructive" });
       return;
     }
     try {
-      // TODO: Replace with API call to POST /api/archive
-      toast({ title: "Fonctionnalité à venir", description: "La création de dossiers sera bientôt disponible." });
-      // After API call is successful:
-      // fetchItems(currentFolderId); // Refresh list
-    } catch (error) {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/archive/folder`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+              name: newFolderName,
+              parentId: currentFolderId,
+          })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "La création du dossier a échoué.");
+      }
+
+      toast({ title: "Dossier créé", description: "Le nouveau dossier a été ajouté avec succès." });
+      fetchItems(currentFolderId);
+    } catch (error: any) {
         console.error("Error creating folder:", error);
-        toast({ title: "Erreur", description: "La création du dossier a échoué.", variant: "destructive" });
+        toast({ title: "Erreur", description: error.message, variant: "destructive" });
     } finally {
         setNewFolderName("");
         setIsCreateFolderDialogOpen(false);
@@ -100,7 +127,7 @@ export default function ArchivePage() {
   };
 
   const navigateToFolder = (item: ArchiveItem) => {
-    if (item.type !== 'folder') return;
+    if (item.type !== 'FOLDER') return;
     setCurrentFolderId(item.id);
     setBreadcrumbs(prev => [...prev, { id: item.id, name: item.name }]);
   };
@@ -114,7 +141,7 @@ export default function ArchivePage() {
   };
 
   if (authLoading) return <div>Chargement...</div>;
-  if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
+  if (!user || (user.role !== 'ADMIN' && user.role !== 'SUPERADMIN')) {
      router.push('/login');
      return null;
   }
@@ -161,11 +188,11 @@ export default function ArchivePage() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  <FileIcon type="document" className="mr-2 h-4 w-4" />
+                  <FileIcon type="DOCUMENT" className="mr-2 h-4 w-4" />
                   <span>Document Word</span>
                 </DropdownMenuItem>
                  <DropdownMenuItem>
-                  <FileIcon type="spreadsheet" className="mr-2 h-4 w-4" />
+                  <FileIcon type="SPREADSHEET" className="mr-2 h-4 w-4" />
                   <span>Fichier Excel</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>

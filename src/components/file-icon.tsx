@@ -8,23 +8,23 @@ interface FileIconProps {
 
 export const FileIcon = ({ type, className }: FileIconProps) => {
     switch (type) {
-        case "folder":
+        case "FOLDER":
             return <Folder className={className} />;
-        case "document":
+        case "DOCUMENT":
             return <FileType2 className={className} />;
-        case "spreadsheet":
+        case "SPREADSHEET":
             return <FileSpreadsheet className={className} />;
-        case "image":
+        case "IMAGE":
             return <ImageIcon className={className} />;
-        case "video":
+        case "VIDEO":
             return <Video className={className} />;
-        case "audio":
+        case "AUDIO":
             return <Music className={className} />;
-        case "pdf":
+        case "PDF":
             return <File className={className} />;
-        case "archive":
+        case "ARCHIVE":
             return <FileArchive className={className} />;
-        case "text":
+        case "TEXT":
             return <FileText className={className} />;
         default:
             return <File className={className} />;

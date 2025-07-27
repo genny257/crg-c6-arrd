@@ -1,4 +1,4 @@
-export type ArchiveItemType = "folder" | "document" | "spreadsheet" | "image" | "video" | "audio" | "pdf" | "archive" | "text" | "unknown";
+export type ArchiveItemType = "FOLDER" | "DOCUMENT" | "SPREADSHEET" | "IMAGE" | "VIDEO" | "AUDIO" | "PDF" | "ARCHIVE" | "TEXT" | "UNKNOWN";
 
 export interface ArchiveItem {
     id: string;
@@ -6,5 +6,6 @@ export interface ArchiveItem {
     type: ArchiveItemType;
     parentId: string | null;
     createdAt: string;
+    url?: string | null;
     // We can add more fields later, like size, etc.
 }
