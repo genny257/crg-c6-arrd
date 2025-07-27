@@ -37,7 +37,7 @@ const getStatusBadgeVariant = (status?: Volunteer['status']) => {
     }
 };
 
-const statusText = {
+const statusText: Record<Volunteer['status'], string> = {
     'ACTIVE': 'Actif',
     'PENDING': 'En attente',
     'INACTIVE': 'Inactif',
