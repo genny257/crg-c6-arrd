@@ -23,6 +23,7 @@ import {
   Clipboard,
   Trash2,
   Pencil,
+  Loader2,
 } from "lucide-react";
 import type { ArchiveItem } from "@/types/archive";
 import { FileIcon } from "@/components/file-icon";
@@ -51,6 +52,8 @@ export default function ArchivePage() {
   const [breadcrumbs, setBreadcrumbs] = React.useState<{ id: string | null; name: string }[]>([{ id: null, name: "Archives" }]);
   const [newFolderName, setNewFolderName] = React.useState("");
   const [isCreateFolderDialogOpen, setIsCreateFolderDialogOpen] = React.useState(false);
+  const [isUploading, setIsUploading] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   
   const { toast } = useToast();
   const { user, loading: authLoading, token } = useAuth();
@@ -126,6 +129,58 @@ export default function ArchivePage() {
     }
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !token) return;
+
+    setIsUploading(true);
+    try {
+      // Step 1: Upload the file to the server's public folder
+      const formData = new FormData();
+      formData.append('file', file);
+      const uploadResponse = await fetch('/api/upload', { method: 'POST', body: formData });
+      const uploadResult = await uploadResponse.json();
+
+      if (!uploadResult.success) {
+        throw new Error(uploadResult.error || 'File upload failed');
+      }
+
+      // Step 2: Create the file entry in the database via the API
+      const fileData = {
+        name: file.name,
+        type: 'DOCUMENT', // This should be determined from file.type in a real app
+        url: uploadResult.url,
+        parentId: currentFolderId,
+      };
+
+      const createResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/archive/file`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(fileData)
+      });
+
+      if (!createResponse.ok) {
+        throw new Error('Failed to create file entry in database.');
+      }
+
+      toast({ title: "Fichier téléversé", description: `${file.name} a été ajouté avec succès.` });
+      fetchItems(currentFolderId);
+
+    } catch (error: any) {
+      console.error("Error uploading file:", error);
+      toast({ title: "Erreur de téléversement", description: error.message, variant: "destructive" });
+    } finally {
+      setIsUploading(false);
+       if(fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+
   const navigateToFolder = (item: ArchiveItem) => {
     if (item.type !== 'FOLDER') return;
     setCurrentFolderId(item.id);
@@ -169,6 +224,7 @@ export default function ArchivePage() {
           </nav>
         </div>
         <div className="flex items-center gap-2">
+           <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
           <Button variant="outline" size="icon" onClick={() => setView(view === "grid" ? "list" : "grid")}>
             {view === "grid" ? <List className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />}
           </Button>
@@ -223,8 +279,8 @@ export default function ArchivePage() {
           </AlertDialog>
 
 
-          <Button variant="outline">
-            <Upload className="mr-2 h-4 w-4" />
+          <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+            {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
             Téléverser
           </Button>
         </div>
@@ -330,3 +386,5 @@ const ItemMenu = () => (
     </DropdownMenu>
   </div>
 );
+
+    

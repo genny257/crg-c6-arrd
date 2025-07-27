@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import * as archiveService from '../services/archive.service';
 import { z } from 'zod';
 import type { User } from '@prisma/client';
+import { ArchiveItemType } from '@prisma/client';
 
 interface AuthRequest extends Request {
   user?: User;
@@ -51,3 +52,31 @@ export const createFolder = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Erreur lors de la création du dossier.", error });
   }
 };
+
+
+const createFileSchema = z.object({
+  name: z.string().min(1, "Le nom du fichier est requis."),
+  type: z.nativeEnum(ArchiveItemType),
+  url: z.string().url("L'URL est invalide."),
+  parentId: z.string().optional().nullable(),
+});
+
+export const createFile = async (req: AuthRequest, res: Response) => {
+  try {
+    const authorId = req.user?.id;
+    if (!authorId) {
+      return res.status(401).json({ message: "Utilisateur non authentifié" });
+    }
+
+    const { name, type, url, parentId } = createFileSchema.parse(req.body);
+    const file = await archiveService.createFile(name, type, url, parentId || null, authorId);
+    res.status(201).json(file);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ message: 'Validation failed', errors: error.flatten().fieldErrors });
+    }
+    res.status(500).json({ message: "Erreur lors de la création du fichier.", error });
+  }
+};
+
+    

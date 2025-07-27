@@ -72,4 +72,36 @@ router.get('/archive', archiveController.getItems);
  */
 router.post('/archive/folder', archiveController.createFolder);
 
+/**
+ * @swagger
+ * /archive/file:
+ *   post:
+ *     summary: Crée une nouvelle entrée de fichier après téléversement.
+ *     tags: [Archive]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               type:
+ *                 type: string
+ *               url:
+ *                 type: string
+ *               parentId:
+ *                 type: string
+ *                 nullable: true
+ *     responses:
+ *       201:
+ *         description: Le fichier a été enregistré avec succès.
+ *       400:
+ *         description: Données invalides.
+ */
+router.post('/archive/file', archiveController.createFile);
+
 export default router;
+
+    

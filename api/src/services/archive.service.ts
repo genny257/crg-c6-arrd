@@ -1,6 +1,6 @@
 // src/services/archive.service.ts
 import prisma from '../lib/prisma';
-import type { Prisma } from '@prisma/client';
+import type { Prisma, ArchiveItemType } from '@prisma/client';
 
 /**
  * Retrieves items from the database based on their parent folder ID.
@@ -45,3 +45,26 @@ export const createFolder = async (name: string, parentId: string | null, author
 
     return await prisma.archiveItem.create({ data });
 };
+
+/**
+ * Creates a new file (ArchiveItem) in the database.
+ * @param {string} name - The name of the new file.
+ * @param {ArchiveItemType} type - The type of file.
+ * @param {string} url - The URL of the uploaded file.
+ * @param {string | null} parentId - The ID of the parent folder.
+ * @param {string} authorId - The ID of the user creating the file.
+ * @returns {Promise<any>} The newly created file item.
+ */
+export const createFile = async (name: string, type: ArchiveItemType, url: string, parentId: string | null, authorId: string) => {
+     const data: Prisma.ArchiveItemCreateInput = {
+        name,
+        type,
+        url,
+        author: { connect: { id: authorId } },
+        parent: parentId ? { connect: { id: parentId } } : undefined,
+    };
+
+    return await prisma.archiveItem.create({ data });
+};
+
+    
