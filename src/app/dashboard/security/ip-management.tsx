@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 
 interface BlockedIP {
     id: string;
@@ -53,6 +53,10 @@ export function IpManagementTab() {
              toast({ title: "Erreur", description: "L'adresse IP est requise.", variant: "destructive" });
              return;
         }
+        if (!token) {
+            toast({ title: "Erreur", description: "Vous n'êtes pas authentifié.", variant: "destructive" });
+            return;
+        }
         setBlocking(true);
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/blocked-ips`, {
@@ -80,6 +84,7 @@ export function IpManagementTab() {
     };
     
     const handleUnblockIp = async (id: string) => {
+        if (!token) return;
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/blocked-ips/${id}`, {
                 method: 'DELETE',
@@ -108,14 +113,17 @@ export function IpManagementTab() {
                         value={ipAddress}
                         onChange={(e) => setIpAddress(e.target.value)}
                         className="flex-grow"
+                        disabled={blocking}
                     />
                      <Input 
                         placeholder="Raison du blocage (optionnel)" 
                         value={reason}
                         onChange={(e) => setReason(e.target.value)}
                          className="flex-grow"
+                         disabled={blocking}
                     />
                     <Button onClick={handleBlockIp} disabled={blocking}>
+                        {blocking ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                         {blocking ? "Blocage..." : "Bloquer l'IP"}
                     </Button>
                 </div>
