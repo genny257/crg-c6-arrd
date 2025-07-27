@@ -175,4 +175,3 @@ export function AssignmentManagementTab() {
         </div>
     );
 }
-
