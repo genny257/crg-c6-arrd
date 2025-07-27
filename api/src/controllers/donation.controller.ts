@@ -11,7 +11,7 @@ if (process.env.STRIPE_SECRET_KEY) {
     apiVersion: '2024-06-20' as any,
   });
 } else {
-    console.error("STRIPE_SECRET_KEY is not set. Donation functionality will be disabled.");
+    console.warn("STRIPE_SECRET_KEY is not set. Stripe donation functionality will be disabled.");
 }
 
 
@@ -25,7 +25,7 @@ const donationSchema = z.object({
 
 export const createDonation = async (req: Request, res: Response) => {
   if (!stripe) {
-    return res.status(503).json({ message: 'Donation service is currently unavailable.' });
+    return res.status(503).json({ message: 'Donation service via Stripe is currently unavailable.' });
   }
 
   try {

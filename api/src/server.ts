@@ -20,6 +20,7 @@ import contactRoutes from './routes/contact.routes';
 import aiRoutes from './routes/ai.routes';
 import paymentRoutes from './routes/payment.routes';
 import archiveRoutes from './routes/archive.routes';
+import eventRoutes from './routes/event.routes';
 import { loggingMiddleware } from './middleware/logging';
 
 // Charger les variables d'environnement
@@ -107,6 +108,7 @@ app.use('/api', contactRoutes);
 app.use('/api', aiRoutes);
 app.use('/api', paymentRoutes);
 app.use('/api', archiveRoutes);
+app.use('/api', eventRoutes);
 
 // Route de base pour vérifier que le serveur fonctionne
 app.get('/', (req, res) => {
