@@ -81,5 +81,40 @@ export const EmailService = {
     `;
     
     await this.sendEmail({ to, subject: emailSubject, html, replyTo: fromEmail });
+  },
+
+  async sendDonationInstructions(donorEmail: string, donorName: string, amount: number): Promise<void> {
+    const subject = "Instructions pour finaliser votre don";
+    const html = `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h2 style="color: #B71C1C; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+          Merci pour votre généreux don, ${donorName} !
+        </h2>
+        <p>Nous avons bien enregistré votre promesse de don d'un montant de <strong>${amount.toLocaleString('fr-FR')} FCFA</strong>.</p>
+        <p>Pour finaliser votre contribution, veuillez suivre les étapes ci-dessous :</p>
+        <div style="background-color: #f9f9f9; border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-top: 20px;">
+          <h3 style="color: #333; margin-top: 0;">Paiement par Mobile Money</h3>
+          <p>
+            Veuillez effectuer votre virement au numéro suivant :<br>
+            <strong>(+241) XX XX XX XX</strong> <em>(Remplacez par votre vrai numéro)</em>
+          </p>
+          <p>
+            <strong>Nom du bénéficiaire :</strong> Croix-Rouge Gabonaise - Comité 6e Arr.
+          </p>
+          <p>
+            <strong>Motif du virement :</strong> Don de ${donorName}
+          </p>
+        </div>
+        <p style="margin-top: 20px;">
+          Une fois le virement effectué, votre don sera marqué comme "Confirmé" dans nos systèmes. Vous recevrez un reçu officiel par e-mail peu de temps après.
+        </p>
+        <p>Votre soutien est précieux et nous permet de poursuivre nos actions sur le terrain.</p>
+        <br/>
+        <p>Cordialement,</p>
+        <p><strong>L'équipe de la Croix-Rouge Gabonaise (Comité du 6ème Arr.)</strong></p>
+      </div>
+    `;
+
+    await this.sendEmail({ to: donorEmail, subject, html });
   }
 };

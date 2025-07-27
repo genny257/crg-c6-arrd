@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import * as donationService from '../services/donation.service';
 import { DonationStatus, DonationMethod, DonationType } from '@prisma/client';
 import { z } from 'zod';
+import { EmailService } from '../services/email.service';
 
 const donationSchema = z.object({
   amount: z.number().positive("Le montant doit être positif."),
@@ -21,8 +22,8 @@ export const createDonation = async (req: Request, res: Response) => {
       status: DonationStatus.PENDING,
     });
 
-    // Here you would typically trigger instructions for Mobile Money payment,
-    // for example by sending an email or SMS. For now, we just confirm creation.
+    // Send donation instructions email
+    await EmailService.sendDonationInstructions(validatedData.email, validatedData.name, validatedData.amount);
 
     res.status(201).json({ 
       message: "Donation promise recorded successfully.",
