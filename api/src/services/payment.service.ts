@@ -4,7 +4,7 @@ import type { PaymentService } from '@prisma/client';
 
 export const getAllPaymentServices = async (): Promise<PaymentService[]> => {
   return await prisma.paymentService.findMany({
-    orderBy: { createdAt: 'asc' },
+    orderBy: { isDefault: 'desc' },
   });
 };
 
