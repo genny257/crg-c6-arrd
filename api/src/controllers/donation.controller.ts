@@ -1,62 +1,31 @@
 // src/controllers/donation.controller.ts
 import { Request, Response } from 'express';
-import Stripe from 'stripe';
 import * as donationService from '../services/donation.service';
 import { DonationStatus, DonationMethod, DonationType } from '@prisma/client';
 import { z } from 'zod';
-
-let stripe: Stripe | null = null;
-if (process.env.STRIPE_SECRET_KEY) {
-  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2024-06-20' as any,
-  });
-} else {
-    console.warn("STRIPE_SECRET_KEY is not set. Stripe donation functionality will be disabled.");
-}
-
 
 const donationSchema = z.object({
   amount: z.number().positive("Le montant doit être positif."),
   name: z.string().min(2, "Le nom est requis."),
   email: z.string().email("L'adresse e-mail est invalide."),
-  method: z.enum(['Mobile_Money', 'Carte_Bancaire']),
+  method: z.enum(['Mobile_Money']), // Removed 'Carte_Bancaire'
   type: z.enum(['Ponctuel', 'Mensuel']),
 });
 
 export const createDonation = async (req: Request, res: Response) => {
-  if (!stripe) {
-    return res.status(503).json({ message: 'Donation service via Stripe is currently unavailable.' });
-  }
-
   try {
     const validatedData = donationSchema.parse(req.body);
-    const { amount, name, email, method, type } = validatedData;
-
-    // 1. Save the donation to your database with status 'PENDING'
+    
     const donation = await donationService.createDonation({
-      name,
-      email,
-      amount,
-      type: type as DonationType,
-      method: method as DonationMethod,
+      ...validatedData,
       status: DonationStatus.PENDING,
     });
 
-    // 2. Create a Payment Intent with Stripe
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount * 100, // Amount in cents
-      currency: 'eur', // Change to your currency
-      metadata: { 
-        name, 
-        email,
-        donationId: donation.id // Pass your internal donation ID to Stripe
-      },
-    });
+    // Here you would typically trigger instructions for Mobile Money payment,
+    // for example by sending an email or SMS. For now, we just confirm creation.
 
-
-    // 3. Return the client secret to the frontend
     res.status(201).json({ 
-      clientSecret: paymentIntent.client_secret,
+      message: "Donation promise recorded successfully.",
       donationId: donation.id 
     });
 

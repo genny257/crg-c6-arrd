@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Lock, Users, HeartHandshake, Loader2, Building } from "lucide-react";
 import Link from "next/link";
@@ -18,19 +17,21 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { cn } from "@/lib/utils";
 import { PublicLayout } from "@/components/public-layout";
 
-import { loadStripe, StripePaymentElementOptions } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-
-// Make sure to call `loadStripe` outside of a component’s render to avoid
-// recreating the `Stripe` object on every render.
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
-
-
 const donationAmounts = [
     { amount: 2000, label: "2 000 FCFA", description: "Fournit un kit d'hygiène de base." },
     { amount: 5000, label: "5 000 FCFA", description: "Permet un soin de santé essentiel pour un enfant." },
     { amount: 10000, label: "10 000 FCFA", description: "Nourrit une famille pendant une semaine." },
 ];
+
+const donationSchema = z.object({
+    amount: z.coerce.number().min(1000, "Le montant minimum est de 1 000 FCFA."),
+    firstName: z.string().min(1, "Le prénom est requis."),
+    lastName: z.string().min(1, "Le nom est requis."),
+    email: z.string().email("L'adresse e-mail n'est pas valide."),
+    type: z.enum(['Ponctuel', 'Mensuel']).default('Ponctuel'),
+});
+
+type FormValues = z.infer<typeof donationSchema>;
 
 export default function DonationPage() {
     const [isSuccess, setIsSuccess] = React.useState(false);
@@ -46,7 +47,7 @@ export default function DonationPage() {
                         </CardHeader>
                         <CardContent>
                             <p className="text-muted-foreground mb-6">
-                                Votre don a été traité avec succès. Votre soutien est précieux et nous aidera à poursuivre nos actions sur le terrain. Un reçu vous a été envoyé par e-mail.
+                                Votre promesse de don a été enregistrée avec succès. Vous recevrez des instructions par e-mail pour finaliser votre contribution par Mobile Money.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Button asChild>
@@ -73,24 +74,13 @@ export default function DonationPage() {
                        
                         <Card>
                             <CardContent className="p-6">
-                                <Tabs defaultValue="onetime">
-                                    <TabsList className="grid w-full grid-cols-2">
-                                        <TabsTrigger value="onetime">Don ponctuel</TabsTrigger>
-                                        <TabsTrigger value="monthly">Don mensuel</TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="onetime" className="mt-6">
-                                        <StripeDonationForm onFormSuccess={() => setIsSuccess(true)} isMonthly={false} />
-                                    </TabsContent>
-                                    <TabsContent value="monthly" className="mt-6">
-                                        <StripeDonationForm onFormSuccess={() => setIsSuccess(true)} isMonthly={true} />
-                                    </TabsContent>
-                                </Tabs>
+                                <DonationForm onFormSuccess={() => setIsSuccess(true)} />
                             </CardContent>
                         </Card>
 
                         <div className="flex items-center text-sm text-muted-foreground">
                             <Lock className="h-4 w-4 mr-2" />
-                            <span>Transactions 100% sécurisées via Stripe.</span>
+                            <span>Votre contribution est essentielle et sécurisée.</span>
                         </div>
                     </div>
                     
@@ -143,20 +133,8 @@ export default function DonationPage() {
     );
 }
 
-const donationSchema = z.object({
-    amount: z.coerce.number().min(1000, "Le montant minimum est de 1 000 FCFA."),
-    firstName: z.string().min(1, "Le prénom est requis."),
-    lastName: z.string().min(1, "Le nom est requis."),
-    email: z.string().email("L'adresse e-mail n'est pas valide."),
-});
-
-type FormValues = z.infer<typeof donationSchema>;
-
-const StripeDonationForm = ({ onFormSuccess, isMonthly }: { onFormSuccess: () => void, isMonthly: boolean }) => {
-    const [clientSecret, setClientSecret] = React.useState<string | null>(null);
-    const [donationId, setDonationId] = React.useState<string | null>(null);
+const DonationForm = ({ onFormSuccess }: { onFormSuccess: () => void }) => {
     const { toast } = useToast();
-
     const form = useForm<FormValues>({
         resolver: zodResolver(donationSchema),
         defaultValues: {
@@ -164,16 +142,16 @@ const StripeDonationForm = ({ onFormSuccess, isMonthly }: { onFormSuccess: () =>
             firstName: "",
             lastName: "",
             email: "",
+            type: 'Ponctuel',
         },
     });
 
-    const handleProceedToPayment = async (data: FormValues) => {
+    const handleDonationSubmit = async (data: FormValues) => {
         try {
             const donationPayload = {
                 ...data,
                 name: `${data.firstName} ${data.lastName}`,
-                type: isMonthly ? 'Mensuel' : 'Ponctuel',
-                method: 'Carte_Bancaire',
+                method: 'Mobile_Money', // Only Mobile Money is supported now
             };
 
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations`, {
@@ -183,45 +161,58 @@ const StripeDonationForm = ({ onFormSuccess, isMonthly }: { onFormSuccess: () =>
             });
 
             if (!response.ok) {
-                throw new Error("Impossible de préparer le paiement.");
+                throw new Error("Impossible d'enregistrer la promesse de don.");
             }
 
-            const { clientSecret, donationId } = await response.json();
-            setClientSecret(clientSecret);
-            setDonationId(donationId);
+            toast({
+                title: "Promesse enregistrée !",
+                description: "Merci ! Vous recevrez bientôt les instructions pour finaliser votre don.",
+            });
+            onFormSuccess();
+
         } catch (error) {
-            console.error("Error creating payment intent:", error);
+            console.error("Error creating donation record:", error);
             toast({
                 title: "Erreur",
-                description: "Une erreur est survenue lors de la préparation du paiement.",
+                description: "Une erreur est survenue lors de l'enregistrement de votre promesse de don.",
                 variant: "destructive",
             });
         }
     };
     
-    const paymentElementOptions: StripePaymentElementOptions = {
-        layout: "tabs",
-    };
-
-    return (
-        <div>
-            {!clientSecret ? (
-                <DonationDetailsForm form={form} onSubmit={handleProceedToPayment} />
-            ) : (
-                <Elements stripe={stripePromise} options={{ clientSecret }}>
-                    <CheckoutForm onFormSuccess={onFormSuccess} donationId={donationId!} />
-                </Elements>
-            )}
-        </div>
-    );
-}
-
-const DonationDetailsForm = ({ form, onSubmit }: { form: any, onSubmit: (data: FormValues) => void }) => {
     const selectedAmount = form.watch("amount");
+
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div>
+            <form onSubmit={form.handleSubmit(handleDonationSubmit)} className="space-y-6">
+                <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                        <FormItem className="space-y-3">
+                            <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="grid grid-cols-2 gap-4"
+                            >
+                                <FormItem>
+                                    <FormControl>
+                                        <RadioGroupItem value="Ponctuel" id="onetime" className="sr-only" />
+                                    </FormControl>
+                                    <Label htmlFor="onetime" className={cn("flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer", field.value === 'Ponctuel' && 'border-primary')}>Don ponctuel</Label>
+                                </FormItem>
+                                <FormItem>
+                                     <FormControl>
+                                        <RadioGroupItem value="Mensuel" id="monthly" className="sr-only" />
+                                    </FormControl>
+                                    <Label htmlFor="monthly" className={cn("flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer", field.value === 'Mensuel' && 'border-primary')}>Don mensuel</Label>
+                                </FormItem>
+                            </RadioGroup>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <div>
                     <Label className="text-base font-semibold mb-2 block">Choisissez un montant</Label>
                     <FormField
                         control={form.control}
@@ -324,63 +315,11 @@ const DonationDetailsForm = ({ form, onSubmit }: { form: any, onSubmit: (data: F
                         )}
                     />
                 </div>
-                <Button type="submit" className="w-full">
-                    Procéder au paiement
+                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                     {form.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    Je fais un don
                 </Button>
             </form>
         </Form>
     )
 }
-
-const CheckoutForm = ({ onFormSuccess, donationId }: { onFormSuccess: () => void, donationId: string }) => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const { toast } = useToast();
-  const [isProcessing, setIsProcessing] = React.useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!stripe || !elements) {
-      return;
-    }
-
-    setIsProcessing(true);
-
-    const { error, paymentIntent } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/donations?success=true`,
-      },
-      redirect: 'if_required',
-    });
-
-    if (error) {
-      toast({ title: "Erreur de paiement", description: error.message, variant: "destructive" });
-      setIsProcessing(false);
-    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      try {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/confirm`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ donationId: donationId })
-        });
-        toast({ title: "Paiement réussi!", description: "Votre don a été accepté. Merci !" });
-        onFormSuccess();
-      } catch (confirmError) {
-          toast({ title: "Erreur de confirmation", description: "Votre paiement a été traité, mais nous n'avons pas pu confirmer la donation. Veuillez nous contacter.", variant: "destructive" });
-      } finally {
-        setIsProcessing(false);
-      }
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-        <PaymentElement />
-        <Button disabled={isProcessing || !stripe || !elements} className="w-full text-lg h-12" type="submit">
-            {isProcessing ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : "Payer maintenant"}
-        </Button>
-    </form>
-  );
-};
