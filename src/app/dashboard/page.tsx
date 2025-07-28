@@ -15,7 +15,8 @@ import { useAuth } from "@/hooks/use-auth";
 import type { SecurityStats } from "@/types/stats";
 
 export default function DashboardPage() {
-    const { token } = useAuth();
+    const { user, token } = useAuth();
+    const isSuperAdmin = user?.role === 'SUPERADMIN';
     const [stats, setStats] = React.useState<SecurityStats | null>(null);
     const [pendingVolunteers, setPendingVolunteers] = React.useState<Volunteer[]>([]);
     const [upcomingMissions, setUpcomingMissions] = React.useState<Mission[]>([]);
@@ -30,17 +31,30 @@ export default function DashboardPage() {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const [statsRes, volunteersRes, missionsRes] = await Promise.all([
-                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/stats`, { headers: { 'Authorization': `Bearer ${token}` }}),
+                const endpoints = [
                     fetch(`${process.env.NEXT_PUBLIC_API_URL}/volunteers`, { headers: { 'Authorization': `Bearer ${token}` }}),
                     fetch(`${process.env.NEXT_PUBLIC_API_URL}/missions`, { headers: { 'Authorization': `Bearer ${token}` }})
-                ]);
+                ];
                 
-                if (!volunteersRes.ok || !missionsRes.ok || !statsRes.ok) {
-                    throw new Error("Failed to fetch initial dashboard data");
+                if (isSuperAdmin) {
+                    endpoints.unshift(fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/stats`, { headers: { 'Authorization': `Bearer ${token}` }}));
+                }
+
+                const responses = await Promise.all(endpoints);
+                
+                let statsData = null;
+                if (isSuperAdmin) {
+                    const statsRes = responses.shift();
+                    if (statsRes && statsRes.ok) statsData = await statsRes.json();
+                }
+
+                const [volunteersRes, missionsRes] = responses;
+                
+                if (!volunteersRes.ok || !missionsRes.ok) {
+                    throw new Error("Failed to fetch dashboard data");
                 }
                 
-                setStats(await statsRes.json());
+                setStats(statsData);
                 
                 const volunteersData: Volunteer[] = await volunteersRes.json();
                 const missionsData: Mission[] = await missionsRes.json();
@@ -55,54 +69,57 @@ export default function DashboardPage() {
             }
         };
         fetchData();
-    }, [token]);
+    }, [token, isSuperAdmin]);
 
     return (
         <div className="flex flex-col gap-8">
             <h1 className="text-3xl font-headline font-bold">Tableau de bord</h1>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Requêtes (24h)</CardTitle>
-                        <BarChart className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        {loading ? <Skeleton className="h-8 w-1/4" /> : <div className="text-2xl font-bold">{stats?.totalRequests}</div>}
-                        <p className="text-xs text-muted-foreground">Toutes les requêtes API</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Visiteurs Uniques (24h)</CardTitle>
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                         {loading ? <Skeleton className="h-8 w-1/4" /> : <div className="text-2xl font-bold">{stats?.uniqueVisitors}</div>}
-                        <p className="text-xs text-muted-foreground">Adresses IP uniques vues</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Menaces Détectées</CardTitle>
-                        <AlertTriangle className="h-4 w-4 text-destructive" />
-                    </CardHeader>
-                    <CardContent>
-                         {loading ? <Skeleton className="h-8 w-1/4" /> : <div className="text-2xl font-bold text-destructive">{stats?.totalThreats}</div>}
-                        <p className="text-xs text-muted-foreground">Tentatives suspectes bloquées</p>
-                    </CardContent>
-                </Card>
-                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">IP Bloquées</CardTitle>
-                        <Shield className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                         {loading ? <Skeleton className="h-8 w-1/4" /> : <div className="text-2xl font-bold">{stats?.totalBlocked}</div>}
-                        <p className="text-xs text-muted-foreground">IP bannies manuellement</p>
-                    </CardContent>
-                </Card>
-            </div>
+            {isSuperAdmin && (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <Card>
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                          <CardTitle className="text-sm font-medium">Total Requêtes (24h)</CardTitle>
+                          <BarChart className="h-4 w-4 text-muted-foreground" />
+                      </CardHeader>
+                      <CardContent>
+                          {loading ? <Skeleton className="h-8 w-1/4" /> : <div className="text-2xl font-bold">{stats?.totalRequests}</div>}
+                          <p className="text-xs text-muted-foreground">Toutes les requêtes API</p>
+                      </CardContent>
+                  </Card>
+                  <Card>
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                          <CardTitle className="text-sm font-medium">Visiteurs Uniques (24h)</CardTitle>
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                      </CardHeader>
+                      <CardContent>
+                           {loading ? <Skeleton className="h-8 w-1/4" /> : <div className="text-2xl font-bold">{stats?.uniqueVisitors}</div>}
+                          <p className="text-xs text-muted-foreground">Adresses IP uniques vues</p>
+                      </CardContent>
+                  </Card>
+                  <Card>
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                          <CardTitle className="text-sm font-medium">Menaces Détectées</CardTitle>
+                          <AlertTriangle className="h-4 w-4 text-destructive" />
+                      </CardHeader>
+                      <CardContent>
+                           {loading ? <Skeleton className="h-8 w-1/4" /> : <div className="text-2xl font-bold text-destructive">{stats?.totalThreats}</div>}
+                          <p className="text-xs text-muted-foreground">Tentatives suspectes bloquées</p>
+                      </CardContent>
+                  </Card>
+                   <Card>
+                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                          <CardTitle className="text-sm font-medium">IP Bloquées</CardTitle>
+                          <Shield className="h-4 w-4 text-muted-foreground" />
+                      </CardHeader>
+                      <CardContent>
+                           {loading ? <Skeleton className="h-8 w-1/4" /> : <div className="text-2xl font-bold">{stats?.totalBlocked}</div>}
+                          <p className="text-xs text-muted-foreground">IP bannies manuellement</p>
+                      </CardContent>
+                  </Card>
+              </div>
+            )}
+
 
             <div className="grid gap-8 md:grid-cols-2">
                 <Card>

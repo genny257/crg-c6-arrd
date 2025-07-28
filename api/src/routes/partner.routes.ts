@@ -17,10 +17,8 @@ const isAdmin = (req: any, res: any, next: any) => {
 router.get('/partners', partnerController.getPartners);
 
 // Protected routes for management
-router.use('/partners', protect, isAdmin);
-
-router.post('/partners', partnerController.createPartner);
-router.put('/partners/:id', partnerController.updatePartner);
-router.delete('/partners/:id', partnerController.deletePartner);
+router.post('/partners', protect, isAdmin, partnerController.createPartner);
+router.put('/partners/:id', protect, isAdmin, partnerController.updatePartner);
+router.delete('/partners/:id', protect, isAdmin, partnerController.deletePartner);
 
 export default router;

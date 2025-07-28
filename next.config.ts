@@ -6,10 +6,11 @@ const ContentSecurityPolicy = `
   script-src 'self' 'unsafe-eval' 'unsafe-inline';
   child-src 'self';
   style-src 'self' 'unsafe-inline';
-  img-src * blob: data:;
+  img-src 'self' https://placehold.co https://images.weserv.nl data:;
   media-src 'self';
-  connect-src *;
+  connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL ? new URL(process.env.NEXT_PUBLIC_API_URL).origin : ''} https://api.mapbox.com https://events.mapbox.com;
   font-src 'self';
+  frame-src 'self' https://www.google.com;
 `;
 
 const securityHeaders = [

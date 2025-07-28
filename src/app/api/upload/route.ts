@@ -25,8 +25,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: 'Failed to create upload directory' }, { status: 500 });
   }
   
-  // Use a timestamp for unique filenames
-  const filename = `${Date.now()}-${file.name}`;
+  // Use a timestamp and a random string for unique filenames to prevent conflicts and guessing
+  const fileExtension = file.name.split('.').pop();
+  const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+  const filename = `${uniqueSuffix}.${fileExtension}`;
   const path = join(uploadDir, filename);
   
   try {
