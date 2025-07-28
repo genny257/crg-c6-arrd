@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -5,7 +6,6 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { PublicLayout } from "@/components/public-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -75,23 +75,20 @@ export default function RendezVousPage() {
 
   if (isSubmitted) {
     return (
-        <PublicLayout>
-            <div className="container mx-auto px-4 py-16 flex items-center justify-center">
-                <Card className="flex flex-col items-center justify-center text-center p-8 max-w-lg">
-                    <CheckCircle2 className="h-16 w-16 text-green-500 mb-4" />
-                    <CardTitle className="font-headline text-2xl">Rendez-vous demandé !</CardTitle>
-                    <CardDescription className="mt-2">
-                        Votre demande a bien été enregistrée. Nous la confirmerons par e-mail dans les plus brefs délais.
-                    </CardDescription>
-                    <Button onClick={() => setIsSubmitted(false)} className="mt-6">Prendre un autre rendez-vous</Button>
-                </Card>
-            </div>
-        </PublicLayout>
+        <div className="container mx-auto px-4 py-16 flex items-center justify-center">
+            <Card className="flex flex-col items-center justify-center text-center p-8 max-w-lg">
+                <CheckCircle2 className="h-16 w-16 text-green-500 mb-4" />
+                <CardTitle className="font-headline text-2xl">Rendez-vous demandé !</CardTitle>
+                <CardDescription className="mt-2">
+                    Votre demande a bien été enregistrée. Nous la confirmerons par e-mail dans les plus brefs délais.
+                </CardDescription>
+                <Button onClick={() => setIsSubmitted(false)} className="mt-6">Prendre un autre rendez-vous</Button>
+            </Card>
+        </div>
     );
   }
 
   return (
-    <PublicLayout>
       <div className="container mx-auto px-4 py-8 md:py-16">
         <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
@@ -193,6 +190,5 @@ export default function RendezVousPage() {
             </Card>
         </div>
       </div>
-    </PublicLayout>
   );
 }
