@@ -2,7 +2,8 @@
 
 Bienvenue sur la plateforme de gestion de la Croix-Rouge Gabonaise pour le comité du 6ème arrondissement. Cette application est conçue pour optimiser la gestion des volontaires, des missions, des dons et des communications.
 
-**Propriété** : Cette plateforme a été développée par **TechGa**, qui en est l'unique propriétaire.
+**Slogan** : Ensemble nous sommes plus forts.
+**Propriété** : Cette plateforme a été développée par **TechGA**, qui en est l'unique propriétaire.
 
 ## Stack Technique
 
