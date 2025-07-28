@@ -1,17 +1,17 @@
-
 "use client"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Network, Users } from "lucide-react";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { Volunteer } from "@/types/volunteer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TeamMember, TeamStructure, Pool } from "@/types/team";
 import { allPoolIcons } from "@/lib/icons";
 
+// Component to display a team member card
 const MemberCard = ({ member, size = 'default' }: { member: TeamMember, size?: 'default' | 'small' }) => (
     <div className="flex flex-col items-center text-center">
         <Avatar className={size === 'default' ? "h-24 w-24 mb-2" : "h-16 w-16 mb-2"}>
@@ -23,6 +23,7 @@ const MemberCard = ({ member, size = 'default' }: { member: TeamMember, size?: '
     </div>
 );
 
+// Component to display a volunteer card
 const VolunteerCard = ({ volunteer }: { volunteer: Volunteer }) => (
     <div className="flex flex-col items-center text-center">
         <Avatar className={"h-16 w-16 mb-2"}>
@@ -33,6 +34,7 @@ const VolunteerCard = ({ volunteer }: { volunteer: Volunteer }) => (
     </div>
 );
 
+// Component to display a team pool card
 const PoolCard = ({ pool }: { pool: Pool }) => {
     const Icon = allPoolIcons[pool.iconKey] || Network;
     return (
@@ -63,20 +65,22 @@ const PoolCard = ({ pool }: { pool: Pool }) => {
     );
 };
 
-
+// Component for section titles
 const SectionTitle = ({ children }: { children: React.ReactNode }) => (
     <div className="relative my-6">
         <Separator />
-        <h2 className="absolute left-1/2 -translate-x-1/2 -top-3.5 bg-card px-2 text-center font-headline text-lg text-muted-foreground">{children}</h2>
+        <h2 className="absolute left-1/2 -translate-x-1/2 -top-3.5 bg-background px-2 text-center font-headline text-lg text-muted-foreground">{children}</h2>
     </div>
 );
 
+// Main TeamPage component
 export default function TeamPage() {
     const { toast } = useToast();
     const [teamStructure, setTeamStructure] = useState<TeamStructure | null>(null);
     const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
     const [loading, setLoading] = useState(true);
     
+    // Fetch team structure and active volunteers
     useEffect(() => {
         const fetchTeamData = async () => {
             setLoading(true);
@@ -103,13 +107,9 @@ export default function TeamPage() {
         fetchTeamData();
     }, [toast]);
 
-    const activeVolunteers = useMemo(() => {
-        return volunteers.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    }, [volunteers]);
-
     if (loading || !teamStructure) {
         return (
-            <div className="space-y-4">
+            <div className="space-y-4 container mx-auto px-4 py-8 md:py-16">
                 <Skeleton className="h-10 w-64" />
                 <Card><CardContent><Skeleton className="h-96 w-full" /></CardContent></Card>
                  <Card><CardContent><Skeleton className="h-64 w-full" /></CardContent></Card>
@@ -118,13 +118,13 @@ export default function TeamPage() {
     }
 
     return (
-        <div className="flex flex-col gap-12">
-            <div className="space-y-2">
-                <h1 className="text-3xl font-headline font-bold flex items-center gap-2">
+        <div className="flex flex-col gap-12 container mx-auto px-4 py-8 md:py-16">
+            <div className="space-y-2 text-center">
+                <h1 className="text-3xl font-headline font-bold flex items-center justify-center gap-2">
                     <Network className="w-8 h-8 text-primary"/>
                     Notre Équipe
                 </h1>
-                <p className="text-muted-foreground">Découvrez l'organisation et les membres du Comité du Sixième Arrondissement.</p>
+                <p className="text-muted-foreground max-w-2xl mx-auto">Découvrez l'organisation et les membres du Comité du Sixième Arrondissement.</p>
             </div>
             
              <Card className="w-full">
@@ -189,7 +189,7 @@ export default function TeamPage() {
                     <CardTitle className="text-center font-headline text-xl flex items-center justify-center gap-2">
                         <Users className="w-6 h-6"/> Nos Volontaires Actifs
                     </CardTitle>
-                    <CardDescription className="text-center">La force vive de notre comité.</CardDescription>
+                    <p className="text-center text-muted-foreground">La force vive de notre comité.</p>
                 </CardHeader>
                 <CardContent>
                     {loading ? (
@@ -203,12 +203,12 @@ export default function TeamPage() {
                         </div>
                     ) : (
                             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-x-4 gap-y-6">
-                            {activeVolunteers.map(volunteer => (
+                            {volunteers.map(volunteer => (
                                 <VolunteerCard key={volunteer.id} volunteer={volunteer} />
                             ))}
                         </div>
                     )}
-                    {!loading && activeVolunteers.length === 0 && (
+                    {!loading && volunteers.length === 0 && (
                         <p className="text-center text-muted-foreground py-8">
                            Aucun volontaire actif pour le moment.
                         </p>

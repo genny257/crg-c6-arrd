@@ -1,4 +1,3 @@
-
 // api/src/services/airtel.service.ts
 import fetch from 'node-fetch';
 
@@ -12,6 +11,9 @@ let authToken: { token: string; expiresAt: number } | null = null;
 
 /**
  * Gets a valid OAuth2 token from Airtel Money API, refreshing if necessary.
+ * Caches the token in memory to avoid redundant authentication requests.
+ * @returns {Promise<string>} A valid Bearer token for API requests.
+ * @throws {Error} If authentication with Airtel fails.
  */
 async function getAuthToken(): Promise<string> {
     if (authToken && authToken.expiresAt > Date.now()) {
@@ -37,7 +39,8 @@ async function getAuthToken(): Promise<string> {
     const data: any = await response.json();
     authToken = {
         token: data.access_token,
-        expiresAt: Date.now() + (parseInt(data.expires_in, 10) - 300) * 1000, // Refresh 5 minutes before expiry
+        // Refresh token 5 minutes before it expires to be safe
+        expiresAt: Date.now() + (parseInt(data.expires_in, 10) - 300) * 1000,
     };
 
     return authToken.token;
@@ -51,6 +54,10 @@ interface UssdPushPayload {
 
 /**
  * Initiates a USSD Push Payment request using Airtel Money Collection API.
+ * This will trigger a prompt on the user's phone to enter their PIN.
+ * @param {UssdPushPayload} payload - The transaction details.
+ * @returns {Promise<any>} The response from the Airtel API.
+ * @throws {Error} If API environment variables are not set or the request fails.
  */
 export async function initiateUssdPushPayment({ msisdn, amount, transactionId }: UssdPushPayload) {
     if (!BASE_URL || !CLIENT_ID || !CLIENT_SECRET) {
@@ -96,14 +103,17 @@ export async function initiateUssdPushPayment({ msisdn, amount, transactionId }:
 }
 
 interface TransactionsSummaryPayload {
-    from: number;
-    to: number;
+    from: number; // EPOCH timestamp
+    to: number;   // EPOCH timestamp
     limit: number;
     offset: number;
 }
 
 /**
  * Retrieves a summary of transactions for a defined period.
+ * @param {TransactionsSummaryPayload} payload - The query parameters for the transaction summary.
+ * @returns {Promise<any>} The transaction summary response from the Airtel API.
+ * @throws {Error} If API environment variables are not set or the request fails.
  */
 export async function getTransactionsSummary({ from, to, limit, offset }: TransactionsSummaryPayload) {
     if (!BASE_URL || !CLIENT_ID || !CLIENT_SECRET) {

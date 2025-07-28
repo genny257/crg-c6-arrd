@@ -130,7 +130,7 @@ export default function RendezVousPage() {
                                     />
                                     {selectedDate && (
                                         <div>
-                                            <Label>2. Choisissez une heure</Label>
+                                            <FormLabel>2. Choisissez une heure</FormLabel>
                                             <div className="grid grid-cols-3 gap-2 mt-2">
                                                 {availableTimeSlots.map(time => (
                                                     <Button
