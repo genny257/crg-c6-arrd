@@ -63,7 +63,7 @@ export default function HymnePage() {
                 </CardHeader>
                 <CardContent>
                     <audio controls className="w-full">
-                        <source src="/hymne-crg.mp3" type="audio/mpeg" />
+                        <source src="https://upload.wikimedia.org/wikipedia/commons/e/e4/The_Hymn_of_the_Red_Cross.ogg" type="audio/ogg" />
                         Votre navigateur ne supporte pas l'élément audio.
                     </audio>
                     <p className="text-sm text-muted-foreground mt-4">
