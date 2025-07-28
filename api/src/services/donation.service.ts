@@ -2,7 +2,7 @@
 import { PrismaClient, Donation, DonationStatus } from '@prisma/client';
 const prisma = new PrismaClient();
 
-export const createDonation = async (data: Omit<Donation, 'id' | 'createdAt' | 'updatedAt'>): Promise<Donation> => {
+export const createDonation = async (data: Omit<Donation, 'id' | 'createdAt' | 'updatedAt' | 'airtelMoneyId'>): Promise<Donation> => {
     return await prisma.donation.create({ data });
 };
 
@@ -12,6 +12,14 @@ export const updateDonationStatus = async (id: string, status: DonationStatus): 
         data: { status },
     });
 };
+
+export const updateDonationWithAirtelId = async (id: string, airtelMoneyId: string): Promise<Donation> => {
+    return await prisma.donation.update({
+        where: { id },
+        data: { airtelMoneyId, status: DonationStatus.CONFIRMED },
+    });
+};
+
 
 export const getAllDonations = async (): Promise<Donation[]> => {
     return await prisma.donation.findMany({

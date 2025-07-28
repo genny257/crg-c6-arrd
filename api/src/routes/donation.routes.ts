@@ -14,7 +14,7 @@ const isAdmin = (req: any, res: any, next: any) => {
 };
 
 router.post('/donations', createDonation);
-router.post('/donations/confirm', confirmDonation);
+router.post('/donations/confirm', protect, isAdmin, confirmDonation);
 
 router.get('/donations', protect, isAdmin, getDonations);
 

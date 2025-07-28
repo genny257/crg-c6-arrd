@@ -82,6 +82,13 @@ Deux fichiers `.env` doivent être configurés : un à la racine pour le fronten
     # Clé API pour Genkit/Gemini
     GEMINI_API_KEY=[VOTRE_CLE_API_GEMINI]
     
+    # Configuration API Airtel Money
+    AIRTEL_API_BASE_URL=https://openapiuat.airtel.africa
+    AIRTEL_API_CLIENT_ID=votre_client_id
+    AIRTEL_API_CLIENT_SECRET=votre_client_secret
+    AIRTEL_API_COUNTRY=GA # Code pays ISO 3166-1 alpha-2 (ex: GA pour Gabon)
+    AIRTEL_API_CURRENCY=XAF # Code devise ISO 4217 (ex: XAF)
+
     NODE_ENV=development
     ```
 
