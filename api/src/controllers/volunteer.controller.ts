@@ -1,4 +1,3 @@
-
 // src/controllers/volunteer.controller.ts
 import { Request, Response } from 'express';
 import * as volunteerService from '../services/volunteer.service';
@@ -43,7 +42,7 @@ export const createVolunteer = async (req: Request, res: Response) => {
 
 export const getVolunteerById = async (req: Request, res: Response) => {
     try {
-        const volunteer = await volunteerService.getVolunteerById(req.params.id);
+        const volunteer = await userService.getFullVolunteerProfile(req.params.id);
         if (volunteer) {
             res.json(volunteer);
         } else {
@@ -71,5 +70,34 @@ export const updateVolunteerStatus = async (req: Request, res: Response) => {
             return res.status(400).json({ message: 'Validation failed', errors: error.issues });
         }
         res.status(500).json({ message: 'Error updating volunteer status', error });
+    }
+};
+
+const featureUpdateSchema = z.object({
+  isFeatured: z.boolean(),
+});
+
+export const updateVolunteerFeatureStatus = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { isFeatured } = featureUpdateSchema.parse(req.body);
+
+        const updatedVolunteer = await volunteerService.updateVolunteerFeatureStatus(id, isFeatured);
+
+        res.json(updatedVolunteer);
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({ message: 'Validation failed', errors: error.issues });
+        }
+        res.status(500).json({ message: 'Error updating volunteer feature status', error });
+    }
+};
+
+export const getFeaturedVolunteers = async (req: Request, res: Response) => {
+    try {
+        const volunteers = await volunteerService.getVolunteersOfTheMonth();
+        res.json(volunteers);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching featured volunteers', error });
     }
 };
