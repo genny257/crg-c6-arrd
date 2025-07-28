@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { ReactNode } from "react";
@@ -40,10 +41,11 @@ export function PublicLayout({ children }: { children: ReactNode }) {
             <Image src="/logo.png" alt="Croix-Rouge Gabonaise Logo" width={40} height={40} style={{ objectFit: 'contain' }} />
             <span className="font-semibold hidden sm:inline-block">Croix-Rouge Gabonaise</span>
         </Link>
-        <nav className="ml-auto hidden md:flex gap-4 sm:gap-6 items-center">
+        <nav className="ml-auto hidden lg:flex gap-4 sm:gap-6 items-center">
             {publicNavLinks.map(link => (
                 <Link key={link.href} href={link.href} className="text-sm font-medium hover:underline underline-offset-4">{link.label}</Link>
             ))}
+             <Link href="/rendez-vous" className="text-sm font-medium hover:underline underline-offset-4">Prendre rendez-vous</Link>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="text-sm font-medium hover:underline underline-offset-4 px-0 flex items-center gap-1">
@@ -74,7 +76,7 @@ export function PublicLayout({ children }: { children: ReactNode }) {
                 <Link href="/donations">Faire un Don</Link>
             </Button>
         </nav>
-        <div className="ml-auto md:hidden">
+        <div className="ml-auto lg:hidden">
             <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                 {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                 <span className="sr-only">Ouvrir le menu</span>
@@ -83,9 +85,9 @@ export function PublicLayout({ children }: { children: ReactNode }) {
       </header>
 
       {isMenuOpen && (
-          <div className="fixed top-14 left-0 w-full md:hidden bg-background shadow-md z-50">
+          <div className="fixed top-14 left-0 w-full lg:hidden bg-background shadow-md z-50">
               <nav className="flex flex-col items-center gap-4 p-4">
-                  {[...publicNavLinks, ...mediaNavLinks].map(link => (
+                  {[...publicNavLinks, { href: "/rendez-vous", label: "Prendre rendez-vous" }, ...mediaNavLinks].map(link => (
                      <Link key={link.href} href={link.href} className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>{link.label}</Link>
                   ))}
                    <div className="flex flex-col gap-4 w-full items-center mt-4 border-t pt-4">
@@ -115,9 +117,6 @@ export function PublicLayout({ children }: { children: ReactNode }) {
         <p className="text-xs text-muted-foreground">&copy; 2024 Croix-Rouge Gabonaise. Tous droits réservés.</p>
         <nav className="sm:ml-auto flex flex-wrap items-center justify-center gap-4 sm:gap-6">
           <PwaInstallButton />
-          <Link href="/rendez-vous" className="text-xs hover:underline underline-offset-4" prefetch={false}>
-            Prendre rendez-vous
-          </Link>
           <Link href="/mecenat" className="text-xs hover:underline underline-offset-4" prefetch={false}>
             Mécénat
           </Link>
