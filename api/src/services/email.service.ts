@@ -1,4 +1,7 @@
 import * as nodemailer from 'nodemailer';
+import type { Appointment } from '@prisma/client';
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface MailOptions {
   to: string;
@@ -53,9 +56,9 @@ export const EmailService = {
   },
 
   async sendContactFormEmail(name: string, fromEmail: string, subject: string, message: string): Promise<void> {
-    const to = process.env.ADMIN_EMAIL || process.env.EMAIL_FROM;
+    const to = process.env.ADMIN_EMAIL;
     if (!to) {
-        console.error("No recipient email address configured for contact form.");
+        console.error("No recipient email address configured for contact form. Set ADMIN_EMAIL in .env");
         throw new Error("Server configuration error: recipient email missing.");
     }
     
@@ -116,5 +119,45 @@ export const EmailService = {
     `;
 
     await this.sendEmail({ to: donorEmail, subject, html });
+  },
+
+  async sendNewAppointmentNotification(appointment: Appointment): Promise<void> {
+    const to = process.env.ADMIN_EMAIL;
+    if (!to) {
+        console.error("No recipient email address configured for appointment notifications. Set ADMIN_EMAIL in .env");
+        return; // Don't throw an error, just log it. The appointment is still created.
+    }
+    
+    const subject = `Nouvelle demande de rendez-vous de ${appointment.name}`;
+    const html = `
+       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h2 style="color: #B71C1C; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+         Nouvelle Demande de Rendez-vous
+        </h2>
+        <p>Une nouvelle demande de rendez-vous a été soumise sur le site.</p>
+        
+        <h3 style="color: #333; margin-top: 20px;">Détails de la demande :</h3>
+        <ul>
+          <li><strong>Nom :</strong> ${appointment.name}</li>
+          <li><strong>Email :</strong> <a href="mailto:${appointment.email}">${appointment.email}</a></li>
+          ${appointment.phone ? `<li><strong>Téléphone :</strong> ${appointment.phone}</li>` : ''}
+          <li><strong>Date et heure souhaitées :</strong> ${format(appointment.scheduledAt, "eeee d MMMM yyyy 'à' HH:mm", { locale: fr })}</li>
+          <li><strong>Motif :</strong> ${appointment.reason}</li>
+          ${appointment.details ? `<li><strong>Détails :</strong> ${appointment.details}</li>` : ''}
+        </ul>
+        
+        <br/>
+        <p>
+          Veuillez vous connecter à votre tableau de bord pour confirmer ou annuler ce rendez-vous.
+        </p>
+        <div style="margin-top: 25px;">
+            <a href="${process.env.NEXTAUTH_URL}/dashboard/appointments" style="background-color: #B71C1C; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                Gérer les rendez-vous
+            </a>
+        </div>
+      </div>
+    `;
+
+    await this.sendEmail({ to, subject, html, replyTo: appointment.email });
   }
 };

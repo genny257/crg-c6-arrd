@@ -222,4 +222,3 @@ Voici un résumé des différentes sections de l'API Airtel Money pour mieux com
 *   **Buy Airtime** : API pour acheter du crédit téléphonique.
 *   **Favourite Service** : Permet de configurer des services favoris pour un utilisateur.
 *   **References** : Documents de référence (schémas JSON, spécifications, etc.).
-```

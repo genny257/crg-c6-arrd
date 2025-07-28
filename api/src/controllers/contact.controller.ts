@@ -14,6 +14,7 @@ export const handleContactForm = async (req: Request, res: Response) => {
     try {
         const { name, email, subject, message } = contactSchema.parse(req.body);
 
+        // Send notification email to admin
         await EmailService.sendContactFormEmail(name, email, subject, message);
 
         res.status(200).json({ message: "Message sent successfully." });

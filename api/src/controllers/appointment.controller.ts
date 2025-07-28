@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import * as appointmentService from '../services/appointment.service';
 import { z } from 'zod';
 import { AppointmentStatus } from '@prisma/client';
+import { EmailService } from '../services/email.service';
 
 const appointmentSchema = z.object({
   name: z.string().min(1, "Le nom est requis."),
@@ -20,6 +21,10 @@ export const createAppointments = async (req: Request, res: Response) => {
             ...validatedData,
             scheduledAt: new Date(validatedData.scheduledAt),
         });
+
+        // Send notification email to admin
+        await EmailService.sendNewAppointmentNotification(appointment);
+        
         res.status(201).json(appointment);
     } catch (error) {
          if (error instanceof z.ZodError) {
