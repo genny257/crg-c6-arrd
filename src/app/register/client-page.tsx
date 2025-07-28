@@ -310,6 +310,8 @@ export function RegisterClientPage({
   const [educationLevels, setEducationLevels] = React.useState(initialEducationLevels);
   const [professions, setProfessions] = React.useState(initialProfessions);
   const [skills, setSkills] = React.useState(initialSkills);
+  
+  const [newSkillInput, setNewSkillInput] = React.useState("");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(RegisterUserInputSchema),
@@ -348,9 +350,6 @@ export function RegisterClientPage({
       termsAccepted: true,
     },
   });
-
-  const [skillsPopoverOpen, setSkillsPopoverOpen] = React.useState(false);
-  const [skillsInputValue, setSkillsInputValue] = React.useState("");
 
   const [educationPopoverOpen, setEducationPopoverOpen] =
     React.useState(false);
@@ -468,23 +467,22 @@ export function RegisterClientPage({
 
   const progress = (step / totalSteps) * 100;
 
-  const handleUnselectSkill = (skill: string) => {
+  const handleSkillsChange = (newSkill: string) => {
+     const currentSkills = form.getValues("skills") || [];
+     if(newSkill && !currentSkills.includes(newSkill)) {
+         form.setValue("skills", [...currentSkills, newSkill]);
+         setNewSkillInput("");
+     }
+  };
+
+  const handleRemoveSkill = (skillToRemove: string) => {
     const currentSkills = form.getValues("skills") || [];
     form.setValue(
       "skills",
-      currentSkills.filter((s: string) => s !== skill)
+      currentSkills.filter((s: string) => s !== skillToRemove)
     );
   };
-
-  const handleSelectSkill = (skill: string) => {
-    const currentSkills = form.getValues("skills") || [];
-    if (!currentSkills.includes(skill)) {
-      form.setValue("skills", [...currentSkills, skill]);
-    }
-    setSkillsInputValue("");
-    setSkillsPopoverOpen(true);
-  };
-
+  
   const photoPreview = form.watch("photo");
   const idCardFrontPreview = form.watch("idCardFront");
   const idCardBackPreview = form.watch("idCardBack");
@@ -1058,36 +1056,32 @@ export function RegisterClientPage({
                       )}
                     />
                     <FormField
-                      control={form.control}
-                      name="skills"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Compétences spécifiques utiles</FormLabel>
-                          <FormDescription>
-                            Sélectionnez vos compétences ou ajoutez les vôtres.
-                          </FormDescription>
-                          <Popover
-                            open={skillsPopoverOpen}
-                            onOpenChange={setSkillsPopoverOpen}
-                          >
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  role="combobox"
-                                  className="w-full justify-between h-auto"
-                                >
-                                  <div className="flex gap-1 flex-wrap">
-                                    {field.value && field.value.length > 0 ? (
-                                      field.value.map((skill) => (
-                                        <Badge
+                        control={form.control}
+                        name="skills"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Compétences spécifiques</FormLabel>
+                                <div className="flex gap-2">
+                                <Input 
+                                    placeholder="Ex: Secourisme, Informatique..."
+                                    value={newSkillInput}
+                                    onChange={(e) => setNewSkillInput(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            handleSkillsChange(newSkillInput);
+                                        }
+                                    }}
+                                />
+                                <Button type="button" variant="outline" onClick={() => handleSkillsChange(newSkillInput)}>Ajouter</Button>
+                                </div>
+                                <div className="flex flex-wrap gap-2 pt-2">
+                                    {field.value?.map(skill => (
+                                         <Badge
                                           variant="secondary"
                                           key={skill}
                                           className="mr-1 mb-1 capitalize"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleUnselectSkill(skill);
-                                          }}
+                                          onClick={() => handleRemoveSkill(skill)}
                                         >
                                           {skill}
                                           <button
@@ -1098,69 +1092,17 @@ export function RegisterClientPage({
                                             }}
                                             onClick={(e) => {
                                               e.stopPropagation();
-                                              handleUnselectSkill(skill);
+                                              handleRemoveSkill(skill);
                                             }}
                                           >
                                             <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
                                           </button>
                                         </Badge>
-                                      ))
-                                    ) : (
-                                      <span className="text-muted-foreground">
-                                        Sélectionner des compétences...
-                                      </span>
-                                    )}
-                                  </div>
-                                  <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 ml-2" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
-                              <Command>
-                                <CommandInput
-                                  placeholder="Rechercher une compétence..."
-                                  value={skillsInputValue}
-                                  onValueChange={setSkillsInputValue}
-                                />
-                                <CommandList>
-                                  <CommandEmpty>
-                                    <CommandItem
-                                      onSelect={() => {
-                                        handleSelectSkill(skillsInputValue);
-                                        setSkills(prev => [...prev, skillsInputValue]);
-                                      }}
-                                    >
-                                      Ajouter "{skillsInputValue}"
-                                    </CommandItem>
-                                  </CommandEmpty>
-                                  <CommandGroup>
-                                      {skills.map((skill) => (
-                                        <CommandItem
-                                          key={skill}
-                                          value={skill}
-                                          onSelect={() =>
-                                            handleSelectSkill(skill)
-                                          }
-                                        >
-                                          <Check
-                                            className={cn(
-                                              "mr-2 h-4 w-4",
-                                              field.value?.includes(skill)
-                                                ? "opacity-100"
-                                                : "opacity-0"
-                                            )}
-                                          />
-                                          {skill}
-                                        </CommandItem>
-                                      ))}
-                                    </CommandGroup>
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                                    ))}
+                                </div>
+                                <FormMessage />
+                            </FormItem>
+                        )}
                     />
                   </div>
                 </div>

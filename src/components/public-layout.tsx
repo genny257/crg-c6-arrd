@@ -120,7 +120,7 @@ export function PublicLayout({ children }: { children: ReactNode }) {
           <Link href="/mecenat" className="text-xs hover:underline underline-offset-4" prefetch={false}>
             Mécénat
           </Link>
-          <Link href="#" className="text-xs hover:underline underline-offset-4" prefetch={false}>
+          <Link href="/privacy-policy" className="text-xs hover:underline underline-offset-4" prefetch={false}>
             Politique de confidentialité
           </Link>
         </nav>
