@@ -4,6 +4,10 @@ import { SidebarNav } from "./sidebar-nav"
 
 const sidebarNavItems = [
   {
+    title: "Page d'accueil",
+    href: "/dashboard/settings/actions",
+  },
+  {
     title: "Paiements",
     href: "/dashboard/settings/payments",
   },
@@ -19,7 +23,7 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
       <div className="space-y-0.5">
         <h2 className="text-2xl font-bold tracking-tight">Paramètres</h2>
         <p className="text-muted-foreground">
-          Gérez les paramètres de votre site.
+          Gérez les paramètres et le contenu de votre site.
         </p>
       </div>
       <Separator className="my-6" />
@@ -27,7 +31,7 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
         <aside className="-mx-4 lg:w-1/5">
           <SidebarNav items={sidebarNavItems} />
         </aside>
-        <div className="flex-1 lg:max-w-4xl">{children}</div>
+        <div className="flex-1 lg:max-w-5xl">{children}</div>
       </div>
     </div>
   )

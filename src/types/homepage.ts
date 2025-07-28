@@ -1,8 +1,9 @@
 export interface ActionSection {
+  id: string;
   title: string;
   description: string;
   image: string;
-  imageHint: string;
+  imageHint?: string | null;
   dialogTitle: string;
   dialogDescription: string;
   dialogList: string[];
@@ -21,7 +22,6 @@ export interface HomePageContent {
   heroTitle: string;
   heroSubtitle: string;
   heroDescription: string;
-  actions: ActionSection[];
   engagement: EngagementSection;
 }
 
