@@ -3,7 +3,7 @@
 Bienvenue sur la plateforme de gestion de la Croix-Rouge Gabonaise pour le comité du 6ème arrondissement. Cette application est conçue pour optimiser la gestion des volontaires, des missions, des dons et des communications.
 
 **Slogan** : Ensemble nous sommes plus forts.
-**Propriété** : Cette plateforme a été développée par **TechGA**, qui en est l'unique propriétaire.
+**Propriété** : Cette plateforme a été développée en 2025 par **TechGA**, qui en est l'unique propriétaire.
 
 ## Stack Technique
 
@@ -89,7 +89,6 @@ Deux fichiers `.env` doivent être configurés : un à la racine pour le fronten
     AIRTEL_API_CLIENT_SECRET=votre_client_secret
     AIRTEL_API_COUNTRY=GA # Code pays ISO 3166-1 alpha-2 (ex: GA pour Gabon)
     AIRTEL_API_CURRENCY=XAF # Code devise ISO 4217 (ex: XAF)
-    AIRTEL_API_PUBLIC_KEY="MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArUj2SQKLCdTqJ3/ZL6nkh1N3rtjXBBM+0hBUrhJ/VNSMTBixpD+JjeNaHbONcrvJGSstC2tcVfD04s9xGIKr9TT6hCYaqGojLeuLimVdXzaP5DzDyrHY8mYgHL+/EGRDh+/7B56Gw8UZxOBPtF6Wjjq0TWGcw5YOW1lSPUeaD+kupmDFlMRk26fASELwkYo5NkHgL/w+XzXw8gDZtrNS6L8UX2mfqdQ9qKpdMP3ztfOUPjmTvIbTKrGLx0U2sUSQINtMxZQzsYaXIGoZ2thvbIhJMDFBNbznuv1n8b03Q3MAnEK/xCduQBUkUg1syy7jZMT4ETDeFuW2NMZhteaadwIDAQAB"
 
     NODE_ENV=development
     ```

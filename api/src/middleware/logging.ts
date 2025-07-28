@@ -1,8 +1,6 @@
 // src/middleware/logging.ts
 import { Request, Response, NextFunction } from 'express';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma'; // Use the shared prisma instance
 
 const THREAT_PATTERNS = [
     /(\%27)|(\')|(\-\-)|(\%23)|(#)/, // SQL Injection
@@ -29,7 +27,6 @@ export const loggingMiddleware = async (req: Request, res: Response, next: NextF
     }
 
     // 2. Request Logging
-    const originalSend = res.send;
     res.on('finish', async () => {
         try {
             const fullUrl = req.originalUrl || req.url;
