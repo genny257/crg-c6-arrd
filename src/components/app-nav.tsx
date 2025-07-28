@@ -184,7 +184,7 @@ export function AppNav() {
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
-            {isSuperAdmin && (
+            {isAdmin && (
             <SidebarMenuItem>
                 <Collapsible open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <CollapsibleTrigger asChild>
@@ -201,6 +201,9 @@ export function AppNav() {
                 <CollapsibleContent className="pl-8 py-1 space-y-1">
                      <Link href="/dashboard/settings/actions" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", pathname.includes('/settings/actions') && 'bg-sidebar-accent')}>
                         Page d'accueil
+                    </Link>
+                     <Link href="/dashboard/settings/partners" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", pathname.includes('/settings/partners') && 'bg-sidebar-accent')}>
+                        Partenaires
                     </Link>
                      <Link href="/dashboard/settings/payments" className={cn("block text-sm p-2 rounded-md hover:bg-sidebar-accent", pathname.includes('/settings/payments') && 'bg-sidebar-accent')}>
                         Paiements

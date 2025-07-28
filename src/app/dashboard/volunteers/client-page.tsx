@@ -130,11 +130,11 @@ export function VolunteersClientPage({ initialVolunteers, allCells, allProfessio
         }
 
         if (skillFilter) {
-            sortedVolunteers = sortedVolunteers.filter(v => v.skills?.includes(skillFilter));
+            sortedVolunteers = sortedVolunteers.filter(v => v.skills?.some(s => typeof s === 'object' ? s.name === skillFilter : s === skillFilter));
         }
         
         if (professionFilter) {
-            sortedVolunteers = sortedVolunteers.filter(v => v.profession === professionFilter);
+             sortedVolunteers = sortedVolunteers.filter(v => (typeof v.profession === 'object' && v.profession !== null) ? v.profession.name === professionFilter : v.profession === professionFilter);
         }
 
         if (searchTerm) {

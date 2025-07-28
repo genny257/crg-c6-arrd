@@ -16,9 +16,9 @@ export interface Volunteer {
   phone: string;
   email: string;
   address: string;
-  educationLevel?: string;
-  profession?: string;
-  skills?: string[];
+  educationLevel?: string | { name: string };
+  profession?: string | { name: string };
+  skills?: string[] | {id: string, name: string}[];
   volunteerExperience?: string;
   availability?: string[];
   causes?: string[];

@@ -1,3 +1,4 @@
+
 // src/app/dashboard/settings/actions/page.tsx
 "use client"
 
@@ -138,7 +139,7 @@ export default function HomepageSettingsPage() {
   const { toast } = useToast();
   const [actions, setActions] = React.useState<ActionSection[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [editingAction, setEditingAction] = React.useState<ActionSection | null>(null);
+  const [editingActionId, setEditingActionId] = React.useState<string | null>(null);
   const [isCreatingNew, setIsCreatingNew] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
 
@@ -162,8 +163,8 @@ export default function HomepageSettingsPage() {
 
   const handleSave = async (data: any) => {
     setIsSaving(true);
-    const isNew = !editingAction?.id;
-    const url = isNew ? `${process.env.NEXT_PUBLIC_API_URL}/actions` : `${process.env.NEXT_PUBLIC_API_URL}/actions/${editingAction?.id}`;
+    const isNew = !data.id;
+    const url = isNew ? `${process.env.NEXT_PUBLIC_API_URL}/actions` : `${process.env.NEXT_PUBLIC_API_URL}/actions/${data.id}`;
     const method = isNew ? 'POST' : 'PUT';
 
     try {
@@ -175,7 +176,7 @@ export default function HomepageSettingsPage() {
         if (!response.ok) throw new Error("L'enregistrement a échoué.");
         toast({ title: "Succès", description: "La section a été enregistrée." });
         setIsCreatingNew(false);
-        setEditingAction(null);
+        setEditingActionId(null);
         fetchActions();
     } catch (error) {
         toast({ title: "Erreur", description: "L'enregistrement a échoué.", variant: "destructive" });
@@ -202,6 +203,8 @@ export default function HomepageSettingsPage() {
   if (loading) {
     return <Skeleton className="h-96 w-full" />;
   }
+  
+  const editingAction = actions.find(a => a.id === editingActionId);
 
   return (
     <div className="space-y-6">
@@ -214,49 +217,42 @@ export default function HomepageSettingsPage() {
             <h3 className="text-lg font-semibold">Section "Nos Actions"</h3>
             <div className="space-y-2">
             {actions.map((action) => (
-                <Collapsible key={action.id} className="border rounded-lg p-4">
-                    {editingAction?.id === action.id ? (
-                        <ActionForm 
-                            action={editingAction} 
-                            onSave={handleSave}
-                            onCancel={() => setEditingAction(null)} 
-                            isSaving={isSaving}
-                        />
-                    ) : (
-                        <div className="flex items-center justify-between">
-                             <CollapsibleTrigger asChild>
-                                <div className="flex items-center gap-4 cursor-pointer flex-1">
-                                    <GripVertical className="h-5 w-5 text-muted-foreground" />
-                                    <p className="font-medium">{action.title}</p>
-                                </div>
-                            </CollapsibleTrigger>
-                            <div className="flex items-center gap-2">
-                                <Button variant="outline" size="sm" onClick={() => setEditingAction(action)}>Modifier</Button>
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button variant="destructive" size="sm">Supprimer</Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
-                                            <AlertDialogDescription>Cette action est irréversible. La section "{action.title}" sera supprimée définitivement.</AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => handleDelete(action.id)}>Supprimer</AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
+                <Collapsible key={action.id} className="border rounded-lg p-0" onOpenChange={(isOpen) => setEditingActionId(isOpen ? action.id : null)}>
+                     <div className="flex items-center justify-between p-4">
+                         <CollapsibleTrigger asChild>
+                            <div className="flex items-center gap-4 cursor-pointer flex-1">
+                                <GripVertical className="h-5 w-5 text-muted-foreground" />
+                                <p className="font-medium">{action.title}</p>
                             </div>
+                        </CollapsibleTrigger>
+                        <div className="flex items-center gap-2">
+                             <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="destructive" size="sm">Supprimer</Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                                        <AlertDialogDescription>Cette action est irréversible. La section "{action.title}" sera supprimée définitivement.</AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDelete(action.id)}>Supprimer</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         </div>
-                    )}
-                    <CollapsibleContent className="mt-4">
-                         <ActionForm 
-                            action={action} 
-                            onSave={(data) => handleSave({...data, id: action.id})}
-                            onCancel={() => {}} 
-                            isSaving={isSaving}
-                        />
+                    </div>
+                    
+                    <CollapsibleContent>
+                        {editingActionId === action.id && (
+                             <ActionForm 
+                                action={editingAction} 
+                                onSave={(data) => handleSave({...data, id: action.id})}
+                                onCancel={() => setEditingActionId(null)} 
+                                isSaving={isSaving}
+                            />
+                        )}
                     </CollapsibleContent>
                 </Collapsible>
             ))}
