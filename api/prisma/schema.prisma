@@ -1,4 +1,3 @@
-
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
@@ -11,73 +10,95 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User and authentication models
 model User {
-  id                      String                 @id @default(cuid())
-  email                   String                 @unique
-  password                String
-  firstName               String
-  lastName                String
-  matricule               String?                @unique
-  birthDate               DateTime?
-  birthPlace              String?
-  sex                     String?
-  maritalStatus           String?
-  idType                  String?
-  idNumber                String?
-  phone                   String?
-  address                 String?
-  residenceProvince       String?
-  residenceDepartement    String?
-  residenceCommuneCanton  String?
-  residenceArrondissement String?
-  residenceQuartierVillage String?
-  photo                   String?
-  idCardFront             String?
-  idCardBack              String?
-  termsAccepted           Boolean                @default(false)
-  volunteerExperience     String?
-  availability            String[]
-  causes                  String[]
-  assignedCell            String?
-  role                    UserRole               @default(VOLUNTEER)
-  status                  UserStatus             @default(PENDING)
-  createdAt               DateTime               @default(now())
-  updatedAt               DateTime               @updatedAt
-  posts                   Post[]
-  nationalityId           String?
-  nationality             Nationality?           @relation(fields: [nationalityId], references: [id])
-  educationLevelId        String?
-  educationLevel          EducationLevel?        @relation(fields: [educationLevelId], references: [id])
-  professionId            String?
-  profession              Profession?            @relation(fields: [professionId], references: [id])
-  skills                  Skill[]                @relation("UserSkills")
-  missions                Mission[]              @relation("MissionParticipants")
-  teamRoleId              String?
-  teamRole                TeamRole?              @relation(fields: [teamRoleId], references: [id])
-  coordinatingPools       TeamPool[]             @relation("PoolCoordinators")
-  ArchiveItem             ArchiveItem[]
+  id                        String                  @id @default(cuid())
+  matricule                 String?                 @unique
+  firstName                 String
+  lastName                  String
+  email                     String                  @unique
+  password                  String
+  role                      UserRole                @default(VOLUNTEER)
+  status                    UserStatus              @default(PENDING)
+  phone                     String?
+  birthDate                 DateTime?
+  birthPlace                String?
+  sex                       String?
+  maritalStatus             String?
+  idType                    String?
+  idNumber                  String?
+  address                   String?
+  residenceProvince         String?
+  residenceDepartement      String?
+  residenceCommuneCanton    String?
+  residenceArrondissement   String?
+  residenceQuartierVillage  String?
+  volunteerExperience       String?
+  availability              String[]
+  causes                    String[]
+  assignedCell              String?
+  photo                     String?
+  idCardFront               String?
+  idCardBack                String?
+  termsAccepted             Boolean                 @default(false)
+  isVolunteerOfTheMonth     Boolean                 @default(false)
+  posts                     Post[]
+  nationality               Nationality?            @relation(fields: [nationalityId], references: [id])
+  nationalityId             String?
+  educationLevel            EducationLevel?         @relation(fields: [educationLevelId], references: [id])
+  educationLevelId          String?
+  profession                Profession?             @relation(fields: [professionId], references: [id])
+  professionId              String?
+  skills                    Skill[]                 @relation("UserSkills")
+  missions                  Mission[]               @relation("MissionParticipants")
+  teamRole                  TeamRole?               @relation(fields: [teamRoleId], references: [id])
+  teamRoleId                String?
+  coordinatedPools          TeamPool[]              @relation("PoolCoordinators")
+  authoredArchiveItems      ArchiveItem[]
+  createdAt                 DateTime                @default(now())
+  updatedAt                 DateTime                @updatedAt
 }
 
-enum UserRole {
-  VOLUNTEER
-  COORDINATOR
-  ADMIN
-  SUPERADMIN
-  DONOR
-  PUBLIC
+model Nationality {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[]
 }
 
-enum UserStatus {
-  PENDING
-  ACTIVE
-  INACTIVE
-  REJECTED
+model EducationLevel {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[]
 }
 
-// Content and feature models
+model Profession {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[]
+}
+
+model Skill {
+  id    String @id @default(cuid())
+  name  String @unique
+  users User[] @relation("UserSkills")
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String?
+  image       String?
+  imageHint   String?
+  visible     Boolean  @default(true)
+  author      User     @relation(fields: [authorId], references: [id])
+  authorId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model Mission {
-  id              String   @id @default(cuid())
+  id              String        @id @default(cuid())
   title           String
   description     String
   location        String
@@ -85,32 +106,10 @@ model Mission {
   endDate         DateTime
   status          MissionStatus @default(PLANNED)
   requiredSkills  String[]
-  participants    User[]   @relation("MissionParticipants")
   maxParticipants Int?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
-
-enum MissionStatus {
-  PLANNED
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
-}
-
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  slug      String   @unique
-  excerpt   String
-  content   String?
-  image     String?
-  imageHint String?
-  visible   Boolean  @default(true)
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  participants    User[]        @relation("MissionParticipants")
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 model Event {
@@ -126,12 +125,6 @@ model Event {
   updatedAt   DateTime    @updatedAt
 }
 
-enum EventStatus {
-  UPCOMING
-  PAST
-  CANCELLED
-}
-
 model Report {
   id        String   @id @default(cuid())
   title     String
@@ -143,107 +136,90 @@ model Report {
 
 model Donation {
   id                    String         @id @default(cuid())
+  amount                Float
   name                  String
   email                 String
-  amount                Float
-  type                  String // Ponctuel ou Mensuel
+  phone                 String
+  type                  String // "Ponctuel" or "Mensuel"
   method                DonationMethod
   status                DonationStatus @default(PENDING)
-  phone                 String?
-  externalTransactionId String?        @unique
-  airtelMoneyId         String?
   createdAt             DateTime       @default(now())
   updatedAt             DateTime       @updatedAt
-}
-
-enum DonationStatus {
-  PENDING
-  CONFIRMED
-  FAILED
-}
-
-enum DonationMethod {
-  AirtelMoney
-  CreditCard
-  Other
+  externalTransactionId String?        @unique
+  airtelMoneyId         String?
 }
 
 model CorporateSponsorship {
-  id           String            @id @default(cuid())
-  companyName  String
-  contactName  String
-  email        String
-  phone        String?
-  message      String
-  status       SponsorshipStatus @default(PENDING)
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
+  id          String            @id @default(cuid())
+  companyName String
+  contactName String
+  email       String
+  phone       String?
+  message     String
+  status      SponsorshipStatus @default(PENDING)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 }
 
-enum SponsorshipStatus {
-  PENDING
-  CONTACTED
-  IN_DISCUSSION
-  CONFIRMED
-  REJECTED
+model Appointment {
+  id          String            @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  reason      String // Using String for flexibility, can be an enum
+  details     String?
+  scheduledAt DateTime
+  status      AppointmentStatus @default(PENDING)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 }
 
-// Generic data models (for dropdowns, etc.)
-model Skill {
-  id    String @id @default(cuid())
-  name  String @unique
-  users User[] @relation("UserSkills")
+model AnnualStat {
+  id                  String  @id @default(cuid())
+  year                Int     @unique
+  bases               Int
+  agents              Int
+  firstAidGraduates   Int
+  assistedHouseholds  Int
+  sensitizedPeople    Int
+  condomsDistributed  Int
+  isVisible           Boolean @default(false)
 }
 
-model Profession {
-  id    String @id @default(cuid())
-  name  String @unique
-  users User[]
+model Action {
+  id                String   @id @default(cuid())
+  title             String
+  description       String
+  image             String
+  imageHint         String?
+  dialogTitle       String
+  dialogDescription String
+  dialogList        String[]
+  order             Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
-model EducationLevel {
-  id    String @id @default(cuid())
-  name  String @unique
-  users User[]
+model Partner {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  logoUrl    String
+  websiteUrl String?
+  order      Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
-model Nationality {
-  id    String @id @default(cuid())
-  name  String @unique
-  users User[]
+model PaymentService {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  isActive  Boolean  @default(false)
+  isDefault Boolean  @default(false)
+  apiKeys   Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-// Location models
-model Province {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  departement String[]
-}
-
-model Departement {
-  id            String   @id @default(cuid())
-  name          String   @unique
-  communeCanton String[]
-}
-
-model CommuneCanton {
-  id             String   @id @default(cuid())
-  name           String   @unique
-  arrondissement String[]
-}
-
-model Arrondissement {
-  id              String   @id @default(cuid())
-  name            String   @unique
-  quartierVillage String[]
-}
-
-model QuartierVillage {
-  id   String @id @default(cuid())
-  name String @unique
-}
-
-// Team structure models
 model TeamRole {
   id          String  @id @default(cuid())
   name        String  @unique
@@ -260,12 +236,20 @@ model TeamPool {
   coordinators User[]  @relation("PoolCoordinators")
 }
 
-enum PoolType {
-  OPERATIONAL
-  SUPPORT
+model ArchiveItem {
+  id        String          @id @default(cuid())
+  name      String
+  type      ArchiveItemType
+  url       String?
+  parentId  String?
+  parent    ArchiveItem?    @relation("FolderChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children  ArchiveItem[]   @relation("FolderChildren")
+  authorId  String
+  author    User            @relation(fields: [authorId], references: [id])
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
 }
 
-// Admin and security models
 model RequestLog {
   id         String   @id @default(cuid())
   ip         String
@@ -284,31 +268,6 @@ model BlockedIP {
   createdAt DateTime @default(now())
 }
 
-// Settings and content management models
-model PaymentService {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  isActive  Boolean  @default(false)
-  isDefault Boolean  @default(false)
-  apiKeys   Json?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model ArchiveItem {
-  id         String          @id @default(cuid())
-  name       String
-  type       ArchiveItemType
-  url        String?
-  parentId   String?
-  parent     ArchiveItem?    @relation("FolderChildren", fields: [parentId], references: [id])
-  children   ArchiveItem[]   @relation("FolderChildren")
-  authorId   String
-  author     User            @relation(fields: [authorId], references: [id])
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
-}
-
 enum ArchiveItemType {
   FOLDER
   DOCUMENT
@@ -322,59 +281,59 @@ enum ArchiveItemType {
   UNKNOWN
 }
 
-model Appointment {
-    id String @id @default(cuid())
-    name String
-    email String
-    phone String?
-    reason String
-    details String?
-    scheduledAt DateTime
-    status AppointmentStatus @default(PENDING)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+enum PoolType {
+  OPERATIONAL
+  SUPPORT
+}
+
+enum UserRole {
+  VOLUNTEER
+  ADMIN
+  SUPERADMIN
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+  REJECTED
+}
+
+enum MissionStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum EventStatus {
+  UPCOMING
+  PAST
+  CANCELLED
+}
+
+enum DonationStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+enum DonationMethod {
+  AirtelMoney
+  MoovMoney
+  PayPal
+}
+
+enum SponsorshipStatus {
+  PENDING
+  CONTACTED
+  IN_DISCUSSION
+  CONFIRMED
+  REJECTED
 }
 
 enum AppointmentStatus {
-    PENDING
-    CONFIRMED
-    CANCELLED
-}
-
-model AnnualStat {
-    id String @id @default(cuid())
-    year Int @unique
-    bases Int
-    agents Int
-    firstAidGraduates Int
-    assistedHouseholds Int
-    sensitizedPeople Int
-    condomsDistributed Int
-    isVisible Boolean @default(false)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}
-
-model Action {
-  id                 String   @id @default(cuid())
-  title              String
-  description        String
-  image              String
-  imageHint          String?
-  dialogTitle        String
-  dialogDescription  String
-  dialogList         String[]
-  order              Int      @default(0)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-}
-
-model Partner {
-  id          String   @id @default(cuid())
-  name        String
-  logoUrl     String
-  websiteUrl  String?
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  PENDING
+  CONFIRMED
+  CANCELLED
 }
