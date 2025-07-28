@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
@@ -10,16 +10,19 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Switch } from "@/components/ui/switch";
+import { ArchivePickerDialog, SelectedFileDisplay } from "@/components/archive-picker-dialog";
+import type { ArchiveItem } from "@/types/archive";
+
 
 const reportSchema = z.object({
   title: z.string().min(1, "Le titre est requis."),
-  fileUrl: z.string().url("L'URL du fichier n'est pas valide."),
+  fileUrl: z.string().url("Veuillez sélectionner un fichier depuis les archives."),
   visible: z.boolean().default(false),
 });
 
@@ -30,6 +33,7 @@ export default function NewReportPage() {
   const { toast } = useToast();
   const { user, loading, token } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isPickerOpen, setIsPickerOpen] = React.useState(false);
 
   const form = useForm<ReportFormValues>({
     resolver: zodResolver(reportSchema),
@@ -39,6 +43,12 @@ export default function NewReportPage() {
       visible: false,
     },
   });
+  
+  const handleFileSelect = (file: ArchiveItem) => {
+    form.setValue("fileUrl", file.url || "");
+    form.setValue("title", file.name.replace(/\.[^/.]+$/, "")); // Remove extension for title
+    setIsPickerOpen(false);
+  }
 
   const onSubmit = async (data: ReportFormValues) => {
     if (!token) return;
@@ -95,11 +105,27 @@ export default function NewReportPage() {
         <Card>
             <CardHeader>
                 <CardTitle>Ajouter un nouveau rapport</CardTitle>
-                <CardDescription>Remplissez les champs ci-dessous pour publier un nouveau rapport.</CardDescription>
+                <CardDescription>Sélectionnez un fichier depuis vos archives et configurez sa visibilité.</CardDescription>
             </CardHeader>
             <CardContent>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+
+                 <Controller
+                  control={form.control}
+                  name="fileUrl"
+                  render={({ field }) => (
+                     <FormItem>
+                        <FormLabel>Fichier du Rapport</FormLabel>
+                          <SelectedFileDisplay 
+                            fileUrl={field.value}
+                            onSelectFile={() => setIsPickerOpen(true)}
+                          />
+                        <FormMessage />
+                     </FormItem>
+                  )}
+                />
+                
                 <FormField
                     control={form.control}
                     name="title"
@@ -107,25 +133,8 @@ export default function NewReportPage() {
                     <FormItem>
                         <FormLabel>Titre du rapport</FormLabel>
                         <FormControl>
-                        <Input placeholder="Rapport Annuel 2024" {...field} />
+                        <Input placeholder="Titre qui sera affiché publiquement" {...field} />
                         </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-                
-                <FormField
-                    control={form.control}
-                    name="fileUrl"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>URL du fichier</FormLabel>
-                        <FormControl>
-                        <Input type="url" placeholder="https://..." {...field} />
-                        </FormControl>
-                        <FormDescription>
-                            Collez ici le lien vers le fichier PDF hébergé.
-                        </FormDescription>
                         <FormMessage />
                     </FormItem>
                     )}
@@ -160,6 +169,12 @@ export default function NewReportPage() {
             </Form>
             </CardContent>
         </Card>
+
+        <ArchivePickerDialog 
+            isOpen={isPickerOpen}
+            onOpenChange={setIsPickerOpen}
+            onFileSelect={handleFileSelect}
+        />
     </div>
   );
 }
