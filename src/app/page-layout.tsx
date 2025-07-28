@@ -1,1 +1,1 @@
-// This file is no longer needed after the layout correction.
+// This file is obsolete and can be deleted. Keeping it empty to avoid breaking the build if it is referenced somewhere.

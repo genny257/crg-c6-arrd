@@ -26,6 +26,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useAuth } from "@/hooks/use-auth";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 const getStatusBadgeVariant = (status?: Volunteer['status']) => {
     switch (status) {
@@ -159,6 +161,26 @@ export function VolunteersClientPage({ initialVolunteers, allCells, allProfessio
         return sortedVolunteers;
     }, [volunteers, searchTerm, statusFilter, sortConfig, cellFilter, skillFilter, professionFilter]);
 
+    const handleExport = () => {
+        const dataToExport = filteredAndSortedVolunteers.map(v => ({
+            "Matricule": v.matricule,
+            "Nom": v.lastName,
+            "Prénom": v.firstName,
+            "Email": v.email,
+            "Téléphone": v.phone,
+            "Statut": statusText[v.status],
+            "Cellule": v.assignedCell,
+            "Inscrit le": new Date(v.createdAt).toLocaleDateString('fr-FR'),
+        }));
+        
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Volontaires");
+        
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8"});
+        saveAs(data, `Export_Volontaires_${new Date().toLocaleDateString('fr-CA')}.xlsx`);
+    };
 
     return (
         <div className="flex flex-col gap-8">
@@ -181,7 +203,7 @@ export function VolunteersClientPage({ initialVolunteers, allCells, allProfessio
                 <div className="flex items-center justify-between">
                     <h1 className="text-3xl font-headline font-bold">Gestion des Volontaires</h1>
                     <div className="flex gap-2">
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={handleExport}>
                             <Download className="mr-2 h-4 w-4" />
                             Exporter la liste
                         </Button>

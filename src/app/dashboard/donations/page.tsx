@@ -1,3 +1,4 @@
+
 "use client"
 import * as React from "react";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useAuth } from "@/hooks/use-auth";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
 
 const getStatusBadgeVariant = (status: Donation['status']) => {
     switch (status) {
@@ -74,12 +78,32 @@ export default function DonationPage() {
         fetchDonations();
     }, [fetchDonations]);
 
+    const handleExport = () => {
+        const dataToExport = donations.map(d => ({
+            "Date": new Date(d.createdAt).toLocaleDateString('fr-FR'),
+            "Donateur": d.name,
+            "Email": d.email,
+            "Montant (FCFA)": d.amount,
+            "Type": d.type,
+            "Méthode": d.method,
+            "Statut": statusText[d.status],
+            "ID Externe": d.airtelMoneyId || 'N/A',
+        }));
+        
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Dons");
+        
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8"});
+        saveAs(data, `Export_Dons_${new Date().toLocaleDateString('fr-CA')}.xlsx`);
+    };
 
     return (
         <div className="flex flex-col gap-8">
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-headline font-bold">Gestion des Dons</h1>
-                <Button>
+                <Button onClick={handleExport}>
                     <Download className="mr-2 h-4 w-4" />
                     Exporter la liste
                 </Button>
