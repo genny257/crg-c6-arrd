@@ -153,3 +153,73 @@ Pour le déploiement, vous devez builder les deux parties de l'application et le
         ```
 
 N'oubliez pas de configurer votre serveur web (Nginx, Apache) pour rediriger les requêtes vers les bons ports.
+
+---
+
+## 🚀 Intégration d'Airtel Money
+
+Pour automatiser la réception des dons, la plateforme est intégrée avec l'API **Airtel Money Collections**.
+
+### Flux de Paiement (USSD Push)
+
+Le flux de paiement implémenté est le **USSD Push**, qui offre une expérience utilisateur sécurisée et fluide :
+
+1.  **Initiation** : Le donateur remplit le formulaire de don sur le site (montant, nom, e-mail, numéro de téléphone).
+2.  **Requête API** : Notre backend appelle l'endpoint `POST /merchant/v2/payments/` d'Airtel Money pour initier la transaction. À ce stade, le don est enregistré dans notre base de données avec le statut `PENDING`.
+3.  **Validation Utilisateur** : Le donateur reçoit une notification push sur son téléphone lui demandant de valider la transaction en saisissant son code PIN Airtel Money. L'application ne gère **jamais** le code PIN de l'utilisateur.
+4.  **Callback (Notification)** : Une fois la transaction validée (ou échouée), Airtel Money envoie une notification (webhook) à notre endpoint `POST /api/donations/callback`.
+5.  **Confirmation Automatique** : Notre backend reçoit ce callback, vérifie les informations, et met automatiquement à jour le statut de la donation dans la base de données vers `CONFIRMED` ou `FAILED`.
+
+### Guide des Fonctionnalités de l'API Airtel Money
+
+Voici un résumé des différentes sections de l'API Airtel Money pour mieux comprendre leur rôle.
+
+#### ✅ **Parties Essentielles pour les Dons**
+
+| Objectif                          | Sections API Concernées                        |
+| --------------------------------- | ---------------------------------------------- |
+| **Authentification**              | `Authorization`, `Encryption`                  |
+| **Réception de Paiement**         | `Collection-APIs` (utilisé), `Cash-In APIs`    |
+| **Notification de Paiement Reçu** | `Notification API` (mécanisme de callback)     |
+| **Suivi des Transactions**        | `Transactions-Summary-APIs`                    |
+| **Consultation du Solde**         | `Account`                                      |
+| **Documentation & Aide**          | `Getting Started`, `Error Codes`, `References` |
+
+---
+
+### 📘 **Détail des APIs Disponibles (pour référence)**
+
+#### 1. APIs de Gestion de Prêts
+*   **Loan Lifecycle Management** : Gère le cycle de vie complet d’un prêt.
+*   **Overdraft Loans** : API pour octroyer des crédits de découvert.
+*   **Term Loans** : API pour proposer des prêts à terme planifiés.
+*   **Loan User KYC** : Gère les vérifications d'identité (KYC) pour les bénéficiaires de prêts.
+
+#### 2. APIs de Notification et de Facturation
+*   **Notification API** : Essentiel pour recevoir des notifications automatiques (webhooks) sur les événements.
+*   **Billers Callback** : Gère les retours de statut pour les paiements de factures.
+*   **TopUp Notification** : Notifications spécifiques aux recharges (top-up).
+
+#### 3. APIs de Transaction (Paiement & Transfert)
+*   **Collection-APIs** : **(Utilisé pour les dons)** Permet de recevoir des paiements depuis les utilisateurs Airtel vers votre compte via USSD Push.
+*   **Cash-In APIs** : Alternative pour recevoir des paiements (nécessite la gestion du PIN).
+*   **Disbursement-APIs / IOP Disbursement** : Envoi d’argent depuis votre compte vers un ou plusieurs utilisateurs (payout).
+*   **Bank to Wallet** : Permet de transférer de l’argent d’un compte bancaire vers un portefeuille Airtel.
+*   **Cash-Out APIs** : Permet à un utilisateur de retirer de l’argent vers une banque ou un distributeur.
+*   **ATM Withdrawal API** : Permet un retrait depuis un distributeur sans carte.
+*   **Remittance APIs / Remittance APIs-V2** : Pour les transferts d’argent entre pays.
+
+#### 4. APIs de Compte et de Conformité
+*   **Authorization** : **(Essentiel)** Détaille comment s’authentifier (via token OAuth2).
+*   **Encryption** : **(Essentiel)** Définit comment chiffrer les données sensibles.
+*   **KYC** : Vérification d’identité standard pour la conformité.
+*   **Account** : Fournit des informations sur le compte Airtel (solde, statut, etc.).
+*   **Transactions-Summary-APIs** : Fournit un résumé des transactions sur une période donnée.
+
+#### 5. APIs de Services Annexes
+*   **Getting Started** : Documentation de démarrage pour les développeurs.
+*   **Error Codes** : Liste des codes d’erreur renvoyés par les APIs.
+*   **Buy Airtime** : API pour acheter du crédit téléphonique.
+*   **Favourite Service** : Permet de configurer des services favoris pour un utilisateur.
+*   **References** : Documents de référence (schémas JSON, spécifications, etc.).
+```
