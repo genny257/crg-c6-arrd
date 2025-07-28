@@ -21,6 +21,7 @@ import type { Event } from "@/types/event"
 import type { BlogPost } from "@/types/blog"
 import Autoplay from "embla-carousel-autoplay"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const initialContent: HomePageContent = {
     heroTitle: "Comité du 6ème Arrondissement",
@@ -319,8 +320,46 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="volunteers-of-month" className="w-full py-12 md:py-24 lg:py-32">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Nos Héros</div>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Volontaires du Mois</h2>
+              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Chaque mois, nous mettons en lumière des volontaires qui se sont distingués par leur dévouement exceptionnel.
+              </p>
+            </div>
+            <div className="mx-auto grid grid-cols-1 gap-6 pt-12 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="flex flex-col items-center text-center">
+                <Avatar className="h-32 w-32 mb-4 border-4 border-primary/20">
+                  <AvatarImage src="https://placehold.co/200x200.png" alt="Volontaire 1" data-ai-hint="female portrait" />
+                  <AvatarFallback>AV1</AvatarFallback>
+                </Avatar>
+                <h3 className="text-xl font-bold font-headline">Marie-Claire Dupont</h3>
+                <p className="text-muted-foreground">Pôle Secourisme</p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                 <Avatar className="h-32 w-32 mb-4 border-4 border-primary/20">
+                  <AvatarImage src="https://placehold.co/200x200.png" alt="Volontaire 2" data-ai-hint="male portrait" />
+                  <AvatarFallback>AV2</AvatarFallback>
+                </Avatar>
+                <h3 className="text-xl font-bold font-headline">Jean-Pierre Okoro</h3>
+                <p className="text-muted-foreground">Pôle Aide Sociale</p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                 <Avatar className="h-32 w-32 mb-4 border-4 border-primary/20">
+                  <AvatarImage src="https://placehold.co/200x200.png" alt="Volontaire 3" data-ai-hint="female portrait" />
+                  <AvatarFallback>AV3</AvatarFallback>
+                </Avatar>
+                <h3 className="text-xl font-bold font-headline">Aïcha Bongo</h3>
+                <p className="text-muted-foreground">Pôle Jeunesse</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="partners" className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
+          <div className="container mx-auto px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Nos Partenaires</div>
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Ils nous font confiance</h2>

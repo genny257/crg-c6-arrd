@@ -25,5 +25,3 @@ export interface HomePageContent {
   actions: ActionSection[];
   engagement: EngagementSection;
 }
-
-    
