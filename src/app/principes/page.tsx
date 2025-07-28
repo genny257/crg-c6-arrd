@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,31 +5,31 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const principles = [
   {
     name: "Humanité",
-    description: "Née du souci de porter secours sans discrimination aux blessés des champs de bataille, la Croix-Rouge, sous son aspect international et national, s'efforce de prévenir et d'alléger en toutes circonstances les souffrances humaines. Elle tend à protéger la vie et la santé, ainsi qu'à faire respecter la personne humaine. Elle favorise l'intercompréhension, l'amitié, la coopération et une paix durable entre tous les peuples."
+    description: "Les volontaires doivent intervenir avec compassion, respect et dignité envers toutes les personnes, sans distinction de leurs opinions politiques. Cela garantit que l'aide humanitaire est délivrée de manière égalitaire."
   },
   {
     name: "Impartialité",
-    description: "Elle ne fait aucune distinction de nationalité, de race, de religion, de condition sociale et d'appartenance politique. Elle s'applique seulement à secourir les individus à la mesure de leurs souffrances et à subvenir par priorité aux détresses les plus urgentes."
+    description: "L'assistance doit être fournie sans discrimination, sur la base des besoins des individus et non de leur appartenance politique, ethnique ou sociale. Les volontaires doivent veiller à ne favoriser aucune partie prenante au cours des élections."
   },
   {
     name: "Neutralité",
-    description: "Afin de garder la confiance de tous, la Croix-Rouge s'abstient de prendre part aux hostilités et, en tout temps, aux controverses d'ordre politique, racial, religieux et idéologique."
+    description: "En période électorale, il est crucial que les volontaires s'abstiennent de toute prise de position sur les partis ou candidats en lice. Ils doivent se concentrer uniquement sur leur mission humanitaire, en évitant d'influencer le processus électoral de quelque manière que ce soit."
   },
   {
     name: "Indépendance",
-    description: "La Croix-Rouge est indépendante. Auxiliaires des pouvoirs publics dans leurs activités humanitaires et soumises aux lois qui régissent leurs pays respectifs, les Sociétés Nationales doivent pourtant conserver une autonomie qui leur permette d'agir toujours selon les principes du Mouvement."
+    description: "La Croix-Rouge Gabonaise doit pouvoir fonctionner de manière autonome, en toute indépendance par rapport aux partis politiques, et éviter toute interférence politique qui pourrait compromettre son action humanitaire."
   },
   {
     name: "Volontariat",
-    description: "La Croix-Rouge est une institution de secours volontaire et désintéressée."
+    description: "En période électorale, les volontaires doivent être libres de toute pression extérieure, en choisissant d'offrir leur aide de manière désintéressée. Ils doivent être sensibilisés sur leur rôle et la manière dont ils peuvent servir les populations sans se laisser influencer."
   },
   {
     name: "Unité",
-    description: "Il ne peut y avoir qu'une seule Société de la Croix-Rouge dans un même pays. Elle doit être ouverte à tous et étendre son action humanitaire au territoire entier."
+    description: "L'unité de l'organisation garantit que les volontaires travaillent ensemble pour une cause commune, en mettant de côté leurs divergences politiques, pour assurer un accès équitable aux services humanitaires."
   },
   {
     name: "Universalité",
-    description: "La Croix-Rouge est une institution universelle, au sein de laquelle toutes les Sociétés ont des droits égaux et le devoir de s'entraider."
+    description: "La Croix-Rouge doit être présente pour tous, sans distinction. Lors de la gestion des élections, les volontaires doivent être formés pour fournir des services aux personnes vulnérables, peu importe leur affiliation politique."
   }
 ];
 
@@ -40,7 +39,7 @@ export default function PrincipesPage() {
       <div className="flex flex-col items-center text-center">
         <h1 className="text-4xl font-headline font-bold text-primary mb-2">Nos Principes Fondamentaux</h1>
         <p className="text-lg text-muted-foreground max-w-3xl">
-          Le Mouvement international de la Croix-Rouge et du Croissant-Rouge est guidé par sept principes fondamentaux qui garantissent la cohérence et l&apos;efficacité de son action humanitaire à travers le monde.
+          Les 7 principes fondamentaux de la Croix-Rouge doivent être scrupuleusement respectés, en particulier en période électorale, où la situation politique peut engendrer des tensions.
         </p>
       </div>
 
