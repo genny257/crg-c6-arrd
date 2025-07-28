@@ -10,10 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Clock, Loader2, CheckCircle2 } from "lucide-react";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Loader2, CheckCircle2 } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { addMinutes, format, setHours, setMinutes } from "date-fns";
+import { format, setHours, setMinutes } from "date-fns";
 
 const appointmentSchema = z.object({
   name: z.string().min(2, "Le nom est requis."),
@@ -114,7 +115,7 @@ export default function RendezVousPage() {
                                                 <FormLabel>1. Choisissez une date</FormLabel>
                                                 <FormControl>
                                                     <div className="p-3 border rounded-md">
-                                                        <Calendar
+                                                        <CalendarComponent
                                                             mode="single"
                                                             selected={selectedDate}
                                                             onSelect={setSelectedDate}
@@ -135,7 +136,7 @@ export default function RendezVousPage() {
                                                     <Button
                                                         key={time}
                                                         type="button"
-                                                        variant={format(form.watch("scheduledAt") || new Date(0), "HH:mm") === time ? "default" : "outline"}
+                                                        variant={form.watch("scheduledAt") && format(form.watch("scheduledAt"), "HH:mm") === time ? "default" : "outline"}
                                                         onClick={() => handleTimeSelect(time)}
                                                     >
                                                         {time}
