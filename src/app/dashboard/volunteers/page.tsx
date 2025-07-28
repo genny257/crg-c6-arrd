@@ -27,12 +27,10 @@ async function getVolunteers(token: string | undefined): Promise<Volunteer[]> {
     }
 }
 
-async function getGenericList(endpoint: string, token: string | undefined): Promise<string[]> {
-    if (!token) return [];
+async function getGenericList(endpoint: string): Promise<string[]> {
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${endpoint}`, { 
             cache: 'no-store',
-            headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!res.ok) {
              console.error(`Failed to fetch ${endpoint}: ${res.statusText}`);
@@ -51,8 +49,8 @@ export default async function VolunteersPage() {
 
     const [volunteers, skills, professions, cells] = await Promise.all([
         getVolunteers(token),
-        getGenericList('skills', token),
-        getGenericList('professions', token),
+        getGenericList('skills'),
+        getGenericList('professions'),
         Promise.resolve(["Nzeng-Ayong Lac", "Nzeng-Ayong Village", "Ondogo", "PK6-PK9", "PK9-Bikélé"]) // This can be fetched if it becomes dynamic
     ]);
 

@@ -32,12 +32,19 @@ const createStyledParagraph = (text: string, options: { bold?: boolean; size?: n
 const createLabelAndValue = (label: string, value?: string | null | any) => {
     let displayValue = 'N/A';
     if (value) {
-        if (typeof value === 'object' && value.name) {
+        if (Array.isArray(value)) {
+             if (value.length > 0) {
+                if (typeof value[0] === 'object' && value[0] !== null && 'name' in value[0]) {
+                    displayValue = value.map(item => item.name).join(', ');
+                } else {
+                    displayValue = value.join(', ');
+                }
+            } else {
+                displayValue = 'N/A';
+            }
+        } else if (typeof value === 'object' && value.name) {
             displayValue = value.name;
-        } else if (Array.isArray(value)) {
-            displayValue = value.join(', ');
-        }
-        else {
+        } else if (typeof value !== 'object') {
             displayValue = String(value);
         }
     }
@@ -119,7 +126,7 @@ export const generateDocx = async (volunteer: any) => {
                                             createLabelAndValue("Prénom(s)", volunteer.firstName),
                                             createLabelAndValue("Né(e) le", volunteer.birthDate ? new Date(volunteer.birthDate).toLocaleDateString('fr-FR') : 'N/A'),
                                             createLabelAndValue("À", volunteer.birthPlace),
-                                            createLabelAndValue("Pièce d'identité", `${volunteer.idCardType || 'N/A'} - ${volunteer.idCardNumber || 'N/A'}`),
+                                            createLabelAndValue("Pièce d'identité", `${volunteer.idType || 'N/A'} - ${volunteer.idNumber || 'N/A'}`),
                                         ],
                                         verticalAlign: VerticalAlign.TOP,
                                         borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
@@ -161,7 +168,7 @@ export const generateDocx = async (volunteer: any) => {
                     createLabelAndValue("Cellule d'affectation souhaitée", volunteer.assignedCell),
                     createLabelAndValue("Domaines d'intérêt", volunteer.causes),
                     createLabelAndValue("Disponibilités", volunteer.availability),
-                    createLabelAndValue("Compétences", volunteer.skills?.map((s: any) => s.name).join(', ')),
+                    createLabelAndValue("Compétences", volunteer.skills),
 
 
                     new Paragraph({ text: "", spacing: { after: 400 } }),
