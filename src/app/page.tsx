@@ -318,6 +318,38 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <section id="partners" className="w-full py-12 md:py-24 lg:py-32">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center">
+              <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Nos Partenaires</div>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Ils nous font confiance</h2>
+              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Nous remercions nos partenaires institutionnels et privés pour leur soutien indéfectible à notre mission humanitaire.
+              </p>
+            </div>
+            <div className="divide-y divide-border rounded-lg border mt-12">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 place-items-center">
+                <div className="flex w-full items-center justify-center p-8">
+                  <Image src="https://placehold.co/150x60.png" alt="Partner Logo" width={140} height={70} data-ai-hint="government logo" className="grayscale transition-all duration-300 hover:grayscale-0" />
+                </div>
+                <div className="flex w-full items-center justify-center p-8">
+                  <Image src="https://placehold.co/150x60.png" alt="Partner Logo" width={140} height={70} data-ai-hint="unicef logo" className="grayscale transition-all duration-300 hover:grayscale-0" />
+                </div>
+                <div className="flex w-full items-center justify-center p-8">
+                  <Image src="https://placehold.co/150x60.png" alt="Partner Logo" width={140} height={70} data-ai-hint="who logo" className="grayscale transition-all duration-300 hover:grayscale-0" />
+                </div>
+                <div className="flex w-full items-center justify-center p-8">
+                  <Image src="https://placehold.co/150x60.png" alt="Partner Logo" width={140} height={70} data-ai-hint="corporate logo" className="grayscale transition-all duration-300 hover:grayscale-0" />
+                </div>
+                <div className="flex w-full items-center justify-center p-8">
+                  <Image src="https://placehold.co/150x60.png" alt="Partner Logo" width={140} height={70} data-ai-hint="bank logo" className="grayscale transition-all duration-300 hover:grayscale-0" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </main>
     </PublicLayout>
   )
