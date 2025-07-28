@@ -1,6 +1,8 @@
+
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ShieldCheck } from "lucide-react";
 
 const principles = [
   {
@@ -56,6 +58,29 @@ export default function PrincipesPage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+      
+      <div className="mt-16">
+        <Card className="bg-muted/30 border-primary/20">
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl flex items-center gap-3">
+                    <ShieldCheck className="h-7 w-7 text-primary"/>
+                    Accès des volontaires en période électorale
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <p className="text-lg leading-relaxed">
+                    Pour garantir que les volontaires puissent mener leurs actions humanitaires, il est essentiel de négocier un accès sécurisé et garanti avec les autorités locales, les partis politiques et les forces de l'ordre. Ce dialogue proactif permet de garantir un environnement neutre et impartial, dans lequel les volontaires peuvent remplir leur mission sans obstruction.
+                </p>
+                <p className="font-semibold text-primary-foreground/90">
+                    En résumé, le respect des principes fondamentaux pendant une période électorale assure non seulement la crédibilité de la Croix-Rouge, mais aussi la protection des personnes vulnérables, indépendamment de leur appartenance politique.
+                </p>
+                <div className="text-right pt-4">
+                    <p className="font-bold">Dr. Véronique Tsakoura</p>
+                    <p className="text-sm text-muted-foreground">Présidente Nationale</p>
+                </div>
+            </CardContent>
+        </Card>
       </div>
     </main>
   );
