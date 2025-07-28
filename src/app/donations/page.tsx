@@ -28,6 +28,8 @@ const donationSchema = z.object({
     firstName: z.string().min(1, "Le prénom est requis."),
     lastName: z.string().min(1, "Le nom est requis."),
     email: z.string().email("L'adresse e-mail n'est pas valide."),
+    phone: z.string().min(9, "Le numéro de téléphone est requis."),
+    pin: z.string().length(4, "Le code PIN est requis et doit contenir 4 chiffres."),
     type: z.enum(['Ponctuel', 'Mensuel']).default('Ponctuel'),
 });
 
@@ -47,7 +49,7 @@ export default function DonationPage() {
                         </CardHeader>
                         <CardContent>
                             <p className="text-muted-foreground mb-6">
-                                Votre promesse de don a été enregistrée avec succès. Vous recevrez des instructions par e-mail pour finaliser votre contribution par Mobile Money.
+                                Votre don a été traité avec succès. Votre soutien est précieux pour nos actions sur le terrain.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Button asChild>
@@ -142,6 +144,8 @@ const DonationForm = ({ onFormSuccess }: { onFormSuccess: () => void }) => {
             firstName: "",
             lastName: "",
             email: "",
+            phone: "",
+            pin: "",
             type: 'Ponctuel',
         },
     });
@@ -151,7 +155,7 @@ const DonationForm = ({ onFormSuccess }: { onFormSuccess: () => void }) => {
             const donationPayload = {
                 ...data,
                 name: `${data.firstName} ${data.lastName}`,
-                method: 'Mobile_Money', // Only Mobile Money is supported now
+                method: 'AirtelMoney',
             };
 
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations`, {
@@ -160,21 +164,23 @@ const DonationForm = ({ onFormSuccess }: { onFormSuccess: () => void }) => {
                 body: JSON.stringify(donationPayload),
             });
 
-            if (!response.ok) {
-                throw new Error("Impossible d'enregistrer la promesse de don.");
+            const result = await response.json();
+
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || "Impossible de traiter le don.");
             }
 
             toast({
-                title: "Promesse enregistrée !",
-                description: "Merci ! Vous recevrez bientôt les instructions pour finaliser votre don.",
+                title: "Don réussi !",
+                description: "Merci ! Votre don a été effectué avec succès.",
             });
             onFormSuccess();
 
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error creating donation record:", error);
             toast({
-                title: "Erreur",
-                description: "Une erreur est survenue lors de l'enregistrement de votre promesse de don.",
+                title: "Erreur de paiement",
+                description: error.message || "Une erreur est survenue lors du traitement de votre don.",
                 variant: "destructive",
             });
         }
@@ -314,10 +320,32 @@ const DonationForm = ({ onFormSuccess }: { onFormSuccess: () => void }) => {
                             </FormItem>
                         )}
                     />
+                     <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>N° de téléphone Airtel Money</FormLabel>
+                                <FormControl><Input type="tel" placeholder="Numéro sans l'indicatif pays" {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                     <FormField
+                        control={form.control}
+                        name="pin"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>PIN Airtel Money</FormLabel>
+                                <FormControl><Input type="password" maxLength={4} placeholder="Votre code PIN à 4 chiffres" {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                 </div>
                 <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
                      {form.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Je fais un don
+                    Faire un don de {form.watch('amount') > 0 ? form.watch('amount').toLocaleString('fr-FR') + ' FCFA' : ''}
                 </Button>
             </form>
         </Form>

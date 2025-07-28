@@ -1,14 +1,39 @@
+
 // api/src/services/airtel.service.ts
 import fetch from 'node-fetch';
-import crypto from 'crypto';
+import forge from 'node-forge';
 
 const BASE_URL = process.env.AIRTEL_API_BASE_URL;
 const CLIENT_ID = process.env.AIRTEL_API_CLIENT_ID;
 const CLIENT_SECRET = process.env.AIRTEL_API_CLIENT_SECRET;
 const COUNTRY = process.env.AIRTEL_API_COUNTRY;
 const CURRENCY = process.env.AIRTEL_API_CURRENCY;
+const PUBLIC_KEY = process.env.AIRTEL_API_PUBLIC_KEY;
 
 let authToken: { token: string; expiresAt: number } | null = null;
+
+/**
+ * Encrypts the user PIN using Airtel's public key (RSA/OAEP).
+ * @param {string} pin - The 4-digit user PIN.
+ * @returns {string} The Base64 encoded encrypted PIN.
+ */
+function encryptPin(pin: string): string {
+    if (!PUBLIC_KEY) {
+        throw new Error("Airtel public key is not configured in environment variables.");
+    }
+    const publicKeyPem = `-----BEGIN PUBLIC KEY-----\n${PUBLIC_KEY}\n-----END PUBLIC KEY-----`;
+    const publicKey = forge.pki.publicKeyFromPem(publicKeyPem);
+
+    const encrypted = publicKey.encrypt(pin, 'RSA-OAEP', {
+      md: forge.md.sha256.create(),
+      mgf1: {
+        md: forge.md.sha1.create()
+      }
+    });
+
+    return forge.util.encode64(encrypted);
+}
+
 
 /**
  * Gets a valid OAuth2 token from Airtel Money API, refreshing if necessary.
@@ -37,7 +62,7 @@ async function getAuthToken(): Promise<string> {
     const data: any = await response.json();
     authToken = {
         token: data.access_token,
-        expiresAt: Date.now() + (data.expires_in - 300) * 1000, // Refresh 5 minutes before expiry
+        expiresAt: Date.now() + (parseInt(data.expires_in, 10) - 300) * 1000, // Refresh 5 minutes before expiry
     };
 
     return authToken.token;
@@ -47,7 +72,7 @@ interface CashInPayload {
     msisdn: string;
     amount: number;
     transactionId: string;
-    pin: string; // This should be encrypted
+    pin: string;
 }
 
 /**
@@ -59,9 +84,7 @@ export async function initiateCashIn({ msisdn, amount, transactionId, pin }: Cas
     }
     const token = await getAuthToken();
 
-    // TODO: Implement proper PIN encryption as per Airtel documentation
-    // For now, we send a placeholder. This will fail in a real environment.
-    const encryptedPin = pin; 
+    const encryptedPin = encryptPin(pin); 
 
     const body = {
         "subscriber": {
