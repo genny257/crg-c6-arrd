@@ -21,6 +21,7 @@ import {
   Building,
   Shield,
   Banknote,
+  BookUser
 } from "lucide-react"
 
 import {
@@ -47,6 +48,7 @@ const mainNavItems = [
   { href: "/dashboard/volunteers", icon: Users, label: "Volontaires" },
   { href: "/dashboard/team", icon: Network, label: "Équipe", adminOnly: true },
   { href: "/dashboard/calendar", icon: Calendar, label: "Calendrier" },
+  { href: "/dashboard/appointments", icon: BookUser, label: "Rendez-vous", adminOnly: true },
   { href: "/dashboard/archive", icon: Archive, label: "Archives", adminOnly: true },
 ]
 

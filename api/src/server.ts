@@ -21,6 +21,7 @@ import aiRoutes from './routes/ai.routes';
 import paymentRoutes from './routes/payment.routes';
 import archiveRoutes from './routes/archive.routes';
 import eventRoutes from './routes/event.routes';
+import appointmentRoutes from './routes/appointment.routes';
 import { loggingMiddleware } from './middleware/logging';
 
 // Charger les variables d'environnement
@@ -109,6 +110,8 @@ app.use('/api', aiRoutes);
 app.use('/api', paymentRoutes);
 app.use('/api', archiveRoutes);
 app.use('/api', eventRoutes);
+app.use('/api', appointmentRoutes);
+
 
 // Route de base pour vérifier que le serveur fonctionne
 app.get('/', (req, res) => {

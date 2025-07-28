@@ -115,6 +115,9 @@ export function PublicLayout({ children }: { children: ReactNode }) {
         <p className="text-xs text-muted-foreground">&copy; 2024 Croix-Rouge Gabonaise. Tous droits réservés.</p>
         <nav className="sm:ml-auto flex flex-wrap items-center justify-center gap-4 sm:gap-6">
           <PwaInstallButton />
+          <Link href="/rendez-vous" className="text-xs hover:underline underline-offset-4" prefetch={false}>
+            Prendre rendez-vous
+          </Link>
           <Link href="/mecenat" className="text-xs hover:underline underline-offset-4" prefetch={false}>
             Mécénat
           </Link>
