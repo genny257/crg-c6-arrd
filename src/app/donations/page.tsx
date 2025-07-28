@@ -1,4 +1,3 @@
-
 "use client"
 import * as React from "react";
 import { useForm } from "react-hook-form";
@@ -29,7 +28,6 @@ const donationSchema = z.object({
     lastName: z.string().min(1, "Le nom est requis."),
     email: z.string().email("L'adresse e-mail n'est pas valide."),
     phone: z.string().min(9, "Le numéro de téléphone est requis."),
-    pin: z.string().length(4, "Le code PIN est requis et doit contenir 4 chiffres."),
     type: z.enum(['Ponctuel', 'Mensuel']).default('Ponctuel'),
 });
 
@@ -49,7 +47,7 @@ export default function DonationPage() {
                         </CardHeader>
                         <CardContent>
                             <p className="text-muted-foreground mb-6">
-                                Votre don a été traité avec succès. Votre soutien est précieux pour nos actions sur le terrain.
+                                Une notification a été envoyée sur votre téléphone pour valider la transaction. Votre soutien est précieux pour nos actions sur le terrain.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Button asChild>
@@ -145,7 +143,6 @@ const DonationForm = ({ onFormSuccess }: { onFormSuccess: () => void }) => {
             lastName: "",
             email: "",
             phone: "",
-            pin: "",
             type: 'Ponctuel',
         },
     });
@@ -169,11 +166,7 @@ const DonationForm = ({ onFormSuccess }: { onFormSuccess: () => void }) => {
             if (!response.ok || !result.success) {
                 throw new Error(result.message || "Impossible de traiter le don.");
             }
-
-            toast({
-                title: "Don réussi !",
-                description: "Merci ! Votre don a été effectué avec succès.",
-            });
+            
             onFormSuccess();
 
         } catch (error: any) {
@@ -327,17 +320,6 @@ const DonationForm = ({ onFormSuccess }: { onFormSuccess: () => void }) => {
                             <FormItem>
                                 <FormLabel>N° de téléphone Airtel Money</FormLabel>
                                 <FormControl><Input type="tel" placeholder="Numéro sans l'indicatif pays" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                     <FormField
-                        control={form.control}
-                        name="pin"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>PIN Airtel Money</FormLabel>
-                                <FormControl><Input type="password" maxLength={4} placeholder="Votre code PIN à 4 chiffres" {...field} /></FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}

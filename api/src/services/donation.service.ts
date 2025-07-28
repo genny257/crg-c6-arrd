@@ -13,6 +13,23 @@ export const updateDonationStatus = async (id: string, status: DonationStatus): 
     });
 };
 
+export const updateDonationByExternalId = async (externalTransactionId: string, status: DonationStatus, airtelMoneyId: string): Promise<Donation | null> => {
+    const donation = await prisma.donation.findUnique({
+        where: { externalTransactionId }
+    });
+
+    if (!donation) {
+        console.error(`Donation with external ID ${externalTransactionId} not found.`);
+        return null;
+    }
+
+    return await prisma.donation.update({
+        where: { id: donation.id },
+        data: { status, airtelMoneyId },
+    });
+}
+
+
 export const updateDonationWithAirtelId = async (id: string, airtelMoneyId: string): Promise<Donation> => {
     return await prisma.donation.update({
         where: { id },

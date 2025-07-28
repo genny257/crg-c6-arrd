@@ -1,4 +1,3 @@
-
 // src/controllers/donation.controller.ts
 import { Request, Response } from 'express';
 import * as donationService from '../services/donation.service';
@@ -8,13 +7,11 @@ import { z } from 'zod';
 import { EmailService } from '../services/email.service';
 import { randomUUID } from 'crypto';
 
-
 const donationSchema = z.object({
   amount: z.number().positive("Le montant doit être positif."),
   name: z.string().min(2, "Le nom est requis."),
   email: z.string().email("L'adresse e-mail est invalide."),
   phone: z.string().min(1, "Le numéro de téléphone est requis pour le paiement."),
-  pin: z.string().length(4, "Le code PIN doit comporter 4 chiffres."),
   type: z.enum(['Ponctuel', 'Mensuel']),
   method: z.nativeEnum(DonationMethod),
 });
@@ -35,28 +32,21 @@ export const createDonation = async (req: Request, res: Response) => {
     // 2. If the method is Airtel Money, initiate the transaction
     if (validatedData.method === DonationMethod.AirtelMoney) {
         try {
-            const airtelResponse = await airtelService.initiateCashIn({
+            const airtelResponse = await airtelService.initiateUssdPushPayment({
                 msisdn: validatedData.phone,
                 amount: validatedData.amount,
                 transactionId: externalTransactionId,
-                pin: validatedData.pin,
             });
             
-            // Update our donation record with Airtel's transaction ID and confirm it
-            await donationService.updateDonationWithAirtelId(
-                pendingDonation.id, 
-                airtelResponse.data.transaction.airtel_money_id
-            );
-
              res.status(201).json({ 
                 success: true,
-                message: "Transaction effectuée avec succès.",
+                message: "Transaction initiée. Veuillez valider sur votre téléphone.",
                 donationId: pendingDonation.id,
-                airtelTransactionId: airtelResponse.data.transaction.airtel_money_id
+                airtelResponse: airtelResponse
             });
 
         } catch (airtelError: any) {
-            // If Airtel payment fails, mark our donation as FAILED
+            // If Airtel payment initiation fails, mark our donation as FAILED
             await donationService.updateDonationStatus(pendingDonation.id, DonationStatus.FAILED);
             return res.status(400).json({ 
                 success: false, 
@@ -144,5 +134,40 @@ export const getDonationsSummary = async (req: Request, res: Response) => {
             return res.status(400).json({ message: 'Validation failed', errors: error.flatten().fieldErrors });
         }
         res.status(500).json({ message: 'Error fetching donations summary', error: (error as Error).message });
+    }
+}
+
+
+const airtelCallbackSchema = z.object({
+    transaction: z.object({
+        id: z.string(),
+        message: z.string(),
+        status_code: z.enum(['TS', 'TF']),
+        airtel_money_id: z.string(),
+    })
+});
+
+export const handleAirtelCallback = async (req: Request, res: Response) => {
+    try {
+        console.log("Airtel Callback Received:", JSON.stringify(req.body, null, 2));
+        const { transaction } = airtelCallbackSchema.parse(req.body);
+
+        const status = transaction.status_code === 'TS' ? DonationStatus.CONFIRMED : DonationStatus.FAILED;
+        
+        const updatedDonation = await donationService.updateDonationByExternalId(transaction.id, status, transaction.airtel_money_id);
+        
+        if (updatedDonation && status === 'CONFIRMED') {
+            // Optional: Send a success email to the donor
+            // await EmailService.sendDonationReceipt(updatedDonation.email, ...);
+        }
+
+        res.status(200).json({ success: true, message: "Callback processed." });
+    } catch (error) {
+         if (error instanceof z.ZodError) {
+            return res.status(400).json({ message: 'Invalid callback format', errors: error.flatten().fieldErrors });
+        }
+        console.error("Error processing Airtel callback:", error);
+        // Inform Airtel that we had an issue but received the request
+        res.status(500).json({ success: false, message: 'Error processing callback.' });
     }
 }
