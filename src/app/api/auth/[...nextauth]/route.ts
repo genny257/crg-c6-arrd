@@ -2,7 +2,7 @@
 // src/app/api/auth/[...nextauth]/route.ts
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
-import { JWT } from "next-auth/jwt"
+import type { JWT } from "next-auth/jwt"
 
 const handler = NextAuth({
   providers: [
@@ -22,13 +22,13 @@ const handler = NextAuth({
             body: JSON.stringify({ email: credentials.email, password: credentials.password }),
             headers: { "Content-Type": "application/json" }
           });
+          
+          const response = await res.json();
 
           if (!res.ok) {
-            console.error('Login failed with status:', res.status);
-            return null;
+            // Forward the error message from the backend
+            throw new Error(response.message || "An error occurred during login.");
           }
-
-          const response = await res.json();
           
           if (response.user && response.token) {
             return {
@@ -38,9 +38,10 @@ const handler = NextAuth({
           } else {
             return null;
           }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Authorize error:", error);
-            return null;
+            // Throw the error to be caught by NextAuth and displayed to the user
+            throw new Error(error.message || "Échec de l'autorisation.");
         }
       }
     })
@@ -70,6 +71,7 @@ const handler = NextAuth({
   },
   pages: {
     signIn: '/login',
+    error: '/login', // Redirect to login page on error, which will display the error message.
   }
 })
 

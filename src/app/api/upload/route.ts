@@ -1,15 +1,22 @@
 
 import { NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
+import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
-import { mkdir } from 'fs/promises';
+import { getServerSession } from 'next-auth/next';
+import type { Session } from 'next-auth';
 
 export async function POST(request: Request) {
+  const session: Session | null = await getServerSession();
+  
+  if (!session || !session.user) {
+    return NextResponse.json({ success: false, error: 'Unauthorized: Not logged in' }, { status: 401 });
+  }
+
   const data = await request.formData();
   const file: File | null = data.get('file') as unknown as File;
 
   if (!file) {
-    return NextResponse.json({ success: false, error: 'No file found' });
+    return NextResponse.json({ success: false, error: 'No file found' }, { status: 400 });
   }
 
   const bytes = await file.arrayBuffer();
@@ -17,7 +24,6 @@ export async function POST(request: Request) {
 
   const uploadDir = join(process.cwd(), 'public/uploads');
   
-  // Ensure the upload directory exists
   try {
     await mkdir(uploadDir, { recursive: true });
   } catch (error) {
@@ -25,7 +31,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: 'Failed to create upload directory' }, { status: 500 });
   }
   
-  // Use a timestamp and a random string for unique filenames to prevent conflicts and guessing
   const fileExtension = file.name.split('.').pop();
   const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
   const filename = `${uniqueSuffix}.${fileExtension}`;
@@ -35,7 +40,6 @@ export async function POST(request: Request) {
     await writeFile(path, buffer);
     console.log(`File saved to ${path}`);
     
-    // Return the public URL of the file
     const publicUrl = `/uploads/${filename}`;
     return NextResponse.json({ success: true, url: publicUrl });
 
