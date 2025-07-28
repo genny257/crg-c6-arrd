@@ -72,7 +72,7 @@ export default function PrincipesPage() {
                 <p className="text-lg leading-relaxed">
                     Pour garantir que les volontaires puissent mener leurs actions humanitaires, il est essentiel de négocier un accès sécurisé et garanti avec les autorités locales, les partis politiques et les forces de l'ordre. Ce dialogue proactif permet de garantir un environnement neutre et impartial, dans lequel les volontaires peuvent remplir leur mission sans obstruction.
                 </p>
-                <p className="font-semibold text-primary-foreground/90">
+                <p className="font-semibold text-primary">
                     En résumé, le respect des principes fondamentaux pendant une période électorale assure non seulement la crédibilité de la Croix-Rouge, mais aussi la protection des personnes vulnérables, indépendamment de leur appartenance politique.
                 </p>
                 <div className="text-right pt-4">
