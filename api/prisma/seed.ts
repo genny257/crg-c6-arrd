@@ -15,34 +15,28 @@ const getArg = (argName: string): string | undefined => {
 
 async function initializePaymentServices() {
   console.log('Checking payment services...');
-  const existingDefault = await prisma.paymentService.findFirst({
-    where: { name: 'Pursa Exchange' },
-  });
+  
+  const servicesToCreate = [
+    { name: 'AirtelMoney', isActive: true, isDefault: true },
+    { name: 'Stripe', isActive: false, isDefault: false },
+    { name: 'PayPal', isActive: false, isDefault: false },
+  ];
 
-  if (!existingDefault) {
-    console.log('Initializing Pursa Exchange as default payment service...');
-    await prisma.paymentService.create({
-      data: {
-        name: 'Pursa Exchange',
-        isActive: true,
-        isDefault: true,
-      },
+  for (const service of servicesToCreate) {
+    const existing = await prisma.paymentService.findFirst({
+      where: { name: service.name },
     });
-    console.log('Pursa Exchange created successfully.');
-  }
 
-  const otherServices = ['Stripe', 'PayPal'];
-  for (const serviceName of otherServices) {
-    const service = await prisma.paymentService.findFirst({ where: { name: serviceName } });
-    if (!service) {
+    if (!existing) {
+      console.log(`Initializing ${service.name} payment service...`);
       await prisma.paymentService.create({
         data: {
-          name: serviceName,
-          isActive: false,
-          isDefault: false,
+          name: service.name,
+          isActive: service.isActive,
+          isDefault: service.isDefault,
         },
       });
-       console.log(`${serviceName} payment service created.`);
+      console.log(`${service.name} created successfully.`);
     }
   }
 }

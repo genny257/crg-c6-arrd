@@ -97,6 +97,10 @@ export default function PartnerSettingsPage() {
   }, [fetchPartners]);
 
   const handleSave = async (data: PartnerFormValues) => {
+    if (!token) {
+        toast({ title: "Erreur", description: "Authentification requise.", variant: "destructive" });
+        return;
+    }
     setIsSaving(true);
     const isNew = !editingPartner?.id;
     const url = isNew ? `${process.env.NEXT_PUBLIC_API_URL}/partners` : `${process.env.NEXT_PUBLIC_API_URL}/partners/${editingPartner?.id}`;
@@ -121,6 +125,10 @@ export default function PartnerSettingsPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!token) {
+        toast({ title: "Erreur", description: "Authentification requise.", variant: "destructive" });
+        return;
+    }
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/partners/${id}`, {
             method: 'DELETE',

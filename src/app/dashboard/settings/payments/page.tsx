@@ -136,9 +136,10 @@ export default function PaymentSettingsPage() {
                 <div>
                   <p className="font-medium">{service.name}
                     {service.isDefault && <Badge className="ml-2">Défaut</Badge>}
-                    {service.isActive && <Badge variant="secondary" className="ml-2 bg-green-100 text-green-800">Activé</Badge>}
                   </p>
-                  <p className="text-sm text-muted-foreground">Gérer l'état et les clés du service.</p>
+                  <p className="text-sm text-muted-foreground">
+                    {service.isActive ? <span className="text-green-600">Activé</span> : <span className="text-gray-500">Désactivé</span>}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">

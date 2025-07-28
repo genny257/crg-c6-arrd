@@ -11,11 +11,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Lock, Users, HeartHandshake, Loader2, Building } from "lucide-react";
+import { Lock, Users, HeartHandshake, Loader2, Building, Banknote } from "lucide-react";
 import Link from "next/link";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { PublicLayout } from "@/components/public-layout";
+
+type PaymentService = {
+  id: string;
+  name: "AirtelMoney" | "Stripe" | "PayPal";
+  isActive: boolean;
+};
+
 
 const donationAmounts = [
     { amount: 2000, label: "2 000 FCFA", description: "Fournit un kit d'hygiène de base." },
@@ -30,12 +37,28 @@ const donationSchema = z.object({
     email: z.string().email("L'adresse e-mail n'est pas valide."),
     phone: z.string().min(9, "Le numéro de téléphone est requis."),
     type: z.enum(['Ponctuel', 'Mensuel']).default('Ponctuel'),
+    method: z.string().min(1, "Veuillez choisir une méthode de paiement."),
 });
 
 type FormValues = z.infer<typeof donationSchema>;
 
 export default function DonationPage() {
     const [isSuccess, setIsSuccess] = React.useState(false);
+    const [activeServices, setActiveServices] = React.useState<PaymentService[]>([]);
+    
+    React.useEffect(() => {
+        const fetchServices = async () => {
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payment-services/active`);
+                if(res.ok) {
+                    setActiveServices(await res.json());
+                }
+            } catch (error) {
+                console.error("Failed to fetch payment services:", error);
+            }
+        };
+        fetchServices();
+    }, []);
 
     if (isSuccess) {
         return (
@@ -75,7 +98,10 @@ export default function DonationPage() {
                        
                         <Card>
                             <CardContent className="p-6">
-                                <DonationForm onFormSuccess={() => setIsSuccess(true)} />
+                                <DonationForm 
+                                    onFormSuccess={() => setIsSuccess(true)}
+                                    activeServices={activeServices}
+                                />
                             </CardContent>
                         </Card>
 
@@ -134,7 +160,7 @@ export default function DonationPage() {
     );
 }
 
-const DonationForm = ({ onFormSuccess }: { onFormSuccess: () => void }) => {
+const DonationForm = ({ onFormSuccess, activeServices }: { onFormSuccess: () => void, activeServices: PaymentService[] }) => {
     const { toast } = useToast();
     const form = useForm<FormValues>({
         resolver: zodResolver(donationSchema),
@@ -145,15 +171,21 @@ const DonationForm = ({ onFormSuccess }: { onFormSuccess: () => void }) => {
             email: "",
             phone: "",
             type: 'Ponctuel',
+            method: activeServices.find(s => s.isActive)?.name || "",
         },
     });
+    
+    React.useEffect(() => {
+        if(activeServices.length > 0 && !form.getValues('method')) {
+            form.setValue('method', activeServices[0].name);
+        }
+    }, [activeServices, form]);
 
     const handleDonationSubmit = async (data: FormValues) => {
         try {
             const donationPayload = {
                 ...data,
                 name: `${data.firstName} ${data.lastName}`,
-                method: 'AirtelMoney',
             };
 
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations`, {
@@ -279,6 +311,28 @@ const DonationForm = ({ onFormSuccess }: { onFormSuccess: () => void }) => {
                 </div>
                 
                 <div className="space-y-4">
+                     <FormField
+                        control={form.control}
+                        name="method"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Moyen de paiement</FormLabel>
+                                <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex items-center gap-4">
+                                    {activeServices.map(service => (
+                                        <FormItem key={service.id}>
+                                            <FormControl>
+                                                <RadioGroupItem value={service.name} id={service.name} className="sr-only"/>
+                                            </FormControl>
+                                            <Label htmlFor={service.name} className={cn("flex items-center gap-2 rounded-md border-2 p-3 hover:border-primary cursor-pointer", field.value === service.name && 'border-primary')}>
+                                                <Banknote className="h-5 w-5"/> {service.name}
+                                            </Label>
+                                        </FormItem>
+                                    ))}
+                                </RadioGroup>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                             control={form.control}

@@ -5,21 +5,34 @@ import { protect, isSuperAdmin } from '../middleware/auth';
 
 const router = Router();
 
-// All routes in this file are protected and require SuperAdmin role
-router.use(protect, isSuperAdmin);
-
 /**
  * @swagger
  * tags:
  *   name: PaymentServices
- *   description: Management of payment services (Stripe, Pursa, etc.)
+ *   description: Management of payment services (Airtel, Stripe, etc.)
  */
+
+/**
+ * @swagger
+ * /payment-services/active:
+ *   get:
+ *     summary: Get all active payment services for public use
+ *     tags: [PaymentServices]
+ *     responses:
+ *       200:
+ *         description: A list of active payment services.
+ */
+router.get('/payment-services/active', paymentController.getActivePaymentServices);
+
+
+// All subsequent routes in this file are protected and require SuperAdmin role
+router.use(protect, isSuperAdmin);
 
 /**
  * @swagger
  * /payment-services:
  *   get:
- *     summary: Get all payment services
+ *     summary: Get all payment services for admin management
  *     tags: [PaymentServices]
  *     security:
  *       - bearerAuth: []
@@ -88,16 +101,5 @@ router.put('/payment-services/:id', paymentController.updatePaymentService);
  */
 router.post('/payment-services/:id/set-default', paymentController.setDefaultService);
 
-/**
- * @swagger
- * /payment-services/active:
- *   get:
- *     summary: Get all active payment services
- *     tags: [PaymentServices]
- *     responses:
- *       200:
- *         description: A list of active payment services.
- */
-router.get('/payment-services/active', paymentController.getActivePaymentServices);
 
 export default router;
