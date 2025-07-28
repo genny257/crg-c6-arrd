@@ -15,11 +15,22 @@ import { ChevronDown, Menu, X, LayoutDashboard, Building } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import Image from "next/image";
 import { PwaInstallButton } from "./pwa-install-button";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
-const publicNavLinks = [
-  { href: "/#actions", label: "Nos Actions" },
+
+const homeSubLinks = [
+    { href: "/#actions", label: "Nos Actions" },
+    { href: "/#stats", label: "Nos Résultats" },
+    { href: "/#engagement", label: "Rejoignez-nous" },
+    { href: "/#volunteers-of-month", label: "Nos Héros" },
+    { href: "/#partners", label: "Nos Partenaires" },
+];
+
+const mainNavLinks = [
   { href: "/team", label: "Équipe" },
   { href: "/contact", label: "Contact" },
+  { href: "/rendez-vous", label: "Prendre rendez-vous" },
 ];
 
 const mediaNavLinks = [
@@ -28,11 +39,16 @@ const mediaNavLinks = [
     { href: "/events", label: "Évènements" },
     { href: "/principes", label: "Principes CRG" },
     { href: "/hymne", label: "Hymne CRG" },
-]
+];
 
 export function PublicLayout({ children }: { children: ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const { user, loading } = useAuth();
+  const pathname = usePathname();
+
+  const isHomePage = pathname === '/';
+
+  const visibleNavLinks = mainNavLinks.filter(link => link.href !== pathname);
 
   return (
     <div className="bg-background min-h-screen flex flex-col">
@@ -42,10 +58,30 @@ export function PublicLayout({ children }: { children: ReactNode }) {
             <span className="font-semibold hidden sm:inline-block">Croix-Rouge Gabonaise</span>
         </Link>
         <nav className="ml-auto hidden lg:flex gap-4 sm:gap-6 items-center">
-            {publicNavLinks.map(link => (
+            
+            {!isHomePage && (
+                 <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Accueil</Link>
+            )}
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className={cn("text-sm font-medium hover:underline underline-offset-4 px-0 flex items-center gap-1", isHomePage && "text-primary")}>
+                  {isHomePage ? 'Navigation' : 'Explorer l\'accueil'} <ChevronDown className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {homeSubLinks.map(link => (
+                    <DropdownMenuItem key={link.href} asChild>
+                        <Link href={link.href}>{link.label}</Link>
+                    </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {visibleNavLinks.map(link => (
                 <Link key={link.href} href={link.href} className="text-sm font-medium hover:underline underline-offset-4">{link.label}</Link>
             ))}
-             <Link href="/rendez-vous" className="text-sm font-medium hover:underline underline-offset-4">Prendre rendez-vous</Link>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="text-sm font-medium hover:underline underline-offset-4 px-0 flex items-center gap-1">
@@ -60,6 +96,7 @@ export function PublicLayout({ children }: { children: ReactNode }) {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+
             {!loading && user ? (
                 <Button asChild variant="ghost">
                   <Link href="/dashboard">
@@ -87,7 +124,7 @@ export function PublicLayout({ children }: { children: ReactNode }) {
       {isMenuOpen && (
           <div className="fixed top-14 left-0 w-full lg:hidden bg-background shadow-md z-50">
               <nav className="flex flex-col items-center gap-4 p-4">
-                  {[...publicNavLinks, { href: "/rendez-vous", label: "Prendre rendez-vous" }, ...mediaNavLinks].map(link => (
+                  {[...mainNavLinks, ...mediaNavLinks].map(link => (
                      <Link key={link.href} href={link.href} className="text-sm font-medium hover:underline underline-offset-4" onClick={() => setIsMenuOpen(false)}>{link.label}</Link>
                   ))}
                    <div className="flex flex-col gap-4 w-full items-center mt-4 border-t pt-4">
@@ -114,7 +151,7 @@ export function PublicLayout({ children }: { children: ReactNode }) {
       <div className="flex-1">{children}</div>
       
        <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t bg-card">
-        <p className="text-xs text-muted-foreground">&copy; 2025 TechGA. Tous droits réservés.</p>
+        <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} TechGA. Tous droits réservés.</p>
         <nav className="sm:ml-auto flex flex-wrap items-center justify-center gap-4 sm:gap-6">
           <PwaInstallButton />
           <Link href="/mecenat" className="text-xs hover:underline underline-offset-4" prefetch={false}>
