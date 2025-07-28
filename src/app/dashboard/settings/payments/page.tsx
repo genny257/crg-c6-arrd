@@ -171,11 +171,11 @@ export default function PaymentSettingsPage() {
           {editingService && (
             <div className="space-y-4 py-4">
                <div className="space-y-2">
-                <Label htmlFor="publicKey">Clé Publique</Label>
+                <Label htmlFor="publicKey">Clé Publique / Client ID</Label>
                 <Input id="publicKey" name="publicKey" value={editingService.apiKeys?.publicKey || ''} onChange={handleKeysChange} />
               </div>
                <div className="space-y-2">
-                <Label htmlFor="secretKey">Clé Secrète</Label>
+                <Label htmlFor="secretKey">Clé Secrète / Client Secret</Label>
                 <Input id="secretKey" name="secretKey" type="password" value={editingService.apiKeys?.secretKey || ''} onChange={handleKeysChange} />
               </div>
             </div>

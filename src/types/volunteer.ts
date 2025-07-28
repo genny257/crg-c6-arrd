@@ -36,4 +36,5 @@ export interface Volunteer {
   termsAccepted: boolean;
   createdAt: string;
   status: UserStatus;
+  isVolunteerOfTheMonth?: boolean;
 }

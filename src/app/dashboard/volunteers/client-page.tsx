@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { UserPlus, MoreHorizontal, Search, ArrowDownUp, Download, Check, X, Shield, Eye } from "lucide-react";
+import { UserPlus, MoreHorizontal, Search, ArrowDownUp, Download, Check, X, Shield, Eye, Star, UserCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Volunteer } from "@/types/volunteer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -83,7 +83,7 @@ export function VolunteersClientPage({ initialVolunteers, allCells, allProfessio
             setVolunteers(volunteers.map(v => v.id === id ? { ...v, status } : v));
             toast({
                 title: "Statut mis à jour",
-                description: `Le volontaire a été marqué comme ${status.toLowerCase()}.`,
+                description: `Le volontaire a été marqué comme ${statusText[status].toLowerCase()}.`,
             });
         } catch (error) {
             console.error("Error updating volunteer status: ", error);
@@ -94,6 +94,27 @@ export function VolunteersClientPage({ initialVolunteers, allCells, allProfessio
             });
         }
     };
+
+    const updateFeatureStatus = async (id: string, isFeatured: boolean) => {
+        if (!id || !token) return;
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/volunteers/${id}/feature`, {
+                method: 'PATCH',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ isFeatured })
+            });
+            if (!response.ok) throw new Error('Failed to update feature status');
+            
+            setVolunteers(volunteers.map(v => v.id === id ? { ...v, isVolunteerOfTheMonth: isFeatured } : v));
+            toast({ title: "Succès", description: `Le volontaire a été ${isFeatured ? 'mis en avant' : 'retiré'}.` });
+        } catch (error) {
+            console.error("Error updating feature status: ", error);
+            toast({ title: "Erreur", description: "Impossible de modifier le statut de mise en avant.", variant: "destructive" });
+        }
+    }
     
     const filteredAndSortedVolunteers = React.useMemo(() => {
         let sortedVolunteers = [...volunteers];
@@ -266,7 +287,10 @@ export function VolunteersClientPage({ initialVolunteers, allCells, allProfessio
                                                     <AvatarFallback>{volunteer.firstName?.[0]}{volunteer.lastName?.[0]}</AvatarFallback>
                                                 </Avatar>
                                                 <div>
-                                                    <div className="font-medium">{volunteer.lastName} {volunteer.firstName}</div>
+                                                    <div className="font-medium flex items-center gap-2">
+                                                        {volunteer.lastName} {volunteer.firstName}
+                                                        {volunteer.isVolunteerOfTheMonth && <Star className="h-4 w-4 text-amber-500 fill-current" />}
+                                                    </div>
                                                     <div className="text-sm text-muted-foreground">{volunteer.email}</div>
                                                 </div>
                                             </div>
@@ -313,6 +337,10 @@ export function VolunteersClientPage({ initialVolunteers, allCells, allProfessio
                                                             <Link href={`/dashboard/volunteers/${volunteer.id}`}>
                                                                 <Eye className="mr-2 h-4 w-4" /> Voir le profil
                                                             </Link>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => updateFeatureStatus(volunteer.id, !volunteer.isVolunteerOfTheMonth)}>
+                                                            {volunteer.isVolunteerOfTheMonth ? <UserCheck className="mr-2 h-4 w-4" /> : <Star className="mr-2 h-4 w-4" />}
+                                                            {volunteer.isVolunteerOfTheMonth ? 'Retirer de la sélection' : 'Mettre en avant'}
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem>
                                                             <Shield className="mr-2 h-4 w-4" /> Changer le statut

@@ -25,6 +25,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import type { Volunteer } from "@/types/volunteer"
 
 
 const initialContent: HomePageContent = {
@@ -145,24 +146,27 @@ export default function Home() {
   const [partners, setPartners] = React.useState<Partner[]>([]);
   const [carouselItems, setCarouselItems] = React.useState<CarouselItemData[]>([]);
   const [annualStats, setAnnualStats] = React.useState<AnnualStatData[]>([]);
+  const [volunteersOfMonth, setVolunteersOfMonth] = React.useState<Volunteer[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchContent = async () => {
       setLoading(true);
       try {
-        const [actionsRes, eventsRes, blogsRes, statsRes, partnersRes] = await Promise.all([
+        const [actionsRes, eventsRes, blogsRes, statsRes, partnersRes, featuredVolunteersRes] = await Promise.all([
            fetch(`${process.env.NEXT_PUBLIC_API_URL}/actions`),
            fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/featured`),
            fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/featured`),
            fetch(`${process.env.NEXT_PUBLIC_API_URL}/annual-stats/public`),
            fetch(`${process.env.NEXT_PUBLIC_API_URL}/partners`),
+           fetch(`${process.env.NEXT_PUBLIC_API_URL}/volunteers/featured`),
         ]);
 
         setContent(initialContent);
         setActions(actionsRes.ok ? await actionsRes.json() : []);
         setAnnualStats(statsRes.ok ? await statsRes.json() : []);
         setPartners(partnersRes.ok ? await partnersRes.json() : []);
+        setVolunteersOfMonth(featuredVolunteersRes.ok ? await featuredVolunteersRes.json() : []);
         
         const eventsData = eventsRes.ok ? await eventsRes.json() : [];
         const blogsData = blogsRes.ok ? await blogsRes.json() : [];
@@ -413,30 +417,18 @@ export default function Home() {
               </p>
             </div>
             <div className="mx-auto grid grid-cols-1 gap-6 pt-12 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="flex flex-col items-center text-center">
-                <Avatar className="h-32 w-32 mb-4 border-4 border-primary/20">
-                  <AvatarImage src="https://placehold.co/200x200.png" alt="Volontaire 1" data-ai-hint="female portrait" />
-                  <AvatarFallback>AV1</AvatarFallback>
-                </Avatar>
-                <h3 className="text-xl font-bold font-headline">Marie-Claire Dupont</h3>
-                <p className="text-muted-foreground">Pôle Secourisme</p>
-              </div>
-              <div className="flex flex-col items-center text-center">
-                 <Avatar className="h-32 w-32 mb-4 border-4 border-primary/20">
-                  <AvatarImage src="https://placehold.co/200x200.png" alt="Volontaire 2" data-ai-hint="male portrait" />
-                  <AvatarFallback>AV2</AvatarFallback>
-                </Avatar>
-                <h3 className="text-xl font-bold font-headline">Jean-Pierre Okoro</h3>
-                <p className="text-muted-foreground">Pôle Aide Sociale</p>
-              </div>
-              <div className="flex flex-col items-center text-center">
-                 <Avatar className="h-32 w-32 mb-4 border-4 border-primary/20">
-                  <AvatarImage src="https://placehold.co/200x200.png" alt="Volontaire 3" data-ai-hint="female portrait" />
-                  <AvatarFallback>AV3</AvatarFallback>
-                </Avatar>
-                <h3 className="text-xl font-bold font-headline">Aïcha Bongo</h3>
-                <p className="text-muted-foreground">Pôle Jeunesse</p>
-              </div>
+              {volunteersOfMonth.length > 0 ? volunteersOfMonth.map(v => (
+                 <div key={v.id} className="flex flex-col items-center text-center">
+                    <Avatar className="h-32 w-32 mb-4 border-4 border-primary/20">
+                      <AvatarImage src={v.photo || "https://placehold.co/200x200.png"} alt={`${v.firstName} ${v.lastName}`} />
+                      <AvatarFallback>{v.firstName?.[0]}{v.lastName?.[0]}</AvatarFallback>
+                    </Avatar>
+                    <h3 className="text-xl font-bold font-headline">{v.firstName} {v.lastName}</h3>
+                    <p className="text-muted-foreground">{v.assignedCell || 'Pôle non spécifié'}</p>
+                  </div>
+              )) : (
+                <p className="col-span-full text-center text-muted-foreground">Les volontaires du mois seront bientôt annoncés.</p>
+              )}
             </div>
           </div>
         </section>
