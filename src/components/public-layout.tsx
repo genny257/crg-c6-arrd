@@ -59,24 +59,24 @@ export function PublicLayout({ children }: { children: ReactNode }) {
         </Link>
         <nav className="ml-auto hidden lg:flex gap-4 sm:gap-6 items-center">
             
-            {!isHomePage && (
-                 <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Accueil</Link>
+            {isHomePage ? (
+                 <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="text-sm font-medium hover:underline underline-offset-4 px-0 flex items-center gap-1 text-primary">
+                            Explorer l'accueil <ChevronDown className="w-4 h-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        {homeSubLinks.map(link => (
+                            <DropdownMenuItem key={link.href} asChild>
+                                <Link href={link.href}>{link.label}</Link>
+                            </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            ) : (
+                <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">Accueil</Link>
             )}
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className={cn("text-sm font-medium hover:underline underline-offset-4 px-0 flex items-center gap-1", isHomePage && "text-primary")}>
-                  {isHomePage ? 'Navigation' : 'Explorer l\'accueil'} <ChevronDown className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {homeSubLinks.map(link => (
-                    <DropdownMenuItem key={link.href} asChild>
-                        <Link href={link.href}>{link.label}</Link>
-                    </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
 
             {visibleNavLinks.map(link => (
                 <Link key={link.href} href={link.href} className="text-sm font-medium hover:underline underline-offset-4">{link.label}</Link>
