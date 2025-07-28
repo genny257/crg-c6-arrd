@@ -196,11 +196,11 @@ export default function VolunteerProfilePage() {
                                     <div className="flex flex-wrap gap-2">
                                         {volunteer.causes.map((cause: string) => <Badge key={cause} variant="secondary">{cause}</Badge>)}
                                     </div>
-                                ) : <p>Non spécifié</p>}
+                                ) : <p className="text-sm text-muted-foreground">Non spécifié</p>}
                             </div>
                              <div className="md:col-span-2">
                                 <h4 className="font-semibold mb-2 flex items-center gap-2"><Shield className="h-4 w-4 text-muted-foreground"/> Cellule souhaitée</h4>
-                                {volunteer.assignedCell ? <Badge>{volunteer.assignedCell}</Badge> : <p>Non spécifiée</p>}
+                                {volunteer.assignedCell ? <Badge>{volunteer.assignedCell}</Badge> : <p className="text-sm text-muted-foreground">Non spécifiée</p>}
                             </div>
                         </CardContent>
                     </Card>
