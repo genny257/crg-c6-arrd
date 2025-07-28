@@ -14,7 +14,7 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog"
-import type { HomePageContent, AnnualStatData, ActionSection } from "@/types/homepage"
+import type { HomePageContent, AnnualStatData, ActionSection, Partner } from "@/types/homepage"
 import { Skeleton } from "@/components/ui/skeleton"
 import { PublicLayout } from "@/components/public-layout"
 import type { Event } from "@/types/event"
@@ -142,6 +142,7 @@ const StatsSection = ({ statsData }: { statsData: AnnualStatData[] }) => {
 export default function Home() {
   const [content, setContent] = React.useState<HomePageContent | null>(null);
   const [actions, setActions] = React.useState<ActionSection[]>([]);
+  const [partners, setPartners] = React.useState<Partner[]>([]);
   const [carouselItems, setCarouselItems] = React.useState<CarouselItemData[]>([]);
   const [annualStats, setAnnualStats] = React.useState<AnnualStatData[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -150,16 +151,18 @@ export default function Home() {
     const fetchContent = async () => {
       setLoading(true);
       try {
-        const [actionsRes, eventsRes, blogsRes, statsRes] = await Promise.all([
+        const [actionsRes, eventsRes, blogsRes, statsRes, partnersRes] = await Promise.all([
            fetch(`${process.env.NEXT_PUBLIC_API_URL}/actions`),
            fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/featured`),
            fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/featured`),
            fetch(`${process.env.NEXT_PUBLIC_API_URL}/annual-stats/public`),
+           fetch(`${process.env.NEXT_PUBLIC_API_URL}/partners`),
         ]);
 
         setContent(initialContent);
         setActions(actionsRes.ok ? await actionsRes.json() : []);
         setAnnualStats(statsRes.ok ? await statsRes.json() : []);
+        setPartners(partnersRes.ok ? await partnersRes.json() : []);
         
         const eventsData = eventsRes.ok ? await eventsRes.json() : [];
         const blogsData = blogsRes.ok ? await blogsRes.json() : [];
@@ -290,7 +293,7 @@ export default function Home() {
                         width={600}
                         height={400}
                         alt={action.title}
-                        data-ai-hint={action.imageHint}
+                        data-ai-hint={action.imageHint ?? undefined}
                         className={cn("mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full", index % 2 !== 0 && "lg:order-last")}
                       />
                       <div className="flex flex-col justify-center space-y-4">
@@ -449,26 +452,19 @@ export default function Home() {
             </div>
             <div className="divide-y divide-border rounded-lg border mt-12">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 place-items-center">
-                <div className="flex w-full items-center justify-center p-8">
-                  <Image src="https://placehold.co/150x60.png" alt="Partner Logo" width={140} height={70} data-ai-hint="government logo" className="grayscale transition-all duration-300 hover:grayscale-0" />
-                </div>
-                <div className="flex w-full items-center justify-center p-8">
-                  <Image src="https://placehold.co/150x60.png" alt="Partner Logo" width={140} height={70} data-ai-hint="unicef logo" className="grayscale transition-all duration-300 hover:grayscale-0" />
-                </div>
-                <div className="flex w-full items-center justify-center p-8">
-                  <Image src="https://placehold.co/150x60.png" alt="Partner Logo" width={140} height={70} data-ai-hint="who logo" className="grayscale transition-all duration-300 hover:grayscale-0" />
-                </div>
-                <div className="flex w-full items-center justify-center p-8">
-                  <Image src="https://placehold.co/150x60.png" alt="Partner Logo" width={140} height={70} data-ai-hint="corporate logo" className="grayscale transition-all duration-300 hover:grayscale-0" />
-                </div>
-                <div className="flex w-full items-center justify-center p-8">
-                  <Image src="https://placehold.co/150x60.png" alt="Partner Logo" width={140} height={70} data-ai-hint="bank logo" className="grayscale transition-all duration-300 hover:grayscale-0" />
-                </div>
+                 {partners.length > 0 ? partners.map(partner => (
+                    <div key={partner.id} className="flex w-full items-center justify-center p-8">
+                       <a href={partner.websiteUrl || '#'} target="_blank" rel="noopener noreferrer">
+                         <Image src={partner.logoUrl} alt={partner.name} width={140} height={70} className="grayscale transition-all duration-300 hover:grayscale-0" />
+                       </a>
+                    </div>
+                )) : (
+                  <p className="col-span-full text-center text-muted-foreground py-8">Nos partenaires seront affichés ici bientôt.</p>
+                )}
               </div>
             </div>
           </div>
         </section>
-
       </main>
     </PublicLayout>
   )

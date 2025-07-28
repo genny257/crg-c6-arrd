@@ -8,6 +8,10 @@ const sidebarNavItems = [
     href: "/dashboard/settings/actions",
   },
   {
+    title: "Partenaires",
+    href: "/dashboard/settings/partners",
+  },
+  {
     title: "Paiements",
     href: "/dashboard/settings/payments",
   },

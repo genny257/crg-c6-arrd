@@ -24,6 +24,7 @@ import eventRoutes from './routes/event.routes';
 import appointmentRoutes from './routes/appointment.routes';
 import annualStatRoutes from './routes/annual-stat.routes';
 import actionRoutes from './routes/action.routes';
+import partnerRoutes from './routes/partner.routes';
 import { loggingMiddleware } from './middleware/logging';
 
 // Charger les variables d'environnement
@@ -115,6 +116,7 @@ app.use('/api', eventRoutes);
 app.use('/api', appointmentRoutes);
 app.use('/api', annualStatRoutes);
 app.use('/api', actionRoutes);
+app.use('/api', partnerRoutes);
 
 
 // Route de base pour vérifier que le serveur fonctionne
