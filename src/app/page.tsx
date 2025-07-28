@@ -4,7 +4,7 @@ import * as React from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
-import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users, CheckCircle2, Droplets, Siren, Soup } from "lucide-react"
+import { HeartHandshake, BookOpenCheck, ShieldCheck, LifeBuoy, Users, CheckCircle2, Droplets, Siren, Soup, BarChart3 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   Dialog,
@@ -14,7 +14,7 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog"
-import type { HomePageContent } from "@/types/homepage"
+import type { HomePageContent, AnnualStatData } from "@/types/homepage"
 import { Skeleton } from "@/components/ui/skeleton"
 import { PublicLayout } from "@/components/public-layout"
 import type { Event } from "@/types/event"
@@ -22,6 +22,10 @@ import type { BlogPost } from "@/types/blog"
 import Autoplay from "embla-carousel-autoplay"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Progress } from "@/components/ui/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
 
 const initialContent: HomePageContent = {
     heroTitle: "Comité du 6ème Arrondissement",
@@ -62,23 +66,105 @@ type CarouselItemData = {
     date: string;
 };
 
+const StatsSection = ({ statsData }: { statsData: AnnualStatData[] }) => {
+    const [selectedYear, setSelectedYear] = React.useState<number>(new Date().getFullYear());
+
+    const availableYears = statsData.map(s => s.year).sort((a, b) => b - a);
+
+    React.useEffect(() => {
+        if (availableYears.length > 0) {
+            setSelectedYear(availableYears[0]);
+        }
+    }, [availableYears]);
+
+    const currentStats = statsData.find(s => s.year === selectedYear);
+    
+    const statsItems = currentStats ? [
+        { label: "Bases Communautaires Impliquées", value: currentStats.bases, goal: 20, color: "bg-accent" },
+        { label: "Agents de Santé Communautaires Formés", value: currentStats.agents, goal: 100, color: "bg-primary" },
+        { label: "Personnes Formées aux Soins de Premiers Secours", value: currentStats.firstAidGraduates, goal: 500, color: "bg-accent" },
+        { label: "Ménages Sinistrés Assistés", value: currentStats.assistedHouseholds, goal: 50, color: "bg-accent" },
+        { label: "Personnes Sensibilisées (VIH, SSR, VBG, COVID-19)", value: currentStats.sensitizedPeople, goal: 15000, color: "bg-primary" },
+        { label: "Préservatifs distribués", value: currentStats.condomsDistributed, goal: 10000, color: "bg-primary" }
+    ] : [];
+
+    const StatItem = ({ label, value, goal, color }: { label: string, value: number, goal: number, color: string }) => (
+        <div className="space-y-2">
+            <p className="text-sm font-medium">{label}</p>
+            <div className="flex items-center gap-2">
+                <Progress value={(value / goal) * 100} className="h-2 [&>div]:bg-transparent" indicatorClassName={color} />
+                <span className="font-bold text-lg">{value}</span>
+            </div>
+        </div>
+    );
+
+    return (
+        <section id="stats" className="w-full py-12 md:py-24 lg:py-32 bg-muted/40">
+            <div className="container px-4 md:px-6">
+                <div className="flex flex-col items-center justify-center space-y-4 text-center">
+                    <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Nos Résultats</div>
+                    <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Notre Impact en Chiffres</h2>
+                    <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                        Découvrez l'impact de nos actions sur le terrain. Votre soutien fait la différence.
+                    </p>
+                </div>
+
+                <div className="mx-auto max-w-5xl mt-12">
+                     <Card>
+                        <CardHeader className="flex-row items-center justify-between">
+                            <CardTitle className="flex items-center gap-2">
+                                <BarChart3 className="h-6 w-6 text-primary" />
+                                Statistiques Annuelles
+                            </CardTitle>
+                             <Select onValueChange={(value) => setSelectedYear(Number(value))} value={String(selectedYear)}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Choisir une année" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {availableYears.map(year => (
+                                        <SelectItem key={year} value={String(year)}>Année {year}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </CardHeader>
+                        <CardContent>
+                            {currentStats ? (
+                                <div className="grid md:grid-cols-2 gap-x-8 gap-y-6">
+                                    {statsItems.map(item => (
+                                        <StatItem key={item.label} {...item} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-center text-muted-foreground py-8">Aucune statistique disponible pour l'année sélectionnée.</p>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        </section>
+    );
+};
+
 
 export default function Home() {
   const [content, setContent] = React.useState<HomePageContent | null>(null);
   const [carouselItems, setCarouselItems] = React.useState<CarouselItemData[]>([]);
+  const [annualStats, setAnnualStats] = React.useState<AnnualStatData[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchContent = async () => {
       setLoading(true);
       try {
-        const [contentRes, eventsRes, blogsRes] = await Promise.all([
+        const [contentRes, eventsRes, blogsRes, statsRes] = await Promise.all([
            Promise.resolve(initialContent), // Mocking content fetch
            fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/featured`),
-           fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/featured`)
+           fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/featured`),
+           fetch(`${process.env.NEXT_PUBLIC_API_URL}/annual-stats/public`),
         ]);
 
         setContent(contentRes);
+        setAnnualStats(statsRes.ok ? await statsRes.json() : []);
         
         const eventsData = eventsRes.ok ? await eventsRes.json() : [];
         const blogsData = blogsRes.ok ? await blogsRes.json() : [];
@@ -255,7 +341,9 @@ export default function Home() {
           </div>
         </section>
         
-        <section id="engagement" className="w-full py-12 md:py-24 lg:py-32 flex flex-col items-center bg-muted/40">
+        <StatsSection statsData={annualStats} />
+
+        <section id="engagement" className="w-full py-12 md:py-24 lg:py-32 flex flex-col items-center">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               {loading ? (

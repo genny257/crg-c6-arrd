@@ -1,4 +1,3 @@
-
 export interface MonthlyData {
   name: string;
   count?: number;
@@ -25,4 +24,18 @@ export interface SecurityStats {
     totalThreats: number;
     totalBlocked: number;
     uniqueVisitors: number;
+}
+
+export interface AnnualStat {
+    id: string;
+    year: number;
+    bases: number;
+    agents: number;
+    firstAidGraduates: number;
+    assistedHouseholds: number;
+    sensitizedPeople: number;
+    condomsDistributed: number;
+    isVisible: boolean;
+    createdAt: string;
+    updatedAt: string;
 }

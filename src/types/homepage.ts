@@ -1,4 +1,3 @@
-
 export interface ActionSection {
   title: string;
   description: string;
@@ -24,4 +23,15 @@ export interface HomePageContent {
   heroDescription: string;
   actions: ActionSection[];
   engagement: EngagementSection;
+}
+
+export interface AnnualStatData {
+    id: string;
+    year: number;
+    bases: number;
+    agents: number;
+    firstAidGraduates: number;
+    assistedHouseholds: number;
+    sensitizedPeople: number;
+    condomsDistributed: number;
 }

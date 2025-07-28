@@ -21,7 +21,8 @@ import {
   Building,
   Shield,
   Banknote,
-  BookUser
+  BookUser,
+  BarChart3
 } from "lucide-react"
 
 import {
@@ -55,7 +56,8 @@ const mainNavItems = [
 const reportsNavItems = [
     { href: "/dashboard/donations", icon: HeartHandshake, label: "Dons" },
     { href: "/dashboard/sponsorships", icon: Building, label: "Mécénat", adminOnly: true },
-    { href: "/dashboard/analytics", icon: LineChart, label: "Statistiques", adminOnly: true },
+    { href: "/dashboard/analytics", icon: LineChart, label: "Analyses", adminOnly: true },
+    { href: "/dashboard/statistics", icon: BarChart3, label: "Statistiques", adminOnly: true },
 ]
 
 export function AppNav() {

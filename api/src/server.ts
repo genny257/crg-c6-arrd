@@ -22,6 +22,7 @@ import paymentRoutes from './routes/payment.routes';
 import archiveRoutes from './routes/archive.routes';
 import eventRoutes from './routes/event.routes';
 import appointmentRoutes from './routes/appointment.routes';
+import annualStatRoutes from './routes/annual-stat.routes';
 import { loggingMiddleware } from './middleware/logging';
 
 // Charger les variables d'environnement
@@ -111,6 +112,7 @@ app.use('/api', paymentRoutes);
 app.use('/api', archiveRoutes);
 app.use('/api', eventRoutes);
 app.use('/api', appointmentRoutes);
+app.use('/api', annualStatRoutes);
 
 
 // Route de base pour vérifier que le serveur fonctionne
