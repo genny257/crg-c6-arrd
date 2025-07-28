@@ -1,6 +1,7 @@
+
 // src/routes/donation.routes.ts
 import { Router } from 'express';
-import { createDonation, getDonations, confirmDonation } from '../controllers/donation.controller';
+import { createDonation, getDonations, confirmDonation, getDonationsSummary } from '../controllers/donation.controller';
 import { protect } from '../middleware/auth';
 import { UserRole } from '@prisma/client';
 
@@ -17,5 +18,7 @@ router.post('/donations', createDonation);
 router.post('/donations/confirm', protect, isAdmin, confirmDonation);
 
 router.get('/donations', protect, isAdmin, getDonations);
+router.get('/donations/summary', protect, isAdmin, getDonationsSummary);
+
 
 export default router;

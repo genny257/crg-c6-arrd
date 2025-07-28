@@ -114,3 +114,35 @@ export const getDonations = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error fetching donations', error });
   }
 };
+
+const summarySchema = z.object({
+  from: z.coerce.date(),
+  to: z.coerce.date(),
+  limit: z.coerce.number().int().positive().default(100),
+  offset: z.coerce.number().int().nonnegative().default(0),
+});
+
+export const getDonationsSummary = async (req: Request, res: Response) => {
+    try {
+        const { from, to, limit, offset } = summarySchema.parse(req.query);
+
+        // Convert dates to EPOCH format (seconds)
+        const fromEpoch = Math.floor(from.getTime() / 1000);
+        const toEpoch = Math.floor(to.getTime() / 1000);
+
+        const summary = await airtelService.getTransactionsSummary({
+            from: fromEpoch,
+            to: toEpoch,
+            limit,
+            offset
+        });
+        
+        res.status(200).json(summary);
+
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return res.status(400).json({ message: 'Validation failed', errors: error.flatten().fieldErrors });
+        }
+        res.status(500).json({ message: 'Error fetching donations summary', error: (error as Error).message });
+    }
+}

@@ -119,3 +119,45 @@ export async function initiateCashIn({ msisdn, amount, transactionId, pin }: Cas
 
     return responseData;
 }
+
+interface TransactionsSummaryPayload {
+    from: number;
+    to: number;
+    limit: number;
+    offset: number;
+}
+/**
+ * Retrieves a summary of transactions for a defined period.
+ */
+export async function getTransactionsSummary({ from, to, limit, offset }: TransactionsSummaryPayload) {
+    if (!BASE_URL || !CLIENT_ID || !CLIENT_SECRET || !COUNTRY || !CURRENCY) {
+        throw new Error("Airtel API environment variables are not configured.");
+    }
+    const token = await getAuthToken();
+
+    const queryParams = new URLSearchParams({
+        from: from.toString(),
+        to: to.toString(),
+        limit: limit.toString(),
+        offset: offset.toString()
+    });
+
+    const response = await fetch(`${BASE_URL}/merchant/v1/transactions?${queryParams.toString()}`, {
+        method: 'GET',
+        headers: {
+            'Accept': '*/*',
+            'X-Country': COUNTRY,
+            'X-Currency': CURRENCY,
+            'Authorization': `Bearer ${token}`
+        },
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok || !responseData.status.success) {
+        console.error("Airtel Transaction Summary Error:", responseData);
+        throw new Error(responseData.status.message || "Failed to fetch transaction summary");
+    }
+
+    return responseData;
+}
