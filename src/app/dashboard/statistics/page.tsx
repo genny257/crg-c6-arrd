@@ -39,7 +39,7 @@ export default function StatisticsPage() {
     const [stats, setStats] = React.useState<AnnualStat[]>([]);
     const [loading, setLoading] = React.useState(true);
     const [isSaving, setIsSaving] = React.useState(false);
-    const [editingStat, setEditingStat] = React.useState<AnnualStat | null>(null);
+    const [editingStat, setEditingStat] = React.useState<Partial<AnnualStat> | null>(null);
 
     const fetchStats = React.useCallback(async () => {
         if (!token) return;
@@ -66,26 +66,7 @@ export default function StatisticsPage() {
         }
     }, [user, authLoading, router, fetchStats]);
 
-    const handleToggleVisibility = async (stat: AnnualStat) => {
-        await handleSave({ ...stat, isVisible: !stat.isVisible });
-    };
-    
-    const handleDelete = async (id: string) => {
-        if (!token) return;
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/annual-stats/${id}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (!response.ok) throw new Error("La suppression a échoué.");
-            toast({ title: "Succès", description: "Statistique supprimée." });
-            fetchStats();
-        } catch (error) {
-            toast({ title: "Erreur", description: "La suppression a échoué.", variant: "destructive" });
-        }
-    }
-
-    const handleSave = async (stat: AnnualStat) => {
+    const handleSave = async (stat: Partial<AnnualStat>) => {
         setIsSaving(true);
         const isNew = !stat.id;
         const url = isNew ? `${process.env.NEXT_PUBLIC_API_URL}/annual-stats` : `${process.env.NEXT_PUBLIC_API_URL}/annual-stats/${stat.id}`;
@@ -107,6 +88,25 @@ export default function StatisticsPage() {
             setIsSaving(false);
         }
     };
+
+    const handleDelete = async (id: string) => {
+        if (!token) return;
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/annual-stats/${id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error("La suppression a échoué.");
+            toast({ title: "Succès", description: "Statistique supprimée." });
+            fetchStats();
+        } catch (error) {
+            toast({ title: "Erreur", description: "La suppression a échoué.", variant: "destructive" });
+        }
+    }
+    
+    const handleToggleVisibility = async (stat: AnnualStat) => {
+        await handleSave({ id: stat.id, isVisible: !stat.isVisible });
+    };
     
     if (authLoading) return <div>Chargement...</div>;
     
@@ -114,15 +114,15 @@ export default function StatisticsPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                  <h1 className="text-3xl font-headline font-bold">Statistiques Annuelles</h1>
-                 <Button onClick={() => setEditingStat({ year: new Date().getFullYear() } as AnnualStat)}>
-                     <PlusCircle className="mr-2 h-4 w-4" /> Ajouter des stats
+                 <Button onClick={() => setEditingStat({ year: new Date().getFullYear(), isVisible: true })}>
+                     <PlusCircle className="mr-2 h-4 w-4" /> Ajouter une année
                  </Button>
             </div>
             
             <Card>
                 <CardHeader>
                     <CardTitle>Historique des statistiques</CardTitle>
-                    <CardDescription>Gérez les données d'impact affichées publiquement.</CardDescription>
+                    <CardDescription>Gérez les données d'impact affichées publiquement sur la page d'accueil.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -165,6 +165,7 @@ export default function StatisticsPage() {
 
             {editingStat && (
                 <StatEditor
+                    key={editingStat.id || 'new'}
                     stat={editingStat}
                     onSave={handleSave}
                     onCancel={() => setEditingStat(null)}
@@ -175,16 +176,16 @@ export default function StatisticsPage() {
     );
 }
 
-const StatEditor = ({ stat, onSave, onCancel, isSaving }: { stat: AnnualStat, onSave: (data: any) => void, onCancel: () => void, isSaving: boolean }) => {
+const StatEditor = ({ stat, onSave, onCancel, isSaving }: { stat: Partial<AnnualStat>, onSave: (data: any) => void, onCancel: () => void, isSaving: boolean }) => {
     const [formData, setFormData] = React.useState(stat);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: Number(value) }));
+        const { name, value, type } = e.target;
+        setFormData(prev => ({ ...prev, [name]: type === 'number' ? Number(value) : value }));
     };
     
     const fields: (keyof AnnualStat)[] = ['bases', 'agents', 'firstAidGraduates', 'assistedHouseholds', 'sensitizedPeople', 'condomsDistributed'];
-    const labels: Record<keyof AnnualStat, string> = {
+    const labels: Record<string, string> = {
         bases: 'Bases Communautaires',
         agents: 'Agents de Santé',
         firstAidGraduates: 'Personnes Formées (Secourisme)',
@@ -201,13 +202,13 @@ const StatEditor = ({ stat, onSave, onCancel, isSaving }: { stat: AnnualStat, on
             <CardContent className="space-y-4">
                  <div>
                     <Label htmlFor="year">Année</Label>
-                    <Input id="year" name="year" type="number" value={formData.year} onChange={handleChange} />
+                    <Input id="year" name="year" type="number" value={formData.year || ''} onChange={handleChange} />
                 </div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {fields.map(field => (
                         <div key={field}>
                             <Label htmlFor={String(field)}>{labels[field]}</Label>
-                            <Input id={String(field)} name={String(field)} type="number" value={formData[field] || ''} onChange={handleChange} />
+                            <Input id={String(field)} name={String(field)} type="number" value={formData[field as keyof AnnualStat] as number || ''} onChange={handleChange} />
                         </div>
                     ))}
                 </div>

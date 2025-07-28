@@ -10,6 +10,10 @@ export const getAllVolunteers = async (): Promise<User[]> => {
         orderBy: {
             createdAt: 'desc',
         },
+         include: {
+            skills: { select: { name: true } },
+            profession: { select: { name: true } },
+        }
     });
 };
 
@@ -72,6 +76,7 @@ export const getVolunteersOfTheMonth = async (): Promise<User[]> => {
             lastName: true,
             photo: true,
             assignedCell: true,
+            isVolunteerOfTheMonth: true,
         }
     });
 };
